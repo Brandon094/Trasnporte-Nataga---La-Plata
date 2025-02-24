@@ -1,0 +1,169 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".Reservas">
+
+    <!-- Título -->
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/seleccionaAsiento"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Sección de Cabina -->
+
+    <!-- Distribución de asientos en la cabina -->
+    <TextView
+        android:id="@+id/textCabina"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="@string/asientosCabina"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView5" />
+
+    <!-- Sección de Asientos en la parte trasera -->
+
+    <!-- Distribución de asientos en la parte trasera -->
+
+    <!-- Botón Confirmar Reserva -->
+    <GridLayout
+        android:id="@+id/layoutCabina"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:columnCount="3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textCabina">
+
+        <!-- Conductor -->
+        <Button
+            android:id="@+id/btnConductor"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:backgroundTint="@android:color/darker_gray"
+            android:enabled="false"
+            android:text="@string/chofer"
+            android:textColor="@android:color/white" />  <!-- No seleccionable -->
+
+        <!-- Asientos de la cabina -->
+        <Button
+            android:id="@+id/btnAsiento1"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento1" />
+
+        <Button
+            android:id="@+id/btnAsiento2"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento2" />
+
+        <Button
+            android:id="@+id/btnAsiento3"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento3" />
+
+        <Button
+            android:id="@+id/btnAsiento4"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento4" />
+
+        <Button
+            android:id="@+id/btnAsiento5"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento5" />
+    </GridLayout>
+
+    <TextView
+        android:id="@+id/textCarga"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
+        android:text="@string/asientosAtras"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutCabina" />
+
+    <GridLayout
+        android:id="@+id/gridAsientos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:columnCount="3"
+        android:rowCount="3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textCarga">
+
+        <Button
+            android:id="@+id/btnAsiento6"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento6" />
+
+        <Button
+            android:id="@+id/btnAsiento7"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento7" />
+
+        <Button
+            android:id="@+id/btnAsiento8"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento8" />
+
+        <Button
+            android:id="@+id/btnAsiento9"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento9" />
+
+        <Button
+            android:id="@+id/btnAsiento10"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento10" />
+
+        <Button
+            android:id="@+id/btnAsiento11"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento11" />
+
+        <Button
+            android:id="@+id/btnAsiento12"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento12" />
+
+        <Button
+            android:id="@+id/btnAsiento13"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento13" />
+
+        <Button
+            android:id="@+id/btnAsiento14"
+            style="@style/AsientoStyle"
+            android:text="@string/asiento14" />
+    </GridLayout>
+
+    <Button
+        android:id="@+id/buttonConfirmar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="@string/confirmarReserva"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gridAsientos" />
+</androidx.constraintlayout.widget.ConstraintLayout>
