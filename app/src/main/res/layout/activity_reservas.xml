@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context=".Reservas">
+    tools:context=".activities.Reservas">
 
     <!-- Título -->
     <TextView
@@ -19,8 +19,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Sección de Cabina -->
+    <RadioGroup
+        android:id="@+id/radioGroupRuta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/textView5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
 
+        <RadioButton
+            android:id="@+id/rbNatagaLaPlata"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Natagá → La Plata" />
+
+        <RadioButton
+            android:id="@+id/rbLaPlataNataga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="La Plata → Natagá" />
+    </RadioGroup>
+
+
+    <!-- Sección de Cabina -->
     <!-- Distribución de asientos en la cabina -->
     <TextView
         android:id="@+id/textCabina"
@@ -33,13 +56,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView5" />
+        app:layout_constraintTop_toBottomOf="@id/radioGroupRuta" />
 
-    <!-- Sección de Asientos en la parte trasera -->
-
-    <!-- Distribución de asientos en la parte trasera -->
-
-    <!-- Botón Confirmar Reserva -->
     <GridLayout
         android:id="@+id/layoutCabina"
         android:layout_width="wrap_content"
@@ -87,6 +105,7 @@
             android:text="@string/asiento5" />
     </GridLayout>
 
+    <!-- Sección de Asientos en la parte trasera -->
     <TextView
         android:id="@+id/textCarga"
         android:layout_width="wrap_content"
@@ -100,6 +119,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutCabina" />
 
+    <!-- Distribución de asientos en la parte trasera -->
     <GridLayout
         android:id="@+id/gridAsientos"
         android:layout_width="wrap_content"
@@ -157,11 +177,12 @@
             android:text="@string/asiento14" />
     </GridLayout>
 
+    <!-- Botón Confirmar Reserva -->
     <Button
         android:id="@+id/buttonConfirmar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="20dp"
         android:text="@string/confirmarReserva"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

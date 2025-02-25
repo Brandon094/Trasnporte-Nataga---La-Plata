@@ -1,8 +1,10 @@
-package com.chopcode.trasnportenataga_laplata;
+package com.chopcode.trasnportenataga_laplata.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.chopcode.trasnportenataga_laplata.R;
 
 public class EditarPerfil extends AppCompatActivity {
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    tools:context=".InicioConductor">
+    tools:context=".activities.InicioConductor">
 
     <!-- Título general del panel de conductor -->
     <TextView

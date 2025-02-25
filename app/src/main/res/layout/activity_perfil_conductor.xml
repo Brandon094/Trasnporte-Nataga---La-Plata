@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    tools:context=".PerfilConductor">
+    tools:context=".activities.PerfilConductor">
 
     <!-- Imagen de perfil circular -->
     <de.hdodenhof.circleimageview.CircleImageView

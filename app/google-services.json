@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "175264872585",
+    "firebase_url": "https://trasnporte-nataga---la-plata-default-rtdb.firebaseio.com",
+    "project_id": "trasnporte-nataga---la-plata",
+    "storage_bucket": "trasnporte-nataga---la-plata.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175264872585:android:af9ca6f6aa555d9ef72e58",
+        "android_client_info": {
+          "package_name": "com.chopcode.trasnportenataga_laplata"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpxgTKGvh3jJYylT6Qr6p2amgHmMzCTZQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

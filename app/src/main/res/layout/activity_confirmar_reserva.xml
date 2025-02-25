@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context=".ConfirmarReserva">
+    tools:context=".activities.ConfirmarReserva">
 
     <!-- Título -->
     <TextView
@@ -33,7 +33,7 @@
 
     <!-- Sección de detalles del viaje -->
     <TextView
-        android:id="@+id/textView8"
+        android:id="@+id/tvHoraSalida"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/horaSalida"
@@ -42,65 +42,65 @@
         android:layout_marginTop="8dp"/>
 
     <TextView
-        android:id="@+id/textView9"
+        android:id="@+id/tvAsientoReservado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/asientoReservado"
-        app:layout_constraintTop_toBottomOf="@id/textView8"
+        app:layout_constraintTop_toBottomOf="@id/tvHoraSalida"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"/>
 
     <TextView
-        android:id="@+id/textView12"
+        android:id="@+id/tvPrecio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/precio"
-        app:layout_constraintTop_toBottomOf="@id/textView9"
+        app:layout_constraintTop_toBottomOf="@id/tvAsientoReservado"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"/>
 
     <TextView
-        android:id="@+id/textView13"
+        android:id="@+id/tvOrigen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/origen"
-        app:layout_constraintTop_toBottomOf="@id/textView12"
+        app:layout_constraintTop_toBottomOf="@id/tvPrecio"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"/>
 
     <TextView
-        android:id="@+id/textView14"
+        android:id="@+id/tvDestino"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/destino"
-        app:layout_constraintTop_toBottomOf="@id/textView13"
+        app:layout_constraintTop_toBottomOf="@id/tvOrigen"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"/>
 
     <TextView
-        android:id="@+id/textView15"
+        android:id="@+id/tvTiempoEstimado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/tiempoEstimado"
-        app:layout_constraintTop_toBottomOf="@id/textView14"
+        app:layout_constraintTop_toBottomOf="@id/tvDestino"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"/>
 
     <TextView
-        android:id="@+id/textView16"
+        android:id="@+id/tvMetodoPago"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/metodoPago"
-        app:layout_constraintTop_toBottomOf="@id/textView15"
+        app:layout_constraintTop_toBottomOf="@id/tvTiempoEstimado"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"/>
 
     <TextView
-        android:id="@+id/textView17"
+        android:id="@+id/tvEstadoReserva"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/estadoReserva"
-        app:layout_constraintTop_toBottomOf="@id/textView16"
+        app:layout_constraintTop_toBottomOf="@id/tvMetodoPago"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"/>
 
@@ -111,12 +111,12 @@
         android:layout_height="wrap_content"
         android:text="@string/datosVehiculo"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/textView17"
+        app:layout_constraintTop_toBottomOf="@id/tvEstadoReserva"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="20dp"/>
 
     <TextView
-        android:id="@+id/textView11"
+        android:id="@+id/tvPlaca"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/placaVehiculo"
@@ -125,17 +125,17 @@
         android:layout_marginTop="8dp"/>
 
     <TextView
-        android:id="@+id/textView10"
+        android:id="@+id/tvConductor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/nombreConductor"
-        app:layout_constraintTop_toBottomOf="@id/textView11"
+        app:layout_constraintTop_toBottomOf="@id/tvPlaca"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"/>
 
     <!-- Botón Confirmar -->
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/btnConfirmarReserva"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -145,11 +145,11 @@
         android:textColor="@android:color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/button3"/>
+        app:layout_constraintBottom_toTopOf="@id/btnCancelar"/>
 
     <!-- Botón Cancelar -->
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/btnCancelar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"

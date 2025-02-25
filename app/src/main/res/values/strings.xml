@@ -100,5 +100,6 @@
     <!-- Botones -->
     <string name="editarPerfil">Editar perfil</string>
     <string name="cerrarSesion">Cerrar sesión</string>
+    <string name="ruta_hora">Ruta - Hora</string>
 
 </resources>

@@ -13,30 +13,29 @@
         android:theme="@style/Theme.TrasnporteNatagaLaPlata"
         tools:targetApi="31">
         <activity
-            android:name=".EditarPerfil"
+            android:name=".activities.EditarPerfil"
             android:exported="false" />
         <activity
-            android:name=".PerfilConductor"
+            android:name=".activities.PerfilConductor"
             android:exported="false" />
         <activity
-            android:name=".InicioConductor"
+            android:name=".activities.InicioConductor"
             android:exported="false" />
         <activity
-            android:name=".RegistroUsuarios"
+            android:name=".activities.RegistroUsuarios"
             android:exported="false" />
         <activity
-            android:name=".InicioDeSesion"
+            android:name=".activities.InicioDeSesion"
             android:exported="false" />
         <activity
-            android:name=".ConfirmarReserva"
+            android:name=".activities.ConfirmarReserva"
             android:exported="false" />
         <activity
-            android:name=".Reservas"
+            android:name=".activities.Reservas"
             android:exported="false"
-            android:label="@string/title_activity_reservas"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata" />
         <activity
-            android:name=".Inicio"
+            android:name=".activities.InicioUsuarios"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
