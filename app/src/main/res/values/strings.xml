@@ -1,37 +1,37 @@
 <resources>
     <!-- Nombre de la app -->
-    <string name="app_name">Transporte Natagá - La Plata</string>
+    <string name="app_name">🚍 Transporte Natagá - La Plata</string>
 
     <!-- Interfaz de inicio de sesión -->
-    <string name="inicioSesion">Iniciar sesión</string>
-    <!-- Botones ingresar -->
-    <string name="ingresar">Ingresar</string>
-    <string name="ingresarGoogle"> Iniciar sesión con Google</string>
-    <string name="noTieneCuenta">¿No tienes cuenta?</string>
-    <string name="registrate">Registrate</string>
+    <string name="inicioSesion">🔐 Iniciar sesión</string>
+    <!-- Botones para ingresar -->
+    <string name="ingresar">👉 Ingresar</string>
+    <string name="ingresarGoogle">🔵 Iniciar sesión con Google</string>
+    <string name="noTieneCuenta">❓ ¿No tienes cuenta?</string>
+    <string name="registrate">📝 Regístrate</string>
 
     <!-- Interfaz Registro de usuarios -->
-    <string name="crearCuenta">Crear cuenta</string>
-    <string name="nombreCompleto">Nombre Completo</string>
-    <string name="correo">Correo Electrónico</string>
-    <string name="telefono">Teléfono (Opcional)</string>
-    <string name="contraseña">Contraseña</string>
-    <string name="confirmarContraseña">Confirmar Contraseña</string>
-    <!-- Botón registrarse -->
-    <string name="regsitrarse">Registrarse</string>
+    <string name="crearCuenta">🆕 Crear cuenta</string>
+    <string name="nombreCompleto">👤 Nombre Completo</string>
+    <string name="correo">📧 Correo Electrónico</string>
+    <string name="telefono">📞 Teléfono (Opcional)</string>
+    <string name="contraseña">🔑 Contraseña</string>
+    <string name="confirmarContraseña">🔑 Confirmar Contraseña</string>
+    <!-- Botón para registrarse -->
+    <string name="regsitrarse">✅ Registrarse</string>
     <!-- Texto "¿Ya tienes cuenta?" -->
-    <string name="iniciaSesion">¿Ya tienes cuenta? Inicia sesión aquí</string>
+    <string name="iniciaSesion">👈 ¿Ya tienes cuenta? Inicia sesión aquí</string>
 
     <!-- Interfaz principal -->
-    <string name="horarios">Horarios de rutas</string>
-    <string name="nataga">Natagá → La Plata</string>
-    <string name="laPlata">La Plata → Natagá</string>
+    <string name="horarios">🕒 Horarios de rutas</string>
+    <string name="nataga">📍Natagá →\n La Plata🏁</string>
+    <string name="laPlata">📍La Plata →\n Natagá🏁</string>
 
     <!-- Botón reservar puesto -->
-    <string name="reservar">Reservar puesto</string>
+    <string name="reservar">💺 Reservar puesto</string>
 
     <!-- Interfaz de selección de asientos -->
-    <string name="seleccionaAsiento">Selecciona tu asiento</string>
+    <string name="seleccionaAsiento">💺 Selecciona tu asiento</string>
     <string name="asientosCabina">🚖 Asientos en la cabina</string>
 
     <!-- Asientos en la cabina -->
@@ -55,15 +55,15 @@
     <string name="asiento14">14</string>
 
     <!-- Botón para confirmar la reserva -->
-    <string name="confirmarReserva">Confirmar reserva</string>
+    <string name="confirmarReserva">✅ Confirmar reserva</string>
 
     <!-- Interfaz de confirmación de reserva -->
-    <string name="infoReserva">Información de reserva:</string>
+    <string name="infoReserva">ℹ️ Información de reserva:</string>
     <string name="horaSalida">🕒 Hora de salida:</string>
     <string name="asientoReservado">💺 Asiento reservado:</string>
     <string name="precio">💰 Precio:</string>
     <string name="origen">📍 Origen:</string>
-    <string name="destino">📍 Destino:</string>
+    <string name="destino">🏁 Destino:</string>
     <string name="tiempoEstimado">⏳ Tiempo Estimado:</string>
     <string name="metodoPago">💳 Método de Pago:</string>
     <string name="estadoReserva">📌 Estado de la Reserva:</string>
@@ -78,30 +78,29 @@
     <string name="cancelar">❌ Cancelar</string>
 
     <!-- Interfaz de inicio conductor -->
-    <string name="reservasActivas">Total de reservas activas:</string>
-    <string name="ingresosDiarios">Ingresos totales diarios:</string>
-    <string name="proximasRutas">Próxima ruta:</string>
+    <string name="reservasActivas">✅ Total de reservas activas:</string>
+    <string name="ingresosDiarios">💰 Ingresos totales diarios:</string>
+    <string name="proximasRutas">📍 Próxima ruta:</string>
 
     <!-- Elementos adicionales para la interfaz del conductor -->
-    <string name="panelConductor">Panel del Conductor</string>
-    <string name="verReservas">Ver Reservas</string>
-    <string name="totalIngresos">Total de Ingresos:</string>
-    <string name="verEstadisticas">Ver Estadísticas</string>
-    <string name="perfilConductor">Perfil del Conductor</string>
-    <string name="actualizarDatos">Actualizar Datos</string>
-    <string name="notificaciones">Notificaciones</string>
+    <string name="panelConductor">👨‍✈️ Panel del Conductor</string>
+    <string name="verReservas">📋 Ver Reservas</string>
+    <string name="totalIngresos">💵 Total de Ingresos:</string>
+    <string name="verEstadisticas">📊 Ver Estadísticas</string>
+    <string name="perfilConductor">👤 Perfil del Conductor</string>
+    <string name="actualizarDatos">✏️ Actualizar Datos</string>
+    <string name="notificaciones">🔔 Notificaciones</string>
 
     <!-- Interfaz de Perfil -->
-
-    <!-- Datos del vehiculo -->
-    <string name="modelo">Modelo:</string>
-    <string name="capacidad">Capacidad:</string>
-    <string name="placa">Placa:</string>
+    <!-- Datos del vehículo -->
+    <string name="modelo">🛻 Modelo:</string>
+    <string name="capacidad">👥 Capacidad:</string>
+    <string name="placa">🚗 Placa:</string>
     <!-- Botones -->
-    <string name="editarPerfil">Editar perfil</string>
-    <string name="cerrarSesion">Cerrar sesión</string>
-    <string name="ruta_hora">Ruta - Hora</string>
+    <string name="editarPerfil">✏️ Editar perfil</string>
+    <string name="cerrarSesion">🚪 Cerrar sesión</string>
+    <string name="ruta_hora">🕒 Ruta - Hora</string>
 
-    <!-- api key autentication google -->
+    <!-- API key de autenticación de Google -->
     <string name="default_web_client_id">175264872585-abombvqq36bqqeet86onnhkf7uep6c60.apps.googleusercontent.com</string>
 </resources>
