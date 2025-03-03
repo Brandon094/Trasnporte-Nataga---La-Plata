@@ -8,11 +8,6 @@
     tools:context=".activities.InicioDeSesion">
 
     <!-- Título -->
-
-    <!-- Campo Usuario -->
-
-    <!-- Campo Contraseña con botón para mostrar/ocultar -->
-
     <TextView
         android:id="@+id/textView7"
         android:layout_width="wrap_content"
@@ -29,16 +24,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
-    <!-- Botón para iniciar sesión -->
-
-    <!-- Línea divisoria -->
-
-    <!-- Botón de Google -->
-
-    <!-- Texto de "No tienes cuenta?" -->
-
-    <!-- Botón de Registro -->
-
+    <!-- Campo correo electronico -->
     <EditText
         android:id="@+id/editTextUsuario"
         android:layout_width="match_parent"
@@ -53,6 +39,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
+    <!-- Campo Contraseña con botón para mostrar/ocultar -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
@@ -74,7 +61,7 @@
             android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@id/btnMostrarContrasena"
             app:layout_constraintStart_toStartOf="parent" />
-
+    <!-- Boton para ocultar contraseña -->
         <ImageButton
             android:id="@+id/btnMostrarContrasena"
             android:layout_width="40dp"
@@ -84,8 +71,10 @@
             android:src="@drawable/baseline_remove_red_eye_24"
             app:layout_constraintEnd_toEndOf="parent"
             tools:layout_editor_absoluteY="0dp" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Boton ingresar -->
     <Button
         android:id="@+id/buttonIngresar"
         android:layout_width="match_parent"
@@ -98,7 +87,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
-
+    <!-- Línea divisoria -->
     <View
         android:id="@+id/view"
         android:layout_width="match_parent"
@@ -108,21 +97,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnGoogleSignIn" />
-
-    <Button
+    <!-- Botón ingresar con Google -->
+    <com.google.android.gms.common.SignInButton
         android:id="@+id/btnGoogleSignIn"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="10dp"
-        android:backgroundTint="@color/white"
-        android:drawablePadding="10dp"
-        android:text="@string/ingresarGoogle"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonIngresar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonIngresar" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Texto de "No tienes cuenta?" -->
     <TextView
         android:id="@+id/textViewRegistro"
         android:layout_width="wrap_content"
