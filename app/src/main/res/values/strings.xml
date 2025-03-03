@@ -6,7 +6,7 @@
     <string name="inicioSesion">Iniciar sesión</string>
     <!-- Botones ingresar -->
     <string name="ingresar">Ingresar</string>
-    <string name="ingresarGoogle">Iniciar sesión con Google</string>
+    <string name="ingresarGoogle"> Iniciar sesión con Google</string>
     <string name="noTieneCuenta">¿No tienes cuenta?</string>
     <string name="registrate">Registrate</string>
 
@@ -102,4 +102,6 @@
     <string name="cerrarSesion">Cerrar sesión</string>
     <string name="ruta_hora">Ruta - Hora</string>
 
+    <!-- api key autentication google -->
+    <string name="default_web_client_id">175264872585-abombvqq36bqqeet86onnhkf7uep6c60.apps.googleusercontent.com</string>
 </resources>
