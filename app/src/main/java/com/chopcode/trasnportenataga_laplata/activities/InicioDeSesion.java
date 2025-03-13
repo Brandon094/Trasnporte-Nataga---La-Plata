@@ -72,10 +72,14 @@ public class InicioDeSesion extends AppCompatActivity {
         });
 
         // Manejar botón de registro
-        buttonRegistro.setOnClickListener(v -> {
-            Intent intent = new Intent(InicioDeSesion.this, RegistroUsuarios.class);
-            startActivity(intent);
-        });
+        if (buttonRegistro != null) {
+            buttonRegistro.setOnClickListener(v -> {
+                Intent intent = new Intent(InicioDeSesion.this, RegistroUsuarios.class);
+                startActivity(intent);
+            });
+        } else {
+            Log.e("InicioDeSesion", "Error: buttonRegistro es null. Verifica el ID en el XML.");
+        }
 
         // Manejar inicio de sesión con Google
         btnGoogleSignIn.setOnClickListener(v -> {
