@@ -13,6 +13,7 @@ import com.google.android.gms.auth.api.identity.SignInCredential;
 import com.google.android.gms.common.api.ApiException;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import androidx.annotation.NonNull;
@@ -23,6 +24,7 @@ public class IniciarService {
     private Activity activity;
     private SignInClient oneTapClient;
     private BeginSignInRequest signInRequest;
+    private RegistroService registroService;
     public static final int REQ_ONE_TAP = 123;
 
     // Interfaz para callbacks de inicio de sesión
@@ -35,6 +37,7 @@ public class IniciarService {
     public IniciarService(Activity activity) {
         this.activity = activity;
         auth = FirebaseAuth.getInstance();
+        registroService = new RegistroService();
         oneTapClient = Identity.getSignInClient(activity);
         signInRequest = BeginSignInRequest.builder()
                 .setGoogleIdTokenRequestOptions(
@@ -81,7 +84,7 @@ public class IniciarService {
     }
 
     /**
-     * Maneja el resultado del inicio de sesión con Google.
+     * 🔥 Maneja el inicio de sesión con Google y guarda el usuario en Firebase si no existe.
      */
     public void manejarResultadoGoogle(Intent data, @NonNull LoginCallback callback) {
         try {
@@ -92,7 +95,23 @@ public class IniciarService {
                 auth.signInWithCredential(firebaseCredential)
                         .addOnCompleteListener(activity, task -> {
                             if (task.isSuccessful()) {
-                                callback.onLoginSuccess();
+                                FirebaseUser user = auth.getCurrentUser();
+                                if (user != null) {
+                                    // 🔥 Guardamos el usuario en Firebase si no existe
+                                    registroService.guardarUsuarioSiNoExiste(user, new RegistroService.RegistroCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            callback.onLoginSuccess();
+                                        }
+
+                                        @Override
+                                        public void onFailure(String error) {
+                                            callback.onLoginFailure("Usuario autenticado, pero fallo el registro en BD: " + error);
+                                        }
+                                    });
+                                } else {
+                                    callback.onLoginFailure("No se pudo obtener el usuario de Firebase.");
+                                }
                             } else {
                                 callback.onLoginFailure(task.getException().getMessage());
                             }
