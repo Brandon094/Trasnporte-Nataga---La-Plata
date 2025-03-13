@@ -63,12 +63,5 @@ public class RegistroUsuarios extends AppCompatActivity {
                 });
             }
         });
-
-        // Manejar el botón de volver al inicio de sesión, si lo tienes
-        buttonVolver.setOnClickListener(v -> {
-            Intent intent = new Intent(RegistroUsuarios.this, InicioDeSesion.class);
-            startActivity(intent);
-            finish();
-        });
     }
 }
