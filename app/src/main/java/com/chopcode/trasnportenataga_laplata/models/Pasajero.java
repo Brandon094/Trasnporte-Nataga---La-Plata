@@ -8,9 +8,10 @@ public class Pasajero extends Usuario {
         super();
     }
 
-    public Pasajero(String id, String nombre, String telefono, String email) {
+    public Pasajero(String id, String nombre, String telefono, String email, String rol) {
         super(id, nombre, telefono, email);
     }
 
     // Métodos específicos para pasajeros, por ejemplo, para reservar asientos, pueden agregarse aquí.
+
 }
