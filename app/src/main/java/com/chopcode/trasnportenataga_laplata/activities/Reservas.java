@@ -75,6 +75,7 @@ public class Reservas extends AppCompatActivity {
         confirmarReserva.putExtra("asientoSeleccionado", asientoSeleccionado);
         confirmarReserva.putExtra("horarioId", horarioId);
         confirmarReserva.putExtra("horarioHora", horarioHora);
+        confirmarReserva.putExtra("rutaSelecionada",rutaSeleccionada);
         startActivity(confirmarReserva);
     }
 
