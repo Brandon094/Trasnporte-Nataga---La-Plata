@@ -1,13 +1,18 @@
 <resources>
     <!-- Nombre de la app -->
-    <string name="app_name">🚍 Transporte Natagá - La Plata</string>
-
+    <string name="app_name">🚍RutaGo🏁</string>
+    <!-- Logo de la app -->
+    <string name="app_logo">Logo de la aplicacion</string>
     <!-- Interfaz de inicio de sesión -->
     <string name="inicioSesion">🔐 Iniciar sesión</string>
+    <!-- Enlace Olvido contraseña -->
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+    <!-- o -->
+    <string name="or">o</string>
     <!-- Botones para ingresar -->
-    <string name="ingresar">👉 Ingresar</string>
-    <string name="ingresarGoogle">🔵 Iniciar sesión con Google</string>
-    <string name="noTieneCuenta">❓ ¿No tienes cuenta?</string>
+    <string name="ingresar">Ingresar</string>
+    <string name="ingresarGoogle">Iniciar sesión con Google</string>
+    <string name="noTieneCuenta">¿No tienes cuenta?</string>
     <string name="registrate">📝 Regístrate</string>
 
     <!-- Interfaz Registro de usuarios -->
@@ -29,7 +34,6 @@
 
     <!-- Botón reservar puesto -->
     <string name="reservar">💺 Reservar puesto</string>
-
     <!-- Interfaz de selección de asientos -->
     <string name="seleccionaAsiento">💺 Selecciona tu asiento</string>
     <string name="asientosCabina">🚖 Asientos en la cabina</string>
