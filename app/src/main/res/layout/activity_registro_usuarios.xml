@@ -94,7 +94,7 @@
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
-            android:src="@drawable/baseline_remove_red_eye_24"
+            android:src="@drawable/baseline_visibility_off_24"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
