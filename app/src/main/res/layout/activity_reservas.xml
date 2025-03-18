@@ -33,13 +33,13 @@
             android:id="@+id/rbNatagaLaPlata"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Natagá → La Plata" />
+            android:text="@string/nataga" />
 
         <RadioButton
             android:id="@+id/rbLaPlataNataga"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="La Plata → Natagá" />
+            android:text="@string/laPlata" />
     </RadioGroup>
 
 
