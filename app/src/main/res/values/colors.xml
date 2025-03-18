@@ -8,6 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="primary_color">@color/teal_700</color>
+    <color name="primary_text">#212121</color>
+    <color name="background_color">#FFFFFF</color>
+
     <color name="asiento_disponible">#4CAF50</color>
     <color name="asiento_reservado">#D32F2F</color>
 </resources>
