@@ -12,6 +12,8 @@
     <color name="primary_text">#212121</color>
     <color name="background_color">#FFFFFF</color>
 
-    <color name="asiento_disponible">#4CAF50</color>
-    <color name="asiento_reservado">#D32F2F</color>
+    <!-- Colores para los asientos -->
+    <color name="asiento_disponible">#8BC34A</color>  <!-- Verde claro -->
+    <color name="asiento_seleccionado">#F44336</color>  <!-- Rojo -->
+    <color name="asiento_ocupado">#9E9E9E</color>  <!-- Gris -->
 </resources>
