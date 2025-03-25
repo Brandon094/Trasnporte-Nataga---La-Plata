@@ -1,162 +1,301 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     tools:context=".activities.ConfirmarReserva">
 
-    <!-- Título -->
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Confirmar Reserva"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <!-- Información de la Reserva -->
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Información de la reserva:"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/textView"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="16dp"/>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:title="@string/confirmarReserva"
+            app:titleTextColor="@android:color/white"/>
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Sección de detalles del viaje -->
-    <TextView
-        android:id="@+id/tvHoraSalida"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/horaSalida"
-        app:layout_constraintTop_toBottomOf="@id/textView6"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <TextView
-        android:id="@+id/tvAsientoReservado"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/asientoReservado"
-        app:layout_constraintTop_toBottomOf="@id/tvHoraSalida"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tvPrecio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/precio"
-        app:layout_constraintTop_toBottomOf="@id/tvAsientoReservado"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+            <!-- Tarjeta para Información de la Reserva -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardInfoReserva"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:cardUseCompatPadding="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-    <TextView
-        android:id="@+id/tvOrigen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/origen"
-        app:layout_constraintTop_toBottomOf="@id/tvPrecio"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tvDestino"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/destino"
-        app:layout_constraintTop_toBottomOf="@id/tvOrigen"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/infoReserva"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:textColor="?attr/colorPrimary"
+                        android:drawablePadding="8dp"/>
 
-    <TextView
-        android:id="@+id/tvTiempoEstimado"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/tiempoEstimado"
-        app:layout_constraintTop_toBottomOf="@id/tvDestino"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?android:attr/listDivider"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="12dp"/>
 
-    <TextView
-        android:id="@+id/tvMetodoPago"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/metodoPago"
-        app:layout_constraintTop_toBottomOf="@id/tvTiempoEstimado"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+                    <TextView
+                        android:id="@+id/tvHoraSalida"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/horaSalida"
+                        android:textSize="16sp"
+                        android:drawablePadding="8dp"
+                        android:layout_marginBottom="8dp"/>
 
-    <TextView
-        android:id="@+id/tvEstadoReserva"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/estadoReserva"
-        app:layout_constraintTop_toBottomOf="@id/tvMetodoPago"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+                    <TextView
+                        android:id="@+id/tvAsientoReservado"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/asientoReservado"
+                        android:textSize="16sp"
+                        android:drawablePadding="8dp"
+                        android:layout_marginBottom="8dp"/>
 
-    <!-- Sección de Información del Vehículo -->
-    <TextView
-        android:id="@+id/textView18"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/datosVehiculo"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/tvEstadoReserva"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="20dp"/>
+                    <TextView
+                        android:id="@+id/tvPrecio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/precio"
+                        android:textSize="16sp"
+                        android:drawablePadding="8dp"
+                        android:layout_marginBottom="8dp"/>
 
-    <TextView
-        android:id="@+id/tvPlaca"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/placaVehiculo"
-        app:layout_constraintTop_toBottomOf="@id/textView18"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+                    <TextView
+                        android:id="@+id/tvOrigen"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/origen"
+                        android:textSize="16sp"
+                        android:drawablePadding="8dp"
+                        android:layout_marginBottom="8dp"/>
 
-    <TextView
-        android:id="@+id/tvConductor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/nombreConductor"
-        app:layout_constraintTop_toBottomOf="@id/tvPlaca"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+                    <TextView
+                        android:id="@+id/tvDestino"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/destino"
+                        android:textSize="16sp"
+                        android:drawablePadding="8dp"
+                        android:layout_marginBottom="8dp"/>
 
-    <!-- Botón Confirmar -->
-    <Button
-        android:id="@+id/btnConfirmarReserva"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="12dp"
-        android:backgroundTint="@color/teal_700"
-        android:text="@string/confirmar"
-        android:textColor="@android:color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btnCancelar"/>
+                    <TextView
+                        android:id="@+id/tvTiempoEstimado"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tiempoEstimado"
+                        android:textSize="16sp"
+                        android:drawablePadding="8dp"
+                        android:layout_marginBottom="8dp"/>
 
-    <!-- Botón Cancelar -->
-    <Button
-        android:id="@+id/btnCancelar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:backgroundTint="@android:color/holo_red_dark"
-        android:text="@string/cancelar"
-        android:textColor="@android:color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/tvMetodoPago"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/metodoPago"
+                        android:textSize="16sp"
+                        android:drawablePadding="8dp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipEstadoReserva"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/estadoReserva"
+                        app:chipBackgroundColor="@color/teal_200"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Tarjeta para Información del Vehículo -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardInfoVehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:cardUseCompatPadding="true"
+                app:layout_constraintTop_toBottomOf="@id/cardInfoReserva"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Tarjeta para datos del usuario -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="👤 Datos del Usuario"
+                                android:textStyle="bold"
+                                android:textSize="18sp"
+                                android:textColor="?attr/colorPrimary"/>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="?android:attr/listDivider"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginBottom="12dp"/>
+
+                            <TextView
+                                android:id="@+id/tvUsuario"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="👤 Usuario: "
+                                android:textSize="16sp"
+                                android:drawablePadding="8dp"
+                                android:layout_marginBottom="8dp"/>
+
+                            <TextView
+                                android:id="@+id/tvTelefonoP"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="📞 Teléfono Usuario:"
+                                android:textSize="16sp"
+                                android:drawablePadding="8dp"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Tarjeta para datos del conductor -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🚗 Datos del Vehículo y Conductor"
+                                android:textStyle="bold"
+                                android:textSize="18sp"
+                                android:textColor="?attr/colorPrimary"/>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="?android:attr/listDivider"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginBottom="12dp"/>
+
+                            <TextView
+                                android:id="@+id/tvPlaca"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="🚘 Placa del Vehículo:"
+                                android:textSize="16sp"
+                                android:drawablePadding="8dp"
+                                android:layout_marginBottom="8dp"/>
+
+                            <TextView
+                                android:id="@+id/tvConductor"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="👨‍✈️ Nombre Conductor:"
+                                android:textSize="16sp"
+                                android:layout_marginBottom="8dp"
+                                android:drawablePadding="8dp"/>
+
+                            <TextView
+                                android:id="@+id/tvTelefonoC"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/telefonoC"
+                                android:textSize="16sp"
+                                android:drawablePadding="8dp"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Botones de acción -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConfirmarReserva"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/confirmar"
+                android:textColor="@android:color/white"
+                app:cornerRadius="8dp"
+                android:paddingVertical="12dp"
+                app:iconGravity="textStart"
+                app:layout_constraintTop_toBottomOf="@id/cardInfoVehiculo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="24dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cancelar"
+                android:textColor="@android:color/darker_gray"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                app:cornerRadius="8dp"
+                app:strokeColor="@android:color/holo_red_dark"
+                android:textColorHint="@android:color/holo_red_dark"
+                android:paddingVertical="12dp"
+                app:iconGravity="textStart"
+                app:iconTint="@android:color/holo_red_dark"
+                android:textAlignment="center"
+                app:layout_constraintTop_toBottomOf="@id/btnConfirmarReserva"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
