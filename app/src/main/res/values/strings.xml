@@ -73,9 +73,11 @@
     <string name="estadoReserva">📌 Estado de la Reserva:</string>
 
     <!-- Sección de Información del Vehículo -->
+    <string name="placaVehiculo">🚗 Placa:</string>
     <string name="datosVehiculo">🚘 Datos del vehículo:</string>
     <string name="nombreConductor">👨‍✈️ Conductor:</string>
-    <string name="placaVehiculo">🚗 Placa:</string>
+    <string name="telefonoC">📞 Teléfono Conductor:</string>
+    <string name="telefonoP">📞 Telefono Pasajero:</string>
 
     <!-- Botones generales -->
     <string name="confirmar">✅ Confirmar</string>
