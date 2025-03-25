@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <corners android:radius="4dp" />
-    <solid android:color="#9E9E9E" />
-</shape>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Respaldo de la silla (rojo para indicar ocupado) -->
+    <path
+        android:fillColor="#D32F2F"
+    android:pathData="M7,3h10a2,2 0 0,1 2,2v10a2,2 0 0,1 -2,2h-10a2,2 0 0,1 -2,-2v-10a2,2 0 0,1 2,-2z" />
+
+    <!-- Base de la silla -->
+    <path
+        android:fillColor="#D32F2F"
+        android:pathData="M5,16h14a1,1 0 0,1 1,1v3h-2v-2h-12v2h-2v-3a1,1 0 0,1 1,-1z" />
+
+    <!-- Línea cruzada (X) para indicar ocupado -->
+    <path
+        android:strokeWidth="2"
+        android:strokeColor="@color/white"
+    android:pathData="M2,4L22,22" />
+
+    <path
+        android:strokeWidth="2"
+        android:strokeColor="@color/white"
+        android:pathData="M22,2L2,22" />
+</vector>
