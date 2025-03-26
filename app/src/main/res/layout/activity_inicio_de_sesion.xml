@@ -82,9 +82,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                app:startIconDrawable="@drawable/baseline_key_24"
                 app:endIconDrawable="@drawable/baseline_visibility_off_24"
-                app:startIconTint="@color/primary_color"
-                app:endIconMode="none"
+                app:startIconTint="@color/primary_color"                app:endIconMode="password_toggle"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -163,7 +163,8 @@
         android:text="@string/ingresarGoogle"
         android:textSize="16sp"
         app:cornerRadius="8dp"
-        app:icon="@drawable/baseline_login"
+        app:icon="@drawable/ic_google_logo"
+        app:iconTint="@null"
         app:iconGravity="textStart"
         app:iconPadding="8dp"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
