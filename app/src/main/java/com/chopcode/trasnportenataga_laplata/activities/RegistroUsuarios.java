@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.services.RegistroService;
@@ -12,7 +13,8 @@ import com.chopcode.trasnportenataga_laplata.services.RegistroService;
 public class RegistroUsuarios extends AppCompatActivity {
 
     private EditText editTextNombre, editTextCorreo, editTextTelefono, editTextPassword, editTextConfirmPassword;
-    private Button buttonRegistrar, buttonVolver;
+    private Button buttonRegistrar;
+    private TextView buttonIniciarSesion;
     private RegistroService registroService;
 
     @Override
@@ -27,40 +29,54 @@ public class RegistroUsuarios extends AppCompatActivity {
         editTextPassword = findViewById(R.id.editTextPassword);
         editTextConfirmPassword = findViewById(R.id.editTextConfirmPassword);
         buttonRegistrar = findViewById(R.id.buttonRegistrar);
+        buttonIniciarSesion = findViewById(R.id.buttonIniciarSesion);
 
-        // Inicializar el servicio de registro
+        // Inicializar servicio de registro
         registroService = new RegistroService();
 
+        // Redirigir al usuario a la pantalla de inicio de sesión
+        buttonIniciarSesion.setOnClickListener(v -> {
+            startActivity(new Intent(RegistroUsuarios.this, InicioDeSesion.class));
+            finish(); // Cierra la pantalla de registro para que no vuelva atrás
+        });
+
         // Manejar el clic del botón de registro
-        buttonRegistrar.setOnClickListener(v -> {
-            String nombre = editTextNombre.getText().toString().trim();
-            String correo = editTextCorreo.getText().toString().trim();
-            String telefono = editTextTelefono.getText().toString().trim();
-            String password = editTextPassword.getText().toString().trim();
-            String confirmPassword = editTextConfirmPassword.getText().toString().trim();
+        buttonRegistrar.setOnClickListener(v -> registrarUsuario());
+    }
 
-            // Validar campos
-            if (nombre.isEmpty() || correo.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(RegistroUsuarios.this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show();
-            } else if (!password.equals(confirmPassword)) {
-                Toast.makeText(RegistroUsuarios.this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
-            } else {
-                // Llamar al servicio para registrar el usuario
-                registroService.registrarUsuario(nombre, correo, telefono, password, new RegistroService.RegistroCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText(RegistroUsuarios.this, "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show();
-                        // Redirigir a la pantalla de inicio de sesión o principal
-                        Intent intent = new Intent(RegistroUsuarios.this, InicioDeSesion.class);
-                        startActivity(intent);
-                        finish();
-                    }
+    /**
+     * Maneja la validación y registro del usuario.
+     */
+    private void registrarUsuario() {
+        String nombre = editTextNombre.getText().toString().trim();
+        String correo = editTextCorreo.getText().toString().trim();
+        String telefono = editTextTelefono.getText().toString().trim();
+        String password = editTextPassword.getText().toString().trim();
+        String confirmPassword = editTextConfirmPassword.getText().toString().trim();
 
-                    @Override
-                    public void onFailure(String error) {
-                        Toast.makeText(RegistroUsuarios.this, "Error: " + error, Toast.LENGTH_LONG).show();
-                    }
-                });
+        // Validaciones
+        if (nombre.isEmpty() || correo.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            Toast.makeText(this, "Por favor, completa todos los campos obligatorios", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Registro del usuario
+        registroService.registrarUsuario(nombre, correo, telefono, password, new RegistroService.RegistroCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(RegistroUsuarios.this, "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(RegistroUsuarios.this, InicioDeSesion.class));
+                finish();
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Toast.makeText(RegistroUsuarios.this, "Error: " + error, Toast.LENGTH_LONG).show();
             }
         });
     }
