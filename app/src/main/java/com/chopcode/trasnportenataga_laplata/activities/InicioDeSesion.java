@@ -12,15 +12,19 @@ import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.services.IniciarService;
 import com.google.android.gms.auth.api.identity.SignInCredential;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.*;
 
 public class InicioDeSesion extends AppCompatActivity {
 
     private EditText editTextUsuario, editTextPassword;
-    private Button buttonIngresar, buttonRegistro;
-    private com.google.android.gms.common.SignInButton btnGoogleSignIn;
+    private Button buttonIngresar;
+    //private com.google.android.gms.common.SignInButton btnGoogleSignIn;
+    private Button btnGoogleSignIn;
     private ImageButton btnMostrarContrasena;
     private IniciarService iniciarService;
+    private TextView buttonRegistro, olvidasteContraseña;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,17 +40,25 @@ public class InicioDeSesion extends AppCompatActivity {
         buttonIngresar = findViewById(R.id.buttonIngresar);
         buttonRegistro = findViewById(R.id.buttonRegistro);
         btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn);
-        btnMostrarContrasena = findViewById(R.id.btnMostrarContrasena);
+        TextInputLayout passwordInputLayout = findViewById(R.id.passwordInputLayout);
+        TextInputEditText editTextPassword = findViewById(R.id.editTextPassword);
 
-        // Configurar botón para mostrar/ocultar contraseña
-        btnMostrarContrasena.setOnClickListener(v -> {
+        // Establecer el icono inicial (contraseña oculta)
+        passwordInputLayout.setEndIconDrawable(R.drawable.baseline_visibility_off_24);
+
+        // Manejar clic en el icono de visibilidad
+        passwordInputLayout.setEndIconOnClickListener(v -> {
             if (editTextPassword.getTransformationMethod() instanceof PasswordTransformationMethod) {
+                // Si está oculta, mostrarla
                 editTextPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                btnMostrarContrasena.setImageResource(R.drawable.baseline_remove_red_eye_24);
+                passwordInputLayout.setEndIconDrawable(R.drawable.baseline_remove_red_eye_24);
             } else {
+                // Si está visible, ocultarla
                 editTextPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                btnMostrarContrasena.setImageResource(R.drawable.baseline_visibility_off_24);
+                passwordInputLayout.setEndIconDrawable(R.drawable.baseline_visibility_off_24);
             }
+            // Mover cursor al final
+            editTextPassword.setSelection(editTextPassword.getText().length());
         });
 
         // Manejar inicio de sesión con correo y contraseña
@@ -117,11 +129,21 @@ public class InicioDeSesion extends AppCompatActivity {
     }
 
     /**
-     * Redirige a la actividad principal de usuarios tras iniciar sesión.
+     * Redirige a la actividad principal de usuarios o a reservas tras iniciar sesión.
      */
     private void irAInicioUsuarios() {
-        Intent intent = new Intent(InicioDeSesion.this, InicioUsuarios.class);
-        startActivity(intent);
+        // Verificar si el usuario intentó hacer una reserva antes de iniciar sesión
+        boolean volverAReserva = getIntent().getBooleanExtra("volverAReserva", false);
+
+        if (volverAReserva) {
+            // Si vino de intentar reservar, llevarlo directamente a reservas
+            Intent intent = new Intent(InicioDeSesion.this, Reservas.class);
+            startActivity(intent);
+        } else {
+            // Caso normal: ir a la pantalla principal
+            Intent intent = new Intent(InicioDeSesion.this, InicioUsuarios.class);
+            startActivity(intent);
+        }
         finish();
     }
 }
