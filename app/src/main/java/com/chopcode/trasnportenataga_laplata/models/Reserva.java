@@ -1,27 +1,22 @@
 package com.chopcode.trasnportenataga_laplata.models;
 
-import java.util.Date;
-
 public class Reserva {
-    private String idReserva;      // Identificador único de la reserva
-    private String usuarioId;      // 🔥 Relaciona la reserva con el usuario que la hizo
-    private String horarioId;      // 🔥 Relaciona la reserva con un horario específico
-    private Integer puestoReservado;
-    private String conductorId;    // 🔥 Relaciona con el conductor
-    private String vehiculoId;     // 🔥 Relaciona con el vehículo
-    private double precio;         // 🔥 Cambié BigDecimal a double (Firebase no lo soporta)
-    private String origen;
-    private String destino;
-    private String tiempoEstimado;
-    private String metodoPago;
-    private String estadoReserva;
-    private long fechaReserva;     // 🔥 Usar timestamp (para Firebase)
+    private String idReserva, usuarioId, horarioId, conductorId, vehiculoId;
+    private String origen, destino, tiempoEstimado, metodoPago,
+            estadoReserva;
 
+    // 🔥 Nuevos campos para almacenar información del usuario
+    private String nombre, telefono, email;
+    private long fechaReserva;
+    private double precio;
+    private int  puestoReservado;
+    // Constructor vacio
     public Reserva() { }
 
     public Reserva(String idReserva, String usuarioId, String horarioId, Integer puestoReservado,
                    String conductorId, String vehiculoId, double precio, String origen, String destino,
-                   String tiempoEstimado, String metodoPago, String estadoReserva, long fechaReserva) {
+                   String tiempoEstimado, String metodoPago, String estadoReserva, long fechaReserva,
+                   String nombre, String telefono, String email) {
         this.idReserva = idReserva;
         this.usuarioId = usuarioId;
         this.horarioId = horarioId;
@@ -35,9 +30,12 @@ public class Reserva {
         this.metodoPago = metodoPago;
         this.estadoReserva = estadoReserva;
         this.fechaReserva = fechaReserva;
+        this.nombre = nombre;
+        this.telefono = telefono;
+        this.email = email;
     }
 
-    // Getters y Setters
+    // 🔥 Getters y Setters
     public String getIdReserva() { return idReserva; }
     public void setIdReserva(String idReserva) { this.idReserva = idReserva; }
 
@@ -76,4 +74,13 @@ public class Reserva {
 
     public long getFechaReserva() { return fechaReserva; }
     public void setFechaReserva(long fechaReserva) { this.fechaReserva = fechaReserva; }
+
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 }
