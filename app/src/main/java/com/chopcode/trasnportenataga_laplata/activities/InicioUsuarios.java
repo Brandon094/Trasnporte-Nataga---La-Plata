@@ -28,6 +28,7 @@ public class InicioUsuarios extends AppCompatActivity {
     private List<Horario> listaLaPlata = new ArrayList<>();
     private Button btnReservas, btnCerrarSesion;
     private HorarioService horarioService;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class InicioUsuarios extends AppCompatActivity {
 
         // 🔹 Inicializar Firebase
         FirebaseApp.initializeApp(this);
+        auth = FirebaseAuth.getInstance();
 
         // 🔹 Configurar RecyclerViews
         recyclerViewNataga = findViewById(R.id.recyclerViewNataga);
@@ -77,13 +79,35 @@ public class InicioUsuarios extends AppCompatActivity {
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         btnCerrarSesion.setOnClickListener(view -> cerrarSesion());
     }
+    /**
+     * 🔹 Carga los horarios desde Firebase.
+     */
+    private void cargarHorarios() {
+        horarioService.cargarHorarios(new HorarioService.HorarioCallback() {
+            @Override
+            public void onHorariosCargados(List<Horario> nataga, List<Horario> laPlata) {
+                listaNataga.clear();
+                listaLaPlata.clear();
 
+                listaNataga.addAll(nataga);
+                adapterNataga.notifyItemRangeInserted(0, nataga.size());
+
+                listaLaPlata.addAll(laPlata);
+                adapterLaPlata.notifyItemRangeInserted(0, laPlata.size());
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e("Firebase", error);
+            }
+        });
+    }
     /**
      * 🔹 Valida si el usuario ha iniciado sesión.
      * @return true si está autenticado, false si no.
      */
     private boolean validarLogIn() {
-        FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser usuario = auth.getCurrentUser();
         if (usuario == null) {
             Intent intent = new Intent(this, InicioDeSesion.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -98,33 +122,10 @@ public class InicioUsuarios extends AppCompatActivity {
      * 🔹 Cierra la sesión y redirige a la pantalla de inicio.
      */
     private void cerrarSesion() {
-        FirebaseAuth.getInstance().signOut();
+        auth.signOut();
         Intent intent = new Intent(this, InicioDeSesion.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
-    }
-
-    /**
-     * 🔹 Carga los horarios desde Firebase.
-     */
-    private void cargarHorarios() {
-        horarioService.cargarHorarios(new HorarioService.HorarioCallback() {
-            @Override
-            public void onHorariosCargados(List<Horario> nataga, List<Horario> laPlata) {
-                listaNataga.clear();
-                listaLaPlata.clear();
-                listaNataga.addAll(nataga);
-                listaLaPlata.addAll(laPlata);
-
-                adapterNataga.notifyDataSetChanged();
-                adapterLaPlata.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onError(String error) {
-                Log.e("Firebase", error);
-            }
-        });
     }
 }
