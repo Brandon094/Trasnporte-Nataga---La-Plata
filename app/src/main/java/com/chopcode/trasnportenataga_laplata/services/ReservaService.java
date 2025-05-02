@@ -1,146 +1,240 @@
 package com.chopcode.trasnportenataga_laplata.services;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+
 import com.chopcode.trasnportenataga_laplata.models.DisponibilidadAsientos;
+import com.chopcode.trasnportenataga_laplata.models.Pasajero;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.*;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ReservaService {
-
+    private FirebaseFirestore db;
     private DatabaseReference databaseReference;
-
-    public interface HorarioCallback {
-        void onHorarioEncontrado(String horarioId, String horarioHora);
-        void onError(String error);
-    }
-
+    private FirebaseAuth auth;
+    /**
+     * Interfaz para manejar la carga de la reserva de manera asíncrona.
+     */
     public interface ReservaCallback {
         void onReservaExitosa();
         void onError(String error);
     }
-
+    /**
+     * Interfaz para la carga de asientos de forma asincronica
+     */
+    public interface AsientosCallback {
+        void onAsientosObtenidos(int[] asientosOcupados);
+        void onError(String error);
+    }
+    /**
+     * Interfaz para la carga de la disponibilidad de asientos
+     * */
+    public interface DisponibilidadCallback {
+        void onDisponible(boolean disponible);
+        void onError(String error);
+    }
     public ReservaService() {
         this.databaseReference = FirebaseDatabase.getInstance().getReference();
+        db = FirebaseFirestore.getInstance();
+        this.auth = FirebaseAuth.getInstance();
     }
-
     /**
-     * 🔥 Busca el horario más próximo basado en la ruta y la hora actual
+     * 🔥 Actualiza la disponibilidad de asientos y guarda la reserva en Firebase
      */
-    public void obtenerHorarioMasProximo(String rutaSeleccionada, HorarioCallback callback) {
-        databaseReference.child("horarios").addListenerForSingleValueEvent(new ValueEventListener() {
+    public void actualizarDisponibilidadAsientos(Context context, String horarioId, int asientoSeleccionado,
+                                                 String origen, String destino, String tiempoEstimado,
+                                                 String metodoPago, String estadoReserva,
+                                                 String placa,Double precio,
+                                                 String conductor, String telefonoC,
+                                                 ReservaCallback callback) {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            callback.onError("Usuario no autenticado.");
+            return;
+        }
+
+        String uid = currentUser.getUid();
+        DatabaseReference userRef = databaseReference.child("usuarios").child(uid);
+
+        // Recuperar datos del usuario antes de registrar la reserva
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                long horaActual = System.currentTimeMillis();
-                String horarioId = null;
-                String horarioHora = null;
-                long menorDiferencia = Long.MAX_VALUE;
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    callback.onError("No se encontró información del usuario.");
+                    return;
+                }
 
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String ruta = snapshot.child("ruta").getValue(String.class);
-                    String hora = snapshot.child("hora").getValue(String.class);
-                    String id = snapshot.getKey();
+                String nombre = snapshot.child("nombre").getValue(String.class);
+                String telefono = snapshot.child("telefono").getValue(String.class);
+                String email = snapshot.child("email").getValue(String.class);
 
-                    if (ruta != null && hora != null && ruta.equals(rutaSeleccionada)) {
-                        long horaEnMillis = convertirHoraAMillis(hora.trim());
+                if (nombre == null || email == null) {
+                    callback.onError("Datos del usuario incompletos.");
+                    return;
+                }
 
-                        if (horaEnMillis > horaActual && (horaEnMillis - horaActual) < menorDiferencia) {
-                            menorDiferencia = horaEnMillis - horaActual;
-                            horarioId = id;
-                            horarioHora = hora;
+                DatabaseReference refDisponibilidad = databaseReference.child("disponibilidadAsientos").child(horarioId);
+                refDisponibilidad.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (!snapshot.exists()) {
+                            callback.onError("No se encontró disponibilidad.");
+                            return;
+                        }
+
+                        DisponibilidadAsientos disponibilidad = snapshot.getValue(DisponibilidadAsientos.class);
+                        if (disponibilidad != null && disponibilidad.getAsientosDisponibles() > 0) {
+                            // 🔹 Restar un asiento y actualizar Firebase
+                            int nuevosAsientosDisponibles = disponibilidad.getAsientosDisponibles() - 1;
+                            refDisponibilidad.child("asientosDisponibles").setValue(nuevosAsientosDisponibles);
+
+                            // 🔹 Guardar el asiento reservado en `asientosOcupados`
+                            marcarAsientoComoOcupado(horarioId, asientoSeleccionado);
+
+                            // 🔹 Registrar la reserva en Firebase con los datos del usuario
+                            registrarReserva(context, uid, nombre, telefono, email, horarioId, asientoSeleccionado,
+                                    origen, destino, tiempoEstimado, metodoPago, estadoReserva,
+                                    placa, precio,
+                                    conductor, telefonoC, callback);
+                        } else {
+                            callback.onError("No hay asientos disponibles.");
                         }
                     }
-                }
 
-                if (horarioId != null && horarioHora != null) {
-                    callback.onHorarioEncontrado(horarioId, horarioHora);
-                } else {
-                    callback.onError("No hay horarios disponibles.");
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                callback.onError("Error al obtener horarios: " + databaseError.getMessage());
-            }
-        });
-    }
-
-    /**
-     * 🔥 Convierte una hora en formato "HH:mm a" a milisegundos
-     */
-    private long convertirHoraAMillis(String hora) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.US);
-            Date date = sdf.parse(hora);
-            if (date != null) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(date);
-                Calendar now = Calendar.getInstance();
-                calendar.set(Calendar.YEAR, now.get(Calendar.YEAR));
-                calendar.set(Calendar.MONTH, now.get(Calendar.MONTH));
-                calendar.set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH));
-                return calendar.getTimeInMillis();
-            }
-        } catch (ParseException e) {
-            Log.e("Conversión", "Error al convertir hora: " + hora);
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    /**
-     * 🔥 Guarda la reserva en Firebase y actualiza la disponibilidad de asientos
-     */
-    public void guardarReserva(String horarioId, int asientoSeleccionado, ReservaCallback callback) {
-        DatabaseReference refDisponibilidad = databaseReference.child("disponibilidadAsientos").child(horarioId);
-
-        refDisponibilidad.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    DisponibilidadAsientos disponibilidad = snapshot.getValue(DisponibilidadAsientos.class);
-
-                    if (disponibilidad != null && disponibilidad.getAsientosDisponibles() > 0) {
-                        // 🔹 Restar un asiento y actualizar Firebase
-                        int nuevosAsientosDisponibles = disponibilidad.getAsientosDisponibles() - 1;
-                        refDisponibilidad.child("asientosDisponibles").setValue(nuevosAsientosDisponibles);
-
-                        // 🔹 Guardar la reserva en Firebase
-                        registrarReserva(horarioId, asientoSeleccionado, callback);
-                    } else {
-                        callback.onError("No hay asientos disponibles.");
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        callback.onError("Error al consultar disponibilidad: " + error.getMessage());
                     }
-                } else {
-                    callback.onError("Error: No se encontró disponibilidad.");
-                }
+                });
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                callback.onError("Error al consultar disponibilidad: " + error.getMessage());
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError("Error al recuperar datos del usuario: " + error.getMessage());
             }
         });
     }
 
     /**
-     * 🔥 Registra la reserva en Firebase
+     * 🔥 Marca un asiento como ocupado en Firebase.
      */
-    private void registrarReserva(String horarioId, int asientoSeleccionado, ReservaCallback callback) {
+    private void marcarAsientoComoOcupado(String horarioId, int asiento) {
+        DatabaseReference refAsientosOcupados = databaseReference
+                .child("disponibilidadAsientos")
+                .child(horarioId)
+                .child("asientosOcupados");
+
+        // Guardar el asiento como ocupado
+        refAsientosOcupados.child(String.valueOf(asiento)).setValue(true);
+    }
+
+    // 🔥 Registra la reserva en Firebase con los datos del usuario.
+    private void registrarReserva(Context context, String uid, String nombre, String telefono, String email,
+                                  String horarioId, int asientoSeleccionado, String origen, String destino,
+                                  String tiempoEstimado, String metodoPago, String estadoReserva,
+                                  String placa, double precio,String conductor, String telefonoC,
+                                  ReservaCallback callback) {
         String idReserva = UUID.randomUUID().toString();
         long fechaReserva = System.currentTimeMillis();
 
         Reserva reserva = new Reserva(
-                idReserva, "usuario_demo1", horarioId, asientoSeleccionado,
-                "uid_conductor_1", "vehiculo_1", 10000, "Natagá", "La Plata",
-                "1h 30m", "Efectivo", "Pendiente", fechaReserva
+                idReserva, uid, horarioId, asientoSeleccionado, conductor, telefonoC, placa, precio,
+                origen, destino, tiempoEstimado, metodoPago, estadoReserva, fechaReserva,
+                nombre, telefono, email
         );
 
         databaseReference.child("reservas").child(idReserva).setValue(reserva)
-                .addOnSuccessListener(aVoid -> callback.onReservaExitosa())
-                .addOnFailureListener(e -> callback.onError("Error al guardar reserva: " + e.getMessage()));
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(context, "Reserva confirmada", Toast.LENGTH_SHORT).show();
+                    callback.onReservaExitosa();
+                })
+                .addOnFailureListener(e -> {
+                    callback.onError("Error al guardar reserva: " + e.getMessage());
+                });
+    }
+    /**
+     * 🔥 Verifica si un asiento específico está disponible en la base de datos en tiempo real.
+     *
+     * @param horarioId ID del horario en la base de datos
+     * @param asiento Número del asiento a verificar
+     * @param callback Callback para manejar la disponibilidad del asiento
+     */
+    public void verificarDisponibilidadAsiento(String horarioId, int asiento,
+                                               DisponibilidadCallback callback) {
+        DatabaseReference refAsiento = databaseReference
+                .child("disponibilidadAsientos")
+                .child(horarioId)
+                .child("asientosOcupados")
+                .child(String.valueOf(asiento));
+
+        refAsiento.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Si el asiento existe en `asientosOcupados`, significa que está ocupado
+                boolean disponible = !snapshot.exists();
+                callback.onDisponible(disponible);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError("Error al verificar disponibilidad: " + error.getMessage());
+            }
+        });
+    }
+    /**
+     * 🔥 Obtiene los asientos ocupados de Firebase y los envía al callback.
+     */
+    public void obtenerAsientosOcupados(String horarioId, AsientosCallback callback) {
+        DatabaseReference refAsientosOcupados = databaseReference
+                .child("disponibilidadAsientos")
+                .child(horarioId)
+                .child("asientosOcupados");
+
+        refAsientosOcupados.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    callback.onAsientosObtenidos(new int[0]); // 🔹 No hay asientos ocupados
+                    return;
+                }
+
+                List<Integer> asientosOcupadosList = new ArrayList<>();
+
+                for (DataSnapshot asientoSnapshot : snapshot.getChildren()) {
+                    try {
+                        int numeroAsiento = Integer.parseInt(asientoSnapshot.getKey());
+                        asientosOcupadosList.add(numeroAsiento);
+                    } catch (NumberFormatException e) {
+                        // 🔴 Registro del error si el valor no es un número válido
+                        System.err.println("Error al convertir asiento: " + asientoSnapshot.getKey());
+                    }
+                }
+
+                int[] asientosOcupados = new int[asientosOcupadosList.size()];
+                for (int i = 0; i < asientosOcupadosList.size(); i++) {
+                    asientosOcupados[i] = asientosOcupadosList.get(i);
+                }
+
+                callback.onAsientosObtenidos(asientosOcupados);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError("Error al obtener asientos ocupados: " + error.getMessage());
+            }
+        });
     }
 }
