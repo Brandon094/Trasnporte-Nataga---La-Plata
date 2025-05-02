@@ -1,12 +1,9 @@
 package com.chopcode.trasnportenataga_laplata.models;
 
 public class Reserva {
-    private String idReserva, usuarioId, horarioId, conductorId, vehiculoId;
-    private String origen, destino, tiempoEstimado, metodoPago,
-            estadoReserva;
-
-    // 🔥 Nuevos campos para almacenar información del usuario
-    private String nombre, telefono, email;
+    private String idReserva, usuarioId, horarioId, conductor, vehiculoId, origen, destino,
+            tiempoEstimado, metodoPago,
+            estadoReserva, nombre, telefono, telefonoC, email;
     private long fechaReserva;
     private double precio;
     private int  puestoReservado;
@@ -14,14 +11,16 @@ public class Reserva {
     public Reserva() { }
 
     public Reserva(String idReserva, String usuarioId, String horarioId, Integer puestoReservado,
-                   String conductorId, String vehiculoId, double precio, String origen, String destino,
+                   String conductor, String telefonoC, String vehiculoId, double precio,
+                   String origen,
+                   String destino,
                    String tiempoEstimado, String metodoPago, String estadoReserva, long fechaReserva,
                    String nombre, String telefono, String email) {
         this.idReserva = idReserva;
         this.usuarioId = usuarioId;
         this.horarioId = horarioId;
         this.puestoReservado = puestoReservado;
-        this.conductorId = conductorId;
+        this.conductor = conductor;
         this.vehiculoId = vehiculoId;
         this.precio = precio;
         this.origen = origen;
@@ -32,6 +31,7 @@ public class Reserva {
         this.fechaReserva = fechaReserva;
         this.nombre = nombre;
         this.telefono = telefono;
+        this.telefonoC = telefonoC;
         this.email = email;
     }
 
@@ -48,8 +48,8 @@ public class Reserva {
     public Integer getPuestoReservado() { return puestoReservado; }
     public void setPuestoReservado(Integer puestoReservado) { this.puestoReservado = puestoReservado; }
 
-    public String getConductorId() { return conductorId; }
-    public void setConductorId(String conductorId) { this.conductorId = conductorId; }
+    public String getConductorId() { return conductor; }
+    public void setConductorId(String conductorId) { this.conductor = conductorId; }
 
     public String getVehiculoId() { return vehiculoId; }
     public void setVehiculoId(String vehiculoId) { this.vehiculoId = vehiculoId; }
@@ -83,4 +83,12 @@ public class Reserva {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    public String getTelefonoC() {
+        return telefonoC;
+    }
+
+    public void setTelefonoC(String telefonoC) {
+        this.telefonoC = telefonoC;
+    }
 }
