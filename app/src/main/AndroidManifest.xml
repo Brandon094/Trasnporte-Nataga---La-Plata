@@ -16,7 +16,7 @@
             android:name=".activities.EditarPerfil"
             android:exported="false" />
         <activity
-            android:name=".activities.PerfilConductor"
+            android:name=".activities.Perfil"
             android:exported="false" />
         <activity
             android:name=".activities.InicioConductor"
