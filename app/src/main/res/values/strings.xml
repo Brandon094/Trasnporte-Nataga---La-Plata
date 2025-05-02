@@ -16,6 +16,7 @@
     <string name="registrate">📝 Regístrate</string>
 
     <!-- Interfaz Registro de usuarios -->
+    <string name="volver">Volver</string>
     <string name="crearCuenta">🆕 Crear cuenta</string>
     <string name="nombreCompleto">👤 Nombre Completo</string>
     <string name="correo">📧 Correo Electrónico</string>
@@ -23,9 +24,10 @@
     <string name="contraseña">🔑 Contraseña</string>
     <string name="confirmarContraseña">🔑 Confirmar Contraseña</string>
     <!-- Botón para registrarse -->
-    <string name="regsitrarse">✅ Registrarse</string>
+    <string name="registrarse">✅ Registrarse</string>
     <!-- Texto "¿Ya tienes cuenta?" -->
-    <string name="iniciaSesion">👈 ¿Ya tienes cuenta? Inicia sesión aquí</string>
+    <string name="yaTieneCuenta">👈 ¿Ya tienes cuenta?</string>
+    <string name="iniciaSesion">Inicia sesión aquí</string>
 
     <!-- Interfaz principal -->
     <string name="horarios">🕒 Horarios de rutas</string>
@@ -33,7 +35,7 @@
     <string name="laPlata">📍La Plata →\n Natagá🏁</string>
 
     <!-- Botón reservar puesto -->
-    <string name="reservar">💺 Reservar puesto</string>
+    <string name="reservar">Reservar puesto</string>
     <!-- Interfaz de selección de asientos -->
     <string name="seleccionaAsiento">💺 Selecciona tu asiento</string>
     <string name="asientosCabina">🚖 Asientos en la cabina</string>
@@ -73,10 +75,13 @@
     <string name="estadoReserva">📌 Estado de la Reserva:</string>
 
     <!-- Sección de Información del Vehículo -->
-    <string name="placaVehiculo">🚗 Placa:</string>
-    <string name="datosVehiculo">🚘 Datos del vehículo:</string>
-    <string name="nombreConductor">👨‍✈️ Conductor:</string>
+    <string name="datosVehiculo">🚗 Datos del Vehículo y Conductor</string>
+    <string name="placaVehiculo">🚘 Placa del Vehículo:</string>
+    <string name="nombreConductor">👨‍✈️ Nombre Conductor:</string>
     <string name="telefonoC">📞 Teléfono Conductor:</string>
+
+    <!-- Informacion de Pasajero -->
+    <string name="pasajero">👤 Nombre Usuario:</string>
     <string name="telefonoP">📞 Telefono Pasajero:</string>
 
     <!-- Botones generales -->
@@ -104,7 +109,7 @@
     <string name="placa">🚗 Placa:</string>
     <!-- Botones -->
     <string name="editarPerfil">✏️ Editar perfil</string>
-    <string name="cerrarSesion">🚪 Cerrar sesión</string>
+    <string name="cerrarSesion">Cerrar sesión</string>
     <string name="ruta_hora">🕒 Ruta - Hora</string>
 
     <!-- API key de autenticación de Google -->
