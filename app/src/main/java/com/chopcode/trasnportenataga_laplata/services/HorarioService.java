@@ -123,7 +123,7 @@ public class HorarioService {
     private long convertirHoraAMillis(String hora) {
         try {
             // Usa formato de 24 horas (HH:mm)
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm a", Locale.US);
+            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.US);
             sdf.setLenient(false); // Para evitar conversiones erróneas
 
             Date date = sdf.parse(hora);
