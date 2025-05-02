@@ -1,6 +1,8 @@
 package com.chopcode.trasnportenataga_laplata.services;
 
 import androidx.annotation.NonNull;
+
+import com.chopcode.trasnportenataga_laplata.models.Conductor;
 import com.chopcode.trasnportenataga_laplata.models.Pasajero;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,7 +31,7 @@ public class UsuarioService {
      * Callback para manejar la carga del conductor de forma asíncrona.
      */
     public interface ConductorCallback {
-        void onConductorCargado(String nombre, String placa, String telefono);
+        void onConductorCargado(Conductor conductor);
         void onError(String error);
     }
 
@@ -51,14 +53,6 @@ public class UsuarioService {
                     callback.onError("No se encontraron datos del usuario en la base de datos.");
                     return;
                 }
-
-                // Verifica si el usuario es un conductor
-                String tipoUsuario = snapshot.child("tipoUsuario").getValue(String.class);
-                if ("conductor".equals(tipoUsuario)) {
-                    callback.onError("Este usuario es un conductor y no puede realizar reservas.");
-                    return;
-                }
-
                 // Obtener datos del pasajero
                 Pasajero pasajero = snapshot.getValue(Pasajero.class);
                 if (pasajero != null) {
@@ -79,33 +73,32 @@ public class UsuarioService {
      * 🔥 Carga la información del primer conductor disponible en la base de datos.
      */
     public void cargarInformacionConductor(@NonNull final ConductorCallback callback) {
-        databaseReference.orderByChild("tipoUsuario").equalTo("conductor")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (!snapshot.exists()) {
-                            callback.onError("No se encontraron conductores registrados.");
-                            return;
-                        }
+        DatabaseReference refConductores = FirebaseDatabase.getInstance().getReference("conductores");
 
-                        for (DataSnapshot conductorSnapshot : snapshot.getChildren()) {
-                            String nombre = conductorSnapshot.child("nombre").getValue(String.class);
-                            String placa = conductorSnapshot.child("placaVehiculo").getValue(String.class);
-                            String telefono = conductorSnapshot.child("telefono").getValue(String.class);
+        refConductores.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    callback.onError("No se encontraron conductores registrados.");
+                    return;
+                }
 
-                            if (nombre != null && placa != null && telefono != null) {
-                                callback.onConductorCargado(nombre, placa, telefono);
-                                return; // Solo necesitamos el primer conductor encontrado
-                            }
-                        }
-
-                        callback.onError("No se pudo obtener la información del conductor.");
+                for (DataSnapshot conductorSnapshot : snapshot.getChildren()) {
+                    Conductor conductor = conductorSnapshot.getValue(Conductor.class);
+                    if (conductor != null) {
+                        conductor.setId(conductorSnapshot.getKey()); // por si necesitas usarlo
+                        callback.onConductorCargado(conductor);
+                        return; // usamos solo el primer conductor
                     }
+                }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        callback.onError("Error al cargar el conductor: " + error.getMessage());
-                    }
-                });
+                callback.onError("No se pudo obtener la información del conductor.");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError("Error al cargar el conductor: " + error.getMessage());
+            }
+        });
     }
 }
