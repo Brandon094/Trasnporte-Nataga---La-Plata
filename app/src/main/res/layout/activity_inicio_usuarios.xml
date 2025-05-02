@@ -20,6 +20,7 @@
             android:layout_height="?attr/actionBarSize"
             app:title="@string/horarios"
             app:titleTextColor="@color/white"
+            app:menu="@menu/menu_inicio_usuarios"
             style="@style/Widget.MaterialComponents.Toolbar.Primary"/>
     </com.google.android.material.appbar.AppBarLayout>
 
