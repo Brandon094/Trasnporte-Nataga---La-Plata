@@ -189,7 +189,7 @@
                                 android:id="@+id/tvUsuario"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="👤 Usuario: "
+                                android:text="@string/pasajero"
                                 android:textSize="16sp"
                                 android:drawablePadding="8dp"
                                 android:layout_marginBottom="8dp"/>
@@ -220,7 +220,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="🚗 Datos del Vehículo y Conductor"
+                                android:text="@string/datosVehiculo"
                                 android:textStyle="bold"
                                 android:textSize="18sp"
                                 android:textColor="?attr/colorPrimary"/>
@@ -236,7 +236,7 @@
                                 android:id="@+id/tvPlaca"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="🚘 Placa del Vehículo:"
+                                android:text="@string/placaVehiculo"
                                 android:textSize="16sp"
                                 android:drawablePadding="8dp"
                                 android:layout_marginBottom="8dp"/>
@@ -245,7 +245,7 @@
                                 android:id="@+id/tvConductor"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="👨‍✈️ Nombre Conductor:"
+                                android:text="@string/nombreConductor"
                                 android:textSize="16sp"
                                 android:layout_marginBottom="8dp"
                                 android:drawablePadding="8dp"/>
