@@ -9,9 +9,9 @@ public class Conductor extends Usuario {
         super();
     }
 
-    public Conductor(String id, String nombre, String telefono, String email,
+    public Conductor(String id, String nombre, String telefono, String email, String password,
                      String placaVehiculo, String modeloVehiculo, int capacidadVehiculo) {
-        super(id, nombre, telefono, email);
+        super(id, nombre, telefono, email, password);
         this.placaVehiculo = placaVehiculo;
         this.modeloVehiculo = modeloVehiculo;
         this.capacidadVehiculo = capacidadVehiculo;
