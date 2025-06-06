@@ -19,6 +19,14 @@ public class Usuario {
         this.password = password;
     }
 
+    // Constructor para atributos comunes sin password
+    public Usuario(String id, String nombre, String telefono, String email) {
+        this.id = id;
+        this.nombre = nombre;
+        this.telefono = telefono;
+        this.email = email;
+    }
+
     // Getters y setters comunes
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
