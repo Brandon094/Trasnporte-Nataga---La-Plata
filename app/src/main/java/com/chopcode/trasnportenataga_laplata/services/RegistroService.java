@@ -58,7 +58,8 @@ public class RegistroService {
                         String uid = auth.getCurrentUser().getUid();
 
                         // Crear el objeto Usuario. Aquí, por defecto, lo definimos como "pasajero".
-                        Pasajero pasajero = new Pasajero(uid, nombre, telefono, correo, "pasajero");
+                        Pasajero pasajero = new Pasajero(uid, nombre, telefono, correo,
+                                password);
 
                         // Guardar los datos del usuario en la base de datos, bajo el nodo "usuarios".
                         databaseReference.child(uid).setValue(pasajero)
@@ -81,15 +82,14 @@ public class RegistroService {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
                     // Si el usuario no existe en la BD, lo registramos como pasajero
-                    Pasajero nuevoPasajero = new Pasajero(
+                    Pasajero pasajero = new Pasajero(
                             user.getUid(),
                             user.getDisplayName() != null ? user.getDisplayName() : "Usuario sin nombre",
                             user.getPhoneNumber() != null ? user.getPhoneNumber() : "No disponible",
-                            user.getEmail(),
-                            "pasajero"
+                            user.getEmail()
                     );
 
-                    userRef.setValue(nuevoPasajero)
+                    userRef.setValue(pasajero)
                             .addOnSuccessListener(aVoid -> callback.onSuccess())
                             .addOnFailureListener(e -> callback.onFailure("Error al registrar usuario: " + e.getMessage()));
                 } else {
