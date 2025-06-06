@@ -20,9 +20,7 @@ public class InicioDeSesion extends AppCompatActivity {
 
     private EditText editTextUsuario, editTextPassword;
     private Button buttonIngresar;
-    //private com.google.android.gms.common.SignInButton btnGoogleSignIn;
     private Button btnGoogleSignIn;
-    private ImageButton btnMostrarContrasena;
     private IniciarService iniciarService;
     private TextView buttonRegistro, olvidasteContraseña;
 
