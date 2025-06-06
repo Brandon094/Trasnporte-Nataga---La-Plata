@@ -7,11 +7,16 @@ public class Pasajero extends Usuario {
     public Pasajero() {
         super();
     }
-
-    public Pasajero(String id, String nombre, String telefono, String email, String rol, String password) {
+    // Constructor para Correo y contraseña
+    public Pasajero(String id, String nombre, String telefono, String email, String password) {
         super(id, nombre, telefono, email, password);
     }
+    // Constructor para iniciar con google
+    public Pasajero(String id, String nombre, String telefono, String email){
+        super(id, nombre, telefono, email);
+    }
 
+    // Metodo toString
     @Override
     public String toString() {
         return "Pasajero: "+
