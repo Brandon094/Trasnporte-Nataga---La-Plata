@@ -13,6 +13,7 @@ import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.models.Horario;
 import com.chopcode.trasnportenataga_laplata.adapters.HorarioAdapter;
 import com.chopcode.trasnportenataga_laplata.services.HorarioService;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,6 +35,8 @@ public class InicioUsuarios extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inicio_usuarios);
+        // 🔹 Referencia a la barra superior
+        MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
 
         // 🔹 Inicializar Firebase
         FirebaseApp.initializeApp(this);
@@ -73,6 +76,17 @@ public class InicioUsuarios extends AppCompatActivity {
                 // No finalizar la actividad actual para que el usuario pueda volver
                 // a ver los horarios si decide no iniciar sesión
             }
+        });
+
+        // Detectar clic en el ícono del perfil
+        topAppBar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_perfil) {
+                // Ir a la pantalla PerfilUsuario
+                Intent intent = new Intent(InicioUsuarios.this, Perfil.class);
+                startActivity(intent);
+                return true;
+            }
+            return false;
         });
 
         // 🔹 Manejo del botón Cerrar Sesión
