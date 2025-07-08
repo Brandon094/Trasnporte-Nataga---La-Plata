@@ -111,6 +111,7 @@
     <string name="editarPerfil">✏️ Editar perfil</string>
     <string name="cerrarSesion">Cerrar sesión</string>
     <string name="ruta_hora">🕒 Ruta - Hora</string>
+    <string name="historial">🕒 Historial de reservas</string>
 
     <!-- API key de autenticación de Google -->
     <string name="default_web_client_id">175264872585-abombvqq36bqqeet86onnhkf7uep6c60.apps.googleusercontent.com</string>
