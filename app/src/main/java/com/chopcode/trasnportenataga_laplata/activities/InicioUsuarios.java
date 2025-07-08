@@ -82,7 +82,7 @@ public class InicioUsuarios extends AppCompatActivity {
         topAppBar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_perfil) {
                 // Ir a la pantalla PerfilUsuario
-                Intent intent = new Intent(InicioUsuarios.this, Perfil.class);
+                Intent intent = new Intent(InicioUsuarios.this, PerfilUsuario.class);
                 startActivity(intent);
                 return true;
             }
