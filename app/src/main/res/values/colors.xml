@@ -8,6 +8,7 @@
     <color name="gray">#808080</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="text_dark">#212121</color>
 
     <color name="primary_color">@color/teal_700</color>
     <color name="primary_text">#212121</color>
