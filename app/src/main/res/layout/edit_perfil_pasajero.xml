@@ -1,0 +1,152 @@
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    android:padding="24dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvEditarPerfilTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Editar Perfil"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView android:id="@+id/tvNombreActual"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Nombre actual: "
+            android:textColor="@color/gray"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintTop_toBottomOf="@id/tvEditarPerfilTitulo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Campo Nombre -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayoutNombre"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Nuevo nombre"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:layout_constraintTop_toBottomOf="@id/tvNombreActual"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:textColor="@color/black"
+                android:textColorHint="@color/gray" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Texto actual del Correo -->
+        <TextView
+            android:id="@+id/tvCorreoActual"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Correo actual: "
+            android:textColor="@color/gray"
+            android:textSize="14sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintTop_toBottomOf="@id/inputLayoutNombre"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Campo Correo -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayoutCorreo"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Nuevo correo electrónico"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:layout_constraintTop_toBottomOf="@id/tvCorreoActual"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etCorreo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/black"
+                android:textColorHint="@color/gray" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Texto actual del Teléfono -->
+        <TextView
+            android:id="@+id/tvTelefonoActual"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Teléfono actual: "
+            android:textColor="@color/gray"
+            android:textSize="14sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintTop_toBottomOf="@id/inputLayoutCorreo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Campo Teléfono -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayoutTelefono"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Nuevo teléfono"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:layout_constraintTop_toBottomOf="@id/tvTelefonoActual"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etTelefono"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone"
+                android:textColor="@color/black"
+                android:textColorHint="@color/gray" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Botón Guardar -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGuardarCambios"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Guardar Cambios"
+            android:textAllCaps="false"
+            android:icon="@drawable/baseline_save_24"
+            app:iconGravity="textStart"
+            app:cornerRadius="12dp"
+            app:layout_constraintTop_toBottomOf="@id/inputLayoutTelefono"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
