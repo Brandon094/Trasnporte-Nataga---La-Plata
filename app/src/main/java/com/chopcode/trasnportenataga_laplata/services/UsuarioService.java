@@ -8,8 +8,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.*;
 
-public class UsuarioService {
+import java.util.HashMap;
+import java.util.Map;
 
+public class UsuarioService {
     private final FirebaseAuth auth;
     private final DatabaseReference databaseReference;
 
