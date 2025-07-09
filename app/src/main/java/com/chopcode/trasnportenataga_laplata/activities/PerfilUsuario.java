@@ -47,7 +47,7 @@ public class PerfilUsuario extends AppCompatActivity {
         // Boton para editar el perfil
         btnEditarPerfil.setOnClickListener(view -> editPerfil());
         // Boton para ver el historial de reservas
-        //btnHistorialReservas
+        btnHistorialReservas.setOnClickListener(view -> historialReservas());
     }
     /** llamar metodo para editar perfil*/
     private void editPerfil(){
