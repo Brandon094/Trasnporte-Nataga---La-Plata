@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.models.Horario;
@@ -62,8 +63,8 @@ public class InicioUsuarios extends AppCompatActivity {
         btnReservas = findViewById(R.id.btnReservar);
         btnReservas.setOnClickListener(view -> {
             // Validar si el usuario está autenticado
-            FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
-            if (usuario != null) {
+            boolean usuario = validarLogIn();
+            if (usuario != false) {
                 // El usuario está autenticado, proceder a las reservas
                 Intent reservas = new Intent(InicioUsuarios.this, Reservas.class);
                 startActivity(reservas);
@@ -73,15 +74,16 @@ public class InicioUsuarios extends AppCompatActivity {
                 // Guardar la actividad actual para volver después del inicio de sesión
                 intent.putExtra("volverAReserva", true);
                 startActivity(intent);
-                // No finalizar la actividad actual para que el usuario pueda volver
-                // a ver los horarios si decide no iniciar sesión
+                // No finalizar la actividad actual para que el usuario pueda volver a ver los
+                // horarios si decide no iniciar sesión
             }
         });
-
         // Detectar clic en el ícono del perfil
         topAppBar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_perfil) {
-                // Ir a la pantalla PerfilUsuario
+            // Validar si el usuario está autenticado
+            boolean usuario = validarLogIn();
+            if (usuario != false & item.getItemId() == R.id.action_perfil) {
+                // El usuario está autenticado, proceder al perfil de usuario
                 Intent intent = new Intent(InicioUsuarios.this, PerfilUsuario.class);
                 startActivity(intent);
                 return true;
