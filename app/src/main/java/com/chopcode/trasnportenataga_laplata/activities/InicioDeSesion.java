@@ -70,9 +70,26 @@ public class InicioDeSesion extends AppCompatActivity {
                 iniciarService.iniciarSesionCorreo(correo, password, new IniciarService.LoginCallback() {
                     @Override
                     public void onLoginSuccess() {
-                        Toast.makeText(InicioDeSesion.this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show();
-                        irAInicioUsuarios();
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if (user != null) {
+                            iniciarService.detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
+                                @Override
+                                public void onTipoDetectado(String tipo) {
+                                    if (tipo.equals("conductor")) {
+                                        irAInicioConductor();
+                                    } else {
+                                        irAInicioUsuarios();
+                                    }
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    Toast.makeText(InicioDeSesion.this, "Error al detectar tipo de usuario: " + error, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
+
                     @Override
                     public void onLoginFailure(String error) {
                         Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_LONG).show();
@@ -87,8 +104,6 @@ public class InicioDeSesion extends AppCompatActivity {
                 Intent intent = new Intent(InicioDeSesion.this, RegistroUsuarios.class);
                 startActivity(intent);
             });
-        } else {
-            Log.e("InicioDeSesion", "Error: buttonRegistro es null. Verifica el ID en el XML.");
         }
 
         // Manejar inicio de sesión con Google
@@ -96,9 +111,26 @@ public class InicioDeSesion extends AppCompatActivity {
             iniciarService.iniciarSesionGoogle(new IniciarService.LoginCallback() {
                 @Override
                 public void onLoginSuccess() {
-                    Toast.makeText(InicioDeSesion.this, "Inicio de sesión con Google exitoso", Toast.LENGTH_SHORT).show();
-                    irAInicioUsuarios();
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        iniciarService.detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
+                            @Override
+                            public void onTipoDetectado(String tipo) {
+                                if (tipo.equals("conductor")) {
+                                    irAInicioConductor();
+                                } else {
+                                    irAInicioUsuarios();
+                                }
+                            }
+
+                            @Override
+                            public void onError(String error) {
+                                Toast.makeText(InicioDeSesion.this, "Error al detectar tipo de usuario: " + error, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 }
+
                 @Override
                 public void onLoginFailure(String error) {
                     Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_LONG).show();
@@ -142,6 +174,11 @@ public class InicioDeSesion extends AppCompatActivity {
             Intent intent = new Intent(InicioDeSesion.this, InicioUsuarios.class);
             startActivity(intent);
         }
+        finish();
+    }
+    private void irAInicioConductor() {
+        Intent intent = new Intent(InicioDeSesion.this, InicioConductor.class);
+        startActivity(intent);
         finish();
     }
 }
