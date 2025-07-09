@@ -3,7 +3,7 @@ package com.chopcode.trasnportenataga_laplata.services;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.util.Log;
+import com.google.firebase.database.*;
 
 import com.chopcode.trasnportenataga_laplata.R;
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
@@ -19,7 +19,6 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import androidx.annotation.NonNull;
 
 public class IniciarService {
-
     private FirebaseAuth auth;
     private Activity activity;
     private SignInClient oneTapClient;
@@ -32,8 +31,12 @@ public class IniciarService {
         void onLoginSuccess();
         void onLoginFailure(String error);
     }
+    public interface TipoUsuarioCallback {
+        void onTipoDetectado(String tipo); // tipo = "pasajero" o "conductor"
+        void onError(String error);
+    }
 
-    // Constructor que recibe la actividad para poder usar startIntentSenderForResult, etc.
+    /** Constructor que recibe la actividad para poder usar startIntentSenderForResult, etc.*/
     public IniciarService(Activity activity) {
         this.activity = activity;
         auth = FirebaseAuth.getInstance();
@@ -47,6 +50,44 @@ public class IniciarService {
                                 .setFilterByAuthorizedAccounts(false)
                                 .build())
                 .build();
+    }
+    public void detectarTipoUsuario(FirebaseUser user, @NonNull TipoUsuarioCallback callback) {
+        String uid = user.getUid();
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+
+        // Primero busca en el nodo de conductores
+        dbRef.child("conductores").child(uid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshotUsuario) {
+                        if (snapshotUsuario.exists()) {
+                            callback.onTipoDetectado("conductor");
+                        } else {
+                            // Si no está en "usuarios", busca en "conductores"
+                            dbRef.child("usuarios").child(uid)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshotConductor) {
+                                            if (snapshotConductor.exists()) {
+                                                callback.onTipoDetectado("pasajero");
+                                            } else {
+                                                callback.onError("No se encontró el usuario en usuarios ni conductores.");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                            callback.onError("Error al verificar en conductores: " + error.getMessage());
+                                        }
+                                    });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        callback.onError("Error al verificar en usuarios: " + error.getMessage());
+                    }
+                });
     }
 
     /**
@@ -101,12 +142,23 @@ public class IniciarService {
                                     registroService.guardarUsuarioSiNoExiste(user, new RegistroService.RegistroCallback() {
                                         @Override
                                         public void onSuccess() {
-                                            callback.onLoginSuccess();
+                                            // Detectar el tipo y redirigir
+                                            new IniciarService(activity).detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
+                                                @Override
+                                                public void onTipoDetectado(String tipo) {
+                                                    callback.onLoginSuccess(); // ya rediriges según el tipo en la actividad
+                                                }
+
+                                                @Override
+                                                public void onError(String error) {
+                                                    callback.onLoginFailure("Autenticado, pero no se pudo detectar el rol: " + error);
+                                                }
+                                            });
                                         }
 
                                         @Override
                                         public void onFailure(String error) {
-                                            callback.onLoginFailure("Usuario autenticado, pero fallo el registro en BD: " + error);
+                                            callback.onLoginFailure("Autenticado, pero falló guardar usuario: " + error);
                                         }
                                     });
                                 } else {
