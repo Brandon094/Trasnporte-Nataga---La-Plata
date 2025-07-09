@@ -8,7 +8,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <!-- Título -->
         <TextView
             android:id="@+id/tvEditarPerfilTitulo"
@@ -55,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:textColor="@color/black"
-                android:textColorHint="@color/gray" />
+                android:textColorHint="@color/gray"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Texto actual del Correo -->
@@ -92,6 +91,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
+                android:enabled="false"
                 android:textColor="@color/black"
                 android:textColorHint="@color/gray" />
         </com.google.android.material.textfield.TextInputLayout>
