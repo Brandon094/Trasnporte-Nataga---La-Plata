@@ -51,33 +51,39 @@ public class IniciarService {
                                 .build())
                 .build();
     }
+    /** Metodo que se encarga de manejar la logica
+     * para identificar el tipo de usuario validando
+     * en que nodo se encuentra registrado*/
     public void detectarTipoUsuario(FirebaseUser user, @NonNull TipoUsuarioCallback callback) {
         String uid = user.getUid();
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
 
-        // Primero busca en el nodo de conductores
+        // 🔍 Primero busca en el nodo "conductores"
         dbRef.child("conductores").child(uid)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshotUsuario) {
-                        if (snapshotUsuario.exists()) {
+                    public void onDataChange(@NonNull DataSnapshot snapshotConductor) {
+                        if (snapshotConductor.exists()) {
+                            // ✅ Si el UID está en "conductores", es conductor
                             callback.onTipoDetectado("conductor");
                         } else {
-                            // Si no está en "usuarios", busca en "conductores"
+                            // 🔍 Si no está en "conductores", buscar en "usuarios"
                             dbRef.child("usuarios").child(uid)
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshotConductor) {
-                                            if (snapshotConductor.exists()) {
+                                        public void onDataChange(@NonNull DataSnapshot snapshotUsuario) {
+                                            if (snapshotUsuario.exists()) {
+                                                // ✅ Está en "usuarios", es pasajero
                                                 callback.onTipoDetectado("pasajero");
                                             } else {
+                                                // ❌ No se encontró en ninguno
                                                 callback.onError("No se encontró el usuario en usuarios ni conductores.");
                                             }
                                         }
 
                                         @Override
                                         public void onCancelled(@NonNull DatabaseError error) {
-                                            callback.onError("Error al verificar en conductores: " + error.getMessage());
+                                            callback.onError("Error al verificar en usuarios: " + error.getMessage());
                                         }
                                     });
                         }
@@ -85,7 +91,7 @@ public class IniciarService {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        callback.onError("Error al verificar en usuarios: " + error.getMessage());
+                        callback.onError("Error al verificar en conductores: " + error.getMessage());
                     }
                 });
     }
@@ -138,27 +144,28 @@ public class IniciarService {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = auth.getCurrentUser();
                                 if (user != null) {
-                                    // 🔥 Guardamos el usuario en Firebase si no existe
-                                    registroService.guardarUsuarioSiNoExiste(user, new RegistroService.RegistroCallback() {
+                                    // 🔎 Detectar si es conductor o pasajero
+                                    detectarTipoUsuario(user, new TipoUsuarioCallback() {
                                         @Override
-                                        public void onSuccess() {
-                                            // Detectar el tipo y redirigir
-                                            new IniciarService(activity).detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
-                                                @Override
-                                                public void onTipoDetectado(String tipo) {
-                                                    callback.onLoginSuccess(); // ya rediriges según el tipo en la actividad
-                                                }
-
-                                                @Override
-                                                public void onError(String error) {
-                                                    callback.onLoginFailure("Autenticado, pero no se pudo detectar el rol: " + error);
-                                                }
-                                            });
+                                        public void onTipoDetectado(String tipo) {
+                                            // Ya está registrado como pasajero o conductor, continuar
+                                            callback.onLoginSuccess();
                                         }
 
                                         @Override
-                                        public void onFailure(String error) {
-                                            callback.onLoginFailure("Autenticado, pero falló guardar usuario: " + error);
+                                        public void onError(String error) {
+                                            // No existe en ningún nodo, lo registramos como pasajero por defecto
+                                            registroService.guardarUsuarioSiNoExiste(user, new RegistroService.RegistroCallback() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    callback.onLoginSuccess();
+                                                }
+
+                                                @Override
+                                                public void onFailure(String error) {
+                                                    callback.onLoginFailure("Autenticado, pero fallo registro: " + error);
+                                                }
+                                            });
                                         }
                                     });
                                 } else {
