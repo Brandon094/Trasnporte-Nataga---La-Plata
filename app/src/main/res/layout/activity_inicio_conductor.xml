@@ -1,14 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    tools:context=".activities.InicioConductor"
-    android:background="?android:colorBackground">
+    android:background="@color/background_color"
+    android:padding="16dp">
 
-    <!-- Título -->
+    <!-- 🔷 Título del panel -->
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvTituloPanel"
         android:layout_width="wrap_content"
@@ -16,99 +15,127 @@
         android:text="@string/panelConductor"
         android:textSize="26sp"
         android:textStyle="bold"
+        android:textColor="@color/primaryTextColor"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:textColor="?android:textColorPrimary" />
+        android:paddingBottom="8dp" />
 
-    <!-- Título de reservas activas -->
+    <!-- 🔹 Reservas Activas -->
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/textViewReservasActivas"
+        android:id="@+id/tvReservasActivas"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/reservasActivas"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
+        android:textColor="@color/secondaryTextColor"
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/tvTituloPanel"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Lista de reservas -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerReservas"
         android:layout_width="0dp"
-        android:layout_height="150dp"
+        android:layout_height="140dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/textViewReservasActivas"
+        app:layout_constraintTop_toBottomOf="@id/tvReservasActivas"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Título de ingresos -->
+    <!-- 🔹 Ingresos Diarios -->
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/textViewIngresosDiarios"
+        android:id="@+id/tvIngresosDiarios"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/ingresosDiarios"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
+        android:textColor="@color/secondaryTextColor"
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/recyclerReservas"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Card de ingresos -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardIngresos"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        app:cardElevation="4dp"
+        app:cardElevation="6dp"
         app:cardCornerRadius="12dp"
-        app:layout_constraintTop_toBottomOf="@id/textViewIngresosDiarios"
+        app:layout_constraintTop_toBottomOf="@id/tvIngresosDiarios"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:cardBackgroundColor="?android:colorBackground">
+        app:cardBackgroundColor="@color/card_background">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvTotalIngresos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/totalIngresos"
-            android:textSize="18sp"
+            android:text="$ 0.00"
+            android:textSize="20sp"
             android:padding="16dp"
-            android:textColor="?android:textColorPrimary" />
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="@color/primaryTextColor" />
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Título de próximas rutas -->
+    <!-- 🔹 Próximas Rutas -->
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/textViewProximasRutas"
+        android:id="@+id/tvProximaRuta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/proximasRutas"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
+        android:textColor="@color/secondaryTextColor"
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/cardIngresos"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Lista de rutas -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerProximasRutas"
         android:layout_width="0dp"
-        android:layout_height="150dp"
+        android:layout_height="140dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/textViewProximasRutas"
+        app:layout_constraintTop_toBottomOf="@id/tvProximaRuta"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Botón de perfil del conductor -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnPerfilConductor"
-        android:layout_width="wrap_content"
+    <!-- 🔸 Botones de acción -->
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="76dp"
-        android:text="@string/perfilConductor"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerProximasRutas"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@id/recyclerProximasRutas"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:weightSum="2">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPerfilConductor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Perfil"
+            android:textAllCaps="false"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/baseline_person_24"
+            app:iconGravity="textStart" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCerrarSesion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="Cerrar sesión"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/baseline_logout_24"
+            app:iconGravity="textStart" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
