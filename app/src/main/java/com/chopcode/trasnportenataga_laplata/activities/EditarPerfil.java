@@ -52,10 +52,10 @@ public class EditarPerfil extends AppCompatActivity {
                 return;
             }
 
-            if (nuevoCorreo.isEmpty()) {
+           /** if (nuevoCorreo.isEmpty()) {
                 correo.setError("Ingresa tu correo");
                 return;
-            }
+            }*/
 
             if (nuevoTelefono.isEmpty()) {
                 telefono.setError("Ingresa tu número de teléfono");
