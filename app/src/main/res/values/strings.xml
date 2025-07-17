@@ -96,7 +96,7 @@
     <!-- Elementos adicionales para la interfaz del conductor -->
     <string name="panelConductor">👨‍✈️ Panel del Conductor</string>
     <string name="verReservas">📋 Ver Reservas</string>
-    <string name="totalIngresos">💵 Total de Ingresos:</string>
+    <string name="totalIngresos">💵 Total de Ingresos Mensuales:</string>
     <string name="verEstadisticas">📊 Ver Estadísticas</string>
     <string name="perfilConductor">👤 Perfil del Conductor</string>
     <string name="actualizarDatos">✏️ Actualizar Datos</string>
