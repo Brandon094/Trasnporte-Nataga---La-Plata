@@ -18,4 +18,8 @@
     <color name="asiento_disponible">#8BC34A</color>  <!-- Verde claro -->
     <color name="asiento_seleccionado">#F44336</color>  <!-- Rojo -->
     <color name="asiento_ocupado">#9E9E9E</color>  <!-- Gris -->
+
+    <color name="primaryTextColor">#212121</color>
+    <color name="secondaryTextColor">#666666</color>
+    <color name="card_background">#F5F5F5</color>
 </resources>
