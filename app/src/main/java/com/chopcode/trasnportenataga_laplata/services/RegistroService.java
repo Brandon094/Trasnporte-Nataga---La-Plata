@@ -78,31 +78,48 @@ public class RegistroService {
      * 🔥 Guarda el usuario de Google en Firebase si no existe.
      */
     public void guardarUsuarioSiNoExiste(FirebaseUser user, RegistroCallback callback) {
-        DatabaseReference userRef = databaseReference.child(user.getUid());
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        String uid = user.getUid();
 
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        // Verificar si existe en "usuarios"
+        rootRef.child("usuarios").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    // Si el usuario no existe en la BD, lo registramos como pasajero
-                    Pasajero pasajero = new Pasajero(
-                            user.getUid(),
-                            user.getDisplayName() != null ? user.getDisplayName() : "Usuario sin nombre",
-                            user.getPhoneNumber() != null ? user.getPhoneNumber() : "No disponible",
-                            user.getEmail()
-                    );
-
-                    userRef.setValue(pasajero)
-                            .addOnSuccessListener(aVoid -> callback.onSuccess())
-                            .addOnFailureListener(e -> callback.onFailure("Error al registrar usuario: " + e.getMessage()));
+            public void onDataChange(@NonNull DataSnapshot usuarioSnapshot) {
+                if (usuarioSnapshot.exists()) {
+                    callback.onSuccess(); // Ya es pasajero
                 } else {
-                    callback.onSuccess(); // El usuario ya existe, no hacemos nada.
+                    // Si no existe en usuarios, verificar si está en "conductores"
+                    rootRef.child("conductores").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot conductorSnapshot) {
+                            if (conductorSnapshot.exists()) {
+                                callback.onSuccess(); // Ya es conductor, no registramos como pasajero
+                            } else {
+                                // Si no está en ninguno, lo registramos como pasajero
+                                Pasajero pasajero = new Pasajero(
+                                        user.getUid(),
+                                        user.getDisplayName() != null ? user.getDisplayName() : "Usuario sin nombre",
+                                        user.getPhoneNumber() != null ? user.getPhoneNumber() : "No disponible",
+                                        user.getEmail()
+                                );
+
+                                rootRef.child("usuarios").child(uid).setValue(pasajero)
+                                        .addOnSuccessListener(aVoid -> callback.onSuccess())
+                                        .addOnFailureListener(e -> callback.onFailure("Error al registrar usuario: " + e.getMessage()));
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            callback.onFailure("Error al verificar en conductores: " + error.getMessage());
+                        }
+                    });
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                callback.onFailure("Error al verificar usuario: " + error.getMessage());
+                callback.onFailure("Error al verificar en usuarios: " + error.getMessage());
             }
         });
     }
@@ -121,7 +138,6 @@ public class RegistroService {
         Map<String, Object> updates = new HashMap<>();
         updates.put("nombre", nuevoNombre);
         updates.put("telefono", nuevoTelefono);
-        updates.put("email", nuevoEmail);
 
         ref.updateChildren(updates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
