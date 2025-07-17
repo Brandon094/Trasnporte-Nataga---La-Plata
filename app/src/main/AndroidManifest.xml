@@ -28,7 +28,7 @@
             android:name=".activities.RegistroUsuarios"
             android:exported="false" />
         <activity
-            android:name=".activities.InicioDeSesion"
+            android:name=".activities.InicioUsuarios"
             android:exported="false" />
         <activity
             android:name=".activities.ConfirmarReserva"
@@ -38,7 +38,7 @@
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata" />
         <activity
-            android:name=".activities.InicioUsuarios"
+            android:name=".activities.InicioDeSesion"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
