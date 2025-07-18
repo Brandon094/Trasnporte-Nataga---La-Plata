@@ -22,4 +22,9 @@
     <color name="primaryTextColor">#212121</color>
     <color name="secondaryTextColor">#666666</color>
     <color name="card_background">#F5F5F5</color>
+    <color name="colorEstadoPendiente">#FFA500</color>
+    <color name="colorEstadoConfirmado">#4CAF50</color>
+    <color name="colorEstadoCancelado">#F44336</color>
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
 </resources>
