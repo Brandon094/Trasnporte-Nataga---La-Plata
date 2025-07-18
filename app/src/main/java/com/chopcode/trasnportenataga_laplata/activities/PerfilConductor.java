@@ -39,7 +39,28 @@ public class PerfilConductor extends AppCompatActivity {
         // 🔹 Manejo del botón Cerrar Sesión
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         btnCerrarSesion.setOnClickListener(view -> cerrarSesion());
+
+        // 🔹 Manejo del botón Historial de reservas
+        btnHistorialReservas = findViewById(R.id.btnHistorialReservas);
+        btnHistorialReservas.setOnClickListener(view -> irHistorialReservas());
+
+        // 🔹 Manejo del botón Historial de reservas
+        btnEditarPerfil = findViewById(R.id.btnEditarPerfil);
+        btnEditarPerfil.setOnClickListener(view -> irEditarPerfil());
     }
+    /**Metodo para abrir el editor del perfil
+     */
+    public void irEditarPerfil(){
+        Intent intent = new Intent(PerfilConductor.this, EditarPerfilConductor.class);
+    }
+    /**
+     * Metodo para abrir el hsitorial de reservas
+     */
+    public void irHistorialReservas(){
+        Intent intent = new Intent(PerfilConductor.this, HistorialReservas.class);
+        startActivity(intent);
+    }
+
     /**
      *  Metodo para obtener la informacion del conductor desde un callBack
      */
@@ -47,12 +68,14 @@ public class PerfilConductor extends AppCompatActivity {
         usuarioService.cargarInformacionConductor(new UsuarioService.ConductorCallback() {
             @Override
             public void onConductorCargado(Conductor conductor) {
+                // Informacion del conductor
                 tvConductor.setText("\uD83D\uDC68\u200D✈️ Nombre Conductor: " + conductor.getNombre());
-                tvPlaca.setText("\uD83D\uDE98 Placa del Vehículo: " + conductor.getPlacaVehiculo());
                 tvTelefono.setText("\uD83D\uDCDE Teléfono Conductor: " + conductor.getTelefono());
-                tvEmail.setText("Email: " + conductor.getEmail());
-                tvCapacidad.setText("Capacidad: " +conductor.getCapacidadVehiculo() );
-                tvModVehiculo.setText("Modelo: " +conductor.getModeloVehiculo());
+                tvEmail.setText("\uD83D\uDCE7 Email: " + conductor.getEmail());
+                // Informacion del vehiculo
+                tvPlaca.setText("\uD83D\uDE98 Placa del Vehículo: " + conductor.getPlacaVehiculo());
+                tvCapacidad.setText("\uD83D\uDC65 Capacidad: " +conductor.getCapacidadVehiculo() );
+                tvModVehiculo.setText("#️⃣ Modelo: " +conductor.getModeloVehiculo());
             }
 
             @Override
