@@ -6,8 +6,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.chopcode.trasnportenataga_laplata.adapters.ReservaAdapter;
 import com.chopcode.trasnportenataga_laplata.models.DisponibilidadAsientos;
+import com.chopcode.trasnportenataga_laplata.models.Horario;
 import com.chopcode.trasnportenataga_laplata.models.Pasajero;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +28,7 @@ public class ReservaService {
     private FirebaseFirestore db;
     private DatabaseReference databaseReference;
     private FirebaseAuth auth;
+
     /**
      * Interfaz para manejar la carga de la reserva de manera asíncrona.
      */
@@ -45,6 +50,14 @@ public class ReservaService {
         void onDisponible(boolean disponible);
         void onError(String error);
     }
+    /**
+     * Interfaz para la carga de las reservas
+     * */
+    public interface ReservaCargadaCallback {
+        void onCargaExitosa(List<Reserva> reservas);
+        void onError(String mensaje);
+    }
+
     public ReservaService() {
         this.databaseReference = FirebaseDatabase.getInstance().getReference();
         db = FirebaseFirestore.getInstance();
@@ -166,35 +179,6 @@ public class ReservaService {
                 });
     }
     /**
-     * 🔥 Verifica si un asiento específico está disponible en la base de datos en tiempo real.
-     *
-     * @param horarioId ID del horario en la base de datos
-     * @param asiento Número del asiento a verificar
-     * @param callback Callback para manejar la disponibilidad del asiento
-     */
-    public void verificarDisponibilidadAsiento(String horarioId, int asiento,
-                                               DisponibilidadCallback callback) {
-        DatabaseReference refAsiento = databaseReference
-                .child("disponibilidadAsientos")
-                .child(horarioId)
-                .child("asientosOcupados")
-                .child(String.valueOf(asiento));
-
-        refAsiento.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Si el asiento existe en `asientosOcupados`, significa que está ocupado
-                boolean disponible = !snapshot.exists();
-                callback.onDisponible(disponible);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                callback.onError("Error al verificar disponibilidad: " + error.getMessage());
-            }
-        });
-    }
-    /**
      * 🔥 Obtiene los asientos ocupados de Firebase y los envía al callback.
      */
     public void obtenerAsientosOcupados(String horarioId, AsientosCallback callback) {
@@ -237,4 +221,31 @@ public class ReservaService {
             }
         });
     }
+    /**
+     * Método para cargar todas las reservas"
+     */
+    public void cargarReservas(@NonNull final ReservaCargadaCallback callback) {
+        databaseReference.child("reservas")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        List<Reserva> listaReservas = new ArrayList<>();
+                        for (DataSnapshot reservaSnap : snapshot.getChildren()) {
+                            Reserva reserva = reservaSnap.getValue(Reserva.class);
+                            if (reserva != null && "Por confirmar".equals(reserva.getEstadoReserva())) {
+                                listaReservas.add(reserva);
+                            }
+                        }
+                        callback.onCargaExitosa(listaReservas);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        callback.onError("Error al cargar reservas: " + error.getMessage());
+                    }
+                });
+    }
+    /**
+     * Metodo para cargar las rutas siguientes
+     */
 }
