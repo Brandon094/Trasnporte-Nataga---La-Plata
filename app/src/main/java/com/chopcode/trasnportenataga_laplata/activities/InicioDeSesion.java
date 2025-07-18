@@ -147,9 +147,26 @@ public class InicioDeSesion extends AppCompatActivity {
             iniciarService.manejarResultadoGoogle(data, new IniciarService.LoginCallback() {
                 @Override
                 public void onLoginSuccess() {
-                    Toast.makeText(InicioDeSesion.this, "Inicio de sesión con Google exitoso", Toast.LENGTH_SHORT).show();
-                    irAInicioUsuarios();
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        iniciarService.detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
+                            @Override
+                            public void onTipoDetectado(String tipo) {
+                                if (tipo.equals("conductor")) {
+                                    irAInicioConductor();
+                                } else {
+                                    irAInicioUsuarios();
+                                }
+                            }
+
+                            @Override
+                            public void onError(String error) {
+                                Toast.makeText(InicioDeSesion.this, "Error al detectar tipo de usuario: " + error, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 }
+
                 @Override
                 public void onLoginFailure(String error) {
                     Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_LONG).show();
