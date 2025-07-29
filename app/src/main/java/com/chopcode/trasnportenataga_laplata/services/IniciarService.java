@@ -130,8 +130,7 @@ public class IniciarService {
                 });
     }
 
-    /**
-     * 🔥 Maneja el inicio de sesión con Google y guarda el usuario en Firebase si no existe.
+     /** 🔥 Maneja el inicio de sesión con Google y guarda el usuario en Firebase si no existe.
      */
     public void manejarResultadoGoogle(Intent data, @NonNull LoginCallback callback) {
         try {
