@@ -1,142 +1,311 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_color"
-    android:padding="16dp">
+    android:fillViewport="true">
 
-    <!-- 🔷 Título del panel -->
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvTituloPanel"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/panelConductor"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:textColor="@color/primaryTextColor"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:paddingBottom="8dp" />
+        android:padding="16dp">
 
-    <!-- 🔹 Reservas Activas -->
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvReservasActivas"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/reservasActivas"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@color/secondaryTextColor"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTituloPanel"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerReservas"
-        android:layout_width="381dp"
-        android:layout_height="251dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvReservasActivas" />
-
-    <!-- 🔹 Ingresos Diarios -->
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvIngresosDiarios"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/ingresosDiarios"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@color/secondaryTextColor"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/recyclerReservas"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardIngresos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:cardElevation="6dp"
-        app:cardCornerRadius="12dp"
-        app:layout_constraintTop_toBottomOf="@id/tvIngresosDiarios"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:cardBackgroundColor="@color/card_background">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvTotalIngresos"
+        <!-- Header con información del conductor -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="$ 0.00"
-            android:textSize="20sp"
-            android:padding="16dp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:textColor="@color/primaryTextColor" />
-    </com.google.android.material.card.MaterialCardView>
+            app:cardBackgroundColor="@color/background_color"
+            app:cardElevation="2dp"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- 🔹 Próximas Rutas -->
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvProximaRuta"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/proximasRutas"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@color/secondaryTextColor"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/cardIngresos"
-        app:layout_constraintStart_toStartOf="parent" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerProximasRutas"
-        android:layout_width="0dp"
-        android:layout_height="140dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/tvProximaRuta"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+                <TextView
+                    android:id="@+id/tvTituloPanel"
+                    style="@style/TextAppearance.MaterialComponents.Headline5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/panelConductor"
+                    android:textAlignment="center"
+                    android:textColor="@color/primary_text"/>
 
-    <!-- 🔸 Botones de acción -->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="24dp"
-        app:layout_constraintTop_toBottomOf="@id/recyclerProximasRutas"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center"
-        android:weightSum="2">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnPerfilConductor"
-            android:layout_width="0dp"
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_driver"
+                        android:contentDescription="@string/nombreConductor" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvConductor"
+                            style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/primary_text"/>
+
+                        <TextView
+                            android:id="@+id/tvPlacaVehiculo"
+                            style="@style/TextAppearance.MaterialComponents.Body2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="@color/text_tertiary"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Sección de Reservas Activas -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardReservas"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Perfil"
-            android:textAllCaps="false"
-            app:cornerRadius="12dp"
-            app:icon="@drawable/baseline_person_24"
-            app:iconGravity="textStart" />
+            app:cardBackgroundColor="@color/background_color"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintTop_toBottomOf="@id/cardHeader"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCerrarSesion"
-            android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/baseline_save_24"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:id="@+id/tvReservasActivas"
+                        style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reservasActivas"
+                        android:textColor="@color/primary_text"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerReservas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="180dp"
+                    android:clipToPadding="false"
+                    android:paddingVertical="8dp"
+                    tools:listitem="@layout/item_reserva"/>
+
+                <TextView
+                    android:id="@+id/tvEmptyReservas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_hay_reservas"
+                    style="@style/TextAppearance.MaterialComponents.Body1"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:visibility="gone"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Sección de Ingresos -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardIngresos"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:text="Cerrar sesión"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            app:cornerRadius="12dp"
-            app:icon="@drawable/baseline_logout_24"
-            app:iconGravity="textStart" />
-    </LinearLayout>
+            app:cardBackgroundColor="@color/text_tertiary"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintTop_toBottomOf="@id/cardReservas"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/baseline_monetization_on_24"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/tvIngresosDiarios"
+                        style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ingresosDiarios"
+                        android:textColor="@color/primary_text"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvTotalIngresos"
+                    style="@style/TextAppearance.MaterialComponents.Headline4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="$0.00"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/primary_color"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Sección de Próximas Rutas -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardRutas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/text_tertiary"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintTop_toBottomOf="@id/cardIngresos"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/baseline_route_24"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:id="@+id/tvProximaRuta"
+                        style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/proximasRutas"
+                        android:textColor="@color/primary_text"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerProximasRutas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="120dp"
+                    android:clipToPadding="false"
+                    android:paddingVertical="8dp"
+                    tools:listitem="@layout/item_reserva"/>
+
+                <TextView
+                    android:id="@+id/tvEmptyRutas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_hay_rutas"
+                    style="@style/TextAppearance.MaterialComponents.Body1"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:visibility="gone"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Botones de acción -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@id/cardRutas"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:gravity="center">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPerfilConductor"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="@string/perfilConductor"
+                android:textAllCaps="false"
+                app:cornerRadius="24dp"
+                app:icon="@drawable/ic_driver"
+                app:iconGravity="textStart"
+                app:iconTint="@color/primary_color"
+                app:strokeColor="@color/primary_color"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCerrarSesion"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="@string/cerrarSesion"
+                android:textAllCaps="false"
+                app:cornerRadius="24dp"
+                app:icon="@drawable/baseline_logout_24"
+                app:iconGravity="textStart"/>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
