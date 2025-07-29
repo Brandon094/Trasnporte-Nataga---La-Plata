@@ -1,118 +1,106 @@
 <resources>
-    <!-- Nombre de la app -->
-    <string name="app_name">🚍RutaGo🏁</string>
-    <!-- Logo de la app -->
-    <string name="app_logo">Logo de la aplicacion</string>
-    <!-- Interfaz de inicio de sesión -->
-    <string name="inicioSesion">🔐 Iniciar sesión</string>
-    <!-- Enlace Olvido contraseña -->
-    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
-    <!-- o -->
+    <!-- ==================== -->
+    <!-- GENERAL APP STRINGS -->
+    <!-- ==================== -->
+    <string name="app_name">🚍 RutaGo</string>
+    <string name="app_logo">Logo de la aplicación</string>
     <string name="or">o</string>
-    <!-- Botones para ingresar -->
+    <string name="confirmar">Confirmar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="volver">Volver</string>
+
+    <!-- ==================== -->
+    <!-- AUTHENTICATION -->
+    <!-- ==================== -->
+    <string name="inicioSesion">Iniciar sesión</string>
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
     <string name="ingresar">Ingresar</string>
     <string name="ingresarGoogle">Iniciar sesión con Google</string>
     <string name="noTieneCuenta">¿No tienes cuenta?</string>
-    <string name="registrate">📝 Regístrate</string>
+    <string name="registrate">Regístrate</string>
+    <string name="cerrarSesion">Cerrar sesión</string>
 
-    <!-- Interfaz Registro de usuarios -->
-    <string name="volver">Volver</string>
-    <string name="crearCuenta">🆕 Crear cuenta</string>
-    <string name="nombreCompleto">👤 Nombre Completo</string>
-    <string name="correo">📧 Correo Electrónico</string>
-    <string name="telefono">📞 Teléfono (Opcional)</string>
-    <string name="contraseña">🔑 Contraseña</string>
-    <string name="confirmarContraseña">🔑 Confirmar Contraseña</string>
-    <!-- Botón para registrarse -->
-    <string name="registrarse">✅ Registrarse</string>
-    <!-- Texto "¿Ya tienes cuenta?" -->
-    <string name="yaTieneCuenta">👈 ¿Ya tienes cuenta?</string>
+    <!-- REGISTRATION -->
+    <string name="crearCuenta">Crear cuenta</string>
+    <string name="nombreCompleto">Nombre completo</string>
+    <string name="correo">Correo electrónico</string>
+    <string name="telefono">Teléfono (opcional)</string>
+    <string name="contraseña">Contraseña</string>
+    <string name="confirmarContraseña">Confirmar contraseña</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="yaTieneCuenta">¿Ya tienes cuenta?</string>
     <string name="iniciaSesion">Inicia sesión aquí</string>
 
-    <!-- Interfaz principal -->
-    <string name="horarios">🕒 Horarios de rutas</string>
-    <string name="nataga">📍Natagá →\n La Plata🏁</string>
-    <string name="laPlata">📍La Plata →\n Natagá🏁</string>
+    <!-- ==================== -->
+    <!-- ROUTES & SCHEDULES -->
+    <!-- ==================== -->
+    <string name="horarios">Horarios de rutas</string>
+    <string name="nataga">Natagá → La Plata</string>
+    <string name="laPlata">La Plata → Natagá</string>
+    <string name="ruta_hora">Ruta - Hora</string>
+    <string name="proximasRutas">Próxima ruta</string>
+    <string name="tiempoEstimado">Tiempo estimado: %s</string>
 
-    <!-- Botón reservar puesto -->
+    <!-- ==================== -->
+    <!-- RESERVATIONS -->
+    <!-- ==================== -->
     <string name="reservar">Reservar puesto</string>
-    <!-- Interfaz de selección de asientos -->
-    <string name="seleccionaAsiento">💺 Selecciona tu asiento</string>
-    <string name="asientosCabina">🚖 Asientos en la cabina</string>
+    <string name="confirmarReserva">Confirmar reserva</string>
+    <string name="seleccionaAsiento">Selecciona tu asiento</string>
+    <string name="infoReserva">Información de reserva</string>
+    <string name="horaSalida">Hora de salida: %s</string>
+    <string name="asientoReservado">Asiento: %s</string>
+    <string name="precio">Precio: $%s</string>
+    <string name="origen">Origen: %s</string>
+    <string name="destino">Destino: %s</string>
+    <string name="metodoPago">Método de pago: %s</string>
+    <string name="estadoReserva">Estado: %s</string>
+    <string name="reservasActivas">Reservas activas: %d</string>
+    <string name="historial">Historial de reservas</string>
+    <string name="no_hay_reservas">No hay reservas activas</string>
+    <string name="no_hay_rutas">No hay rutas programadas</string>
 
-    <!-- Asientos en la cabina -->
-    <string name="chofer">🚖</string>
-    <string name="asiento1">1</string>
-    <string name="asiento2">2</string>
-    <string name="asiento3">3</string>
-    <string name="asiento4">4</string>
-    <string name="asiento5">5</string>
+    <!-- SEATS -->
+    <string name="asientosCabina">Asientos en cabina</string>
+    <string name="asientosAtras">Asientos traseros</string>
+    <string name="asiento_chofer">Conductor</string>
+    <string name="asiento_number">Asiento %d</string>
 
-    <!-- Asientos en la parte trasera -->
-    <string name="asientosAtras">🛻 Asientos en la parte trasera</string>
-    <string name="asiento6">6</string>
-    <string name="asiento7">7</string>
-    <string name="asiento8">8</string>
-    <string name="asiento9">9</string>
-    <string name="asiento10">10</string>
-    <string name="asiento11">11</string>
-    <string name="asiento12">12</string>
-    <string name="asiento13">13</string>
-    <string name="asiento14">14</string>
+    <!-- ==================== -->
+    <!-- DRIVER PANEL -->
+    <!-- ==================== -->
+    <string name="panelConductor">Panel del conductor</string>
+    <string name="verReservas">Ver reservas</string>
+    <string name="ingresosDiarios">Ingresos diarios: $%.2f</string>
+    <string name="totalIngresos">Ingresos mensuales: $%.2f</string>
+    <string name="verEstadisticas">Ver estadísticas</string>
+    <string name="perfilConductor">Perfil conductor</string>
+    <string name="actualizarDatos">Actualizar datos</string>
+    <string name="notificaciones">Notificaciones (%d)</string>
 
-    <!-- Botón para confirmar la reserva -->
-    <string name="confirmarReserva">✅ Confirmar reserva</string>
+    <!-- ==================== -->
+    <!-- VEHICLE & PROFILE -->
+    <!-- ==================== -->
+    <string name="datosVehiculo">Datos del vehículo</string>
+    <string name="placaVehiculo">Placa: %s</string>
+    <string name="nombreConductor">Conductor: %s</string>
+    <string name="telefonoC">Teléfono: %s</string>
+    <string name="pasajero">Pasajero: %s</string>
+    <string name="telefonoP">Teléfono: %s</string>
+    <string name="modelo">Modelo: %s</string>
+    <string name="capacidad">Capacidad: %d personas</string>
+    <string name="placa">Placa: %s</string>
+    <string name="editarPerfil">Editar perfil</string>
 
-    <!-- Interfaz de confirmación de reserva -->
-    <string name="infoReserva">ℹ️ Información de reserva:</string>
-    <string name="horaSalida">🕒 Hora de salida:</string>
-    <string name="asientoReservado">💺 Asiento reservado:</string>
-    <string name="precio">💰 Precio:</string>
-    <string name="origen">📍 Origen:</string>
-    <string name="destino">🏁 Destino:</string>
-    <string name="tiempoEstimado">⏳ Tiempo Estimado:</string>
-    <string name="metodoPago">💳 Método de Pago:</string>
-    <string name="estadoReserva">📌 Estado de la Reserva:</string>
+    <!-- ==================== -->
+    <!-- PAYMENT METHODS -->
+    <!-- ==================== -->
+    <string name="pago_efectivo">Efectivo</string>
+    <string name="pago_tarjeta">Tarjeta</string>
+    <string name="pago_transferencia">Transferencia</string>
 
-    <!-- Sección de Información del Vehículo -->
-    <string name="datosVehiculo">🚗 Datos del Vehículo y Conductor</string>
-    <string name="placaVehiculo">🚘 Placa del Vehículo:</string>
-    <string name="nombreConductor">👨‍✈️ Nombre Conductor:</string>
-    <string name="telefonoC">📞 Teléfono Conductor:</string>
-
-    <!-- Informacion de Pasajero -->
-    <string name="pasajero">👤 Nombre Usuario:</string>
-    <string name="telefonoP">📞 Telefono Pasajero:</string>
-
-    <!-- Botones generales -->
-    <string name="confirmar">✅ Confirmar</string>
-    <string name="cancelar">❌ Cancelar</string>
-
-    <!-- Interfaz de inicio conductor -->
-    <string name="reservasActivas">✅ Total de reservas activas:</string>
-    <string name="ingresosDiarios">💰 Ingresos totales diarios:</string>
-    <string name="proximasRutas">📍 Próxima ruta:</string>
-
-    <!-- Elementos adicionales para la interfaz del conductor -->
-    <string name="panelConductor">👨‍✈️ Panel del Conductor</string>
-    <string name="verReservas">📋 Ver Reservas</string>
-    <string name="totalIngresos">💵 Total de Ingresos Mensuales:</string>
-    <string name="verEstadisticas">📊 Ver Estadísticas</string>
-    <string name="perfilConductor">👤 Perfil del Conductor</string>
-    <string name="actualizarDatos">✏️ Actualizar Datos</string>
-    <string name="notificaciones">🔔 Notificaciones</string>
-
-    <!-- Interfaz de Perfil -->
-    <!-- Datos del vehículo -->
-    <string name="modelo">🛻 Modelo:</string>
-    <string name="capacidad">👥 Capacidad:</string>
-    <string name="placa">🚗 Placa:</string>
-    <!-- Botones -->
-    <string name="editarPerfil">✏️ Editar perfil</string>
-    <string name="cerrarSesion">Cerrar sesión</string>
-    <string name="ruta_hora">🕒 Ruta - Hora</string>
-    <string name="historial">🕒 Historial de reservas</string>
-
-    <!-- API key de autenticación de Google -->
-    <string name="default_web_client_id">175264872585-abombvqq36bqqeet86onnhkf7uep6c60.apps.googleusercontent.com</string>
+    <!-- ==================== -->
+    <!-- API KEYS -->
+    <!-- ==================== -->
+    <string name="default_web_client_id" translatable="false">175264872585-abombvqq36bqqeet86onnhkf7uep6c60.apps.googleusercontent.com</string>
 </resources>
