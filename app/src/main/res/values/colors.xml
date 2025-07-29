@@ -1,30 +1,68 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="gray">#808080</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="text_dark">#212121</color>
+    <!-- ==================== -->
+    <!-- COLORES PRIMARIOS -->
+    <!-- ==================== -->
+    <color name="primary_500">#1A73E8</color>  <!-- Azul Google (confianza, tecnología) -->
+    <color name="primary_700">#0D47A1</color>  <!-- Azul más oscuro -->
+    <color name="primary_200">#8AB4F8</color>  <!-- Azul claro -->
+    <color name="primary_50">#E8F0FE</color>   <!-- Azul muy claro para fondos -->
 
-    <color name="primary_color">@color/teal_700</color>
-    <color name="primary_text">#212121</color>
-    <color name="background_color">#FFFFFF</color>
+    <!-- COLOR SECUNDARIO (naranja energético) -->
+    <color name="secondary_500">#FF6D00</color>
+    <color name="secondary_700">#E65100</color>
+    <color name="secondary_200">#FFAB40</color>
+    <color name="secondary_50">#FFF3E0</color>
 
-    <!-- Colores para los asientos -->
-    <color name="asiento_disponible">#8BC34A</color>  <!-- Verde claro -->
-    <color name="asiento_seleccionado">#F44336</color>  <!-- Rojo -->
-    <color name="asiento_ocupado">#9E9E9E</color>  <!-- Gris -->
+    <!-- ==================== -->
+    <!-- COLORES DE TEXTO -->
+    <!-- ==================== -->
+    <color name="text_primary">#202124</color>  <!-- Negro casi puro -->
+    <color name="text_secondary">#5F6368</color>  <!-- Gris oscuro -->
+    <color name="text_tertiary">#9AA0A6</color>  <!-- Gris medio -->
+    <color name="text_on_primary">#FFFFFF</color>  <!-- Blanco para texto sobre fondos oscuros -->
+    <color name="text_on_secondary">#FFFFFF</color>
 
-    <color name="primaryTextColor">#212121</color>
-    <color name="secondaryTextColor">#666666</color>
-    <color name="card_background">#F5F5F5</color>
-    <color name="colorEstadoPendiente">#FFA500</color>
-    <color name="colorEstadoConfirmado">#4CAF50</color>
-    <color name="colorEstadoCancelado">#F44336</color>
-    <color name="green">#4CAF50</color>
-    <color name="red">#F44336</color>
+    <!-- ==================== -->
+    <!-- COLORES DE FONDO -->
+    <!-- ==================== -->
+    <color name="background">#FFFFFF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F1F3F4</color>  <!-- Gris muy claro -->
+    <color name="error">#D32F2F</color>  <!-- Rojo para errores -->
+
+    <!-- ==================== -->
+    <!-- COLORES PARA ASIENTOS -->
+    <!-- ==================== -->
+    <color name="seat_available">#34A853</color>  <!-- Verde Google (disponible) -->
+    <color name="seat_selected">#1A73E8</color>  <!-- Azul (seleccionado) -->
+    <color name="seat_booked">#9AA0A6</color>  <!-- Gris (ocupado) -->
+    <color name="seat_disabled">#E8EAED</color>  <!-- Gris claro (no disponible) -->
+
+    <!-- ==================== -->
+    <!-- COLORES PARA ESTADOS -->
+    <!-- ==================== -->
+    <color name="status_confirmed">#34A853</color>  <!-- Verde (confirmado) -->
+    <color name="status_pending">#FBBC04</color>  <!-- Amarillo (pendiente) -->
+    <color name="status_cancelled">#D32F2F</color>  <!-- Rojo (cancelado) -->
+    <color name="status_completed">#5F6368</color>  <!-- Gris (completado) -->
+
+    <!-- ==================== -->
+    <!-- COLORES ADICIONALES -->
+    <!-- ==================== -->
+    <color name="divider">#E0E0E0</color>  <!-- Para separadores -->
+    <color name="shadow">#42000000</color>  <!-- Sombra semi-transparente -->
+    <color name="overlay">#66000000</color>  <!-- Overlay oscuro -->
+    <color name="success">#34A853</color>  <!-- Verde para éxito -->
+    <color name="warning">#FBBC04</color>  <!-- Amarillo para advertencias -->
+    <color name="info">#1A73E8</color>  <!-- Azul para información -->
+
+    <!-- ==================== -->
+    <!-- ALIAS PARA COMPATIBILIDAD -->
+    <!-- ==================== -->
+    <color name="primary_color">@color/primary_500</color>
+    <color name="secondary_color">@color/secondary_500</color>
+    <color name="primary_text">@color/text_primary</color>
+    <color name="secondary_text">@color/text_secondary</color>
+    <color name="background_color">@color/background</color>
+    <color name="card_background">@color/surface_variant</color>
 </resources>
