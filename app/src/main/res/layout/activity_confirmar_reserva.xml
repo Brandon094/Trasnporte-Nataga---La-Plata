@@ -133,7 +133,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/estadoReserva"
-                        app:chipBackgroundColor="@color/teal_200"/>
+                        app:chipBackgroundColor="@color/status_pending"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
