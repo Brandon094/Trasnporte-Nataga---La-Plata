@@ -31,7 +31,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="👤 Nombre actual: -"
-            android:textColor="@color/gray"
+            android:textColor="@color/secondary_text"
             android:textSize="14sp"
             android:layout_marginBottom="4dp"
             app:layout_constraintTop_toBottomOf="@id/tvEditarPerfilTitulo"
@@ -60,8 +60,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
-                android:textColor="@color/black"
-                android:textColorHint="@color/gray" />
+                android:textColor="@color/text_secondary"
+                android:textColorHint="@color/text_primary" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Correo actual -->
@@ -70,7 +70,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="📧 Correo actual: -"
-            android:textColor="@color/gray"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="4dp"
@@ -100,8 +100,8 @@
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
                 android:enabled="false"
-                android:textColor="@color/black"
-                android:textColorHint="@color/gray" />
+                android:textColor="@color/text_secondary"
+                android:textColorHint="@color/text_primary" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Teléfono actual -->
@@ -110,7 +110,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="📱 Teléfono actual: -"
-            android:textColor="@color/gray"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="4dp"
@@ -139,8 +139,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="phone"
-                android:textColor="@color/black"
-                android:textColorHint="@color/gray" />
+                android:textColor="@color/text_secondary"
+                android:textColorHint="@color/text_primary" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Botón Guardar Cambios -->
