@@ -245,7 +245,4 @@ public class ReservaService {
                     }
                 });
     }
-    /**
-     * Metodo para cargar las rutas siguientes
-     */
 }
