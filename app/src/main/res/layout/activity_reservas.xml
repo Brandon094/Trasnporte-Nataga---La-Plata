@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/background"
     tools:context=".activities.Reservas">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="@string/seleccionaAsiento"
-            app:titleTextColor="@color/white"
+            app:titleTextColor="@color/text_on_primary"
             style="@style/Widget.MaterialComponents.Toolbar.Primary" />
 
     </com.google.android.material.appbar.AppBarLayout>
