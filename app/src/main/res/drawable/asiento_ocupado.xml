@@ -18,11 +18,11 @@
     <!-- Línea cruzada (X) para indicar ocupado -->
     <path
         android:strokeWidth="2"
-        android:strokeColor="@color/white"
+        android:strokeColor="@color/text_on_primary"
     android:pathData="M2,4L22,22" />
 
     <path
         android:strokeWidth="2"
-        android:strokeColor="@color/white"
+        android:strokeColor="@color/text_on_primary"
         android:pathData="M22,2L2,22" />
 </vector>
