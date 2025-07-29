@@ -28,7 +28,7 @@
                 android:layout_weight="1"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@color/black"/>
+                android:textColor="@color/primary_text"/>
 
             <TextView
                 android:id="@+id/tvEstado"
@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:padding="4dp"
-                android:background="@drawable/baseline_co_present_24"/>
+                android:background="@drawable/bg_estado_reserva"/>
         </LinearLayout>
 
         <!-- Detalles de contacto -->
@@ -89,8 +89,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Cancelar"
-                android:backgroundTint="@color/red"
-                android:textColor="@color/white"
+                android:backgroundTint="@color/status_cancelled"
+                android:textColor="@color/text_on_primary"
                 android:layout_marginEnd="8dp"/>
 
             <Button
@@ -98,8 +98,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Confirmar"
-                android:backgroundTint="@color/green"
-                android:textColor="@color/white"/>
+                android:backgroundTint="@color/status_confirmed"
+                android:textColor="@color/text_on_primary"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
