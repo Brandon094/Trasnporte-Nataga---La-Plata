@@ -33,7 +33,7 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
             String ruta = (horario.getRuta() != null) ? horario.getRuta().trim() : "Ruta desconocida";
             String hora = (horario.getHora() != null) ? horario.getHora() : "Hora no disponible";
 
-            holder.tvHorario.setText(ruta + "\n" + hora);
+            holder.tvHora.setText(hora);
         }
     }
 
@@ -43,11 +43,11 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView tvHorario;
+        public TextView tvHora,tvInfoAdicional, badgeDiponibilidad;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvHorario = itemView.findViewById(R.id.tvHorario);
+            tvHora = itemView.findViewById(R.id.tvHora);
         }
     }
 }
