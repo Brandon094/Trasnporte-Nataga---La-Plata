@@ -5,11 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="0dp"
-    app:cardBackgroundColor="@color/surface_variant"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/surface"
     app:strokeColor="@color/primary_200"
     app:strokeWidth="1dp">
 
@@ -17,19 +17,46 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_horizontal"
-        android:paddingVertical="12dp"
-        android:paddingHorizontal="16dp">
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
-        <!-- Indicador de hora -->
+        <!-- Hora -->
         <TextView
             android:id="@+id/tvHora"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:textColor="@color/primary_500"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:minWidth="64dp"
+            android:gravity="center"
             tools:text="08:00 AM" />
+
+        <!-- Separador CON COLOR -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="24dp"
+            android:background="@color/primary_200"
+            android:layout_marginHorizontal="12dp" />
+
+        <!-- Información de la ruta -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvRuta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Natagá → La Plata" />
+
+        </LinearLayout>
+
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>
