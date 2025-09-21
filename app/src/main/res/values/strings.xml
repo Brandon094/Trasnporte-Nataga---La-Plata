@@ -56,6 +56,7 @@
     <string name="metodoPago">Método de pago: %s</string>
     <string name="estadoReserva">Estado: %s</string>
     <string name="reservasActivas">Reservas activas: %d</string>
+    <string name="reservasPendientes">Reservas activas: %d</string>
     <string name="historial">Historial de reservas</string>
     <string name="no_hay_reservas">No hay reservas activas</string>
     <string name="no_hay_rutas">No hay rutas programadas</string>
