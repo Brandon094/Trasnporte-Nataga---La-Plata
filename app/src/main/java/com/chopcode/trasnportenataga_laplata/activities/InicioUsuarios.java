@@ -36,6 +36,7 @@ public class InicioUsuarios extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inicio_usuarios);
+
         // 🔹 Referencia a la barra superior
         MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
 
@@ -49,7 +50,7 @@ public class InicioUsuarios extends AppCompatActivity {
         recyclerViewNataga.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewLaPlata.setLayoutManager(new LinearLayoutManager(this));
 
-        // 🔹 Configurar Adapters
+        // 🔹 Configurar Adapters (SIN listener)
         adapterNataga = new HorarioAdapter(listaNataga);
         adapterLaPlata = new HorarioAdapter(listaLaPlata);
         recyclerViewNataga.setAdapter(adapterNataga);
@@ -62,28 +63,15 @@ public class InicioUsuarios extends AppCompatActivity {
         // 🔹 Manejo del botón Reservar
         btnReservas = findViewById(R.id.btnReservar);
         btnReservas.setOnClickListener(view -> {
-            // Validar si el usuario está autenticado
-            boolean usuario = validarLogIn();
-            if (usuario != false) {
-                // El usuario está autenticado, proceder a las reservas
+            if (validarLogIn()) {
                 Intent reservas = new Intent(InicioUsuarios.this, Reservas.class);
                 startActivity(reservas);
-            } else {
-                // Usuario no autenticado, redirigir al inicio de sesión
-                Intent intent = new Intent(InicioUsuarios.this, InicioDeSesion.class);
-                // Guardar la actividad actual para volver después del inicio de sesión
-                intent.putExtra("volverAReserva", true);
-                startActivity(intent);
-                // No finalizar la actividad actual para que el usuario pueda volver a ver los
-                // horarios si decide no iniciar sesión
             }
         });
+
         // Detectar clic en el ícono del perfil
         topAppBar.setOnMenuItemClickListener(item -> {
-            // Validar si el usuario está autenticado
-            boolean usuario = validarLogIn();
-            if (usuario != false & item.getItemId() == R.id.action_perfil) {
-                // El usuario está autenticado, proceder al perfil de usuario
+            if (item.getItemId() == R.id.action_perfil && validarLogIn()) {
                 Intent intent = new Intent(InicioUsuarios.this, PerfilUsuario.class);
                 startActivity(intent);
                 return true;
@@ -95,6 +83,7 @@ public class InicioUsuarios extends AppCompatActivity {
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         btnCerrarSesion.setOnClickListener(view -> cerrarSesion());
     }
+
     /**
      * 🔹 Carga los horarios desde Firebase.
      */
@@ -106,29 +95,29 @@ public class InicioUsuarios extends AppCompatActivity {
                 listaLaPlata.clear();
 
                 listaNataga.addAll(nataga);
-                adapterNataga.notifyItemRangeInserted(0, nataga.size());
-
                 listaLaPlata.addAll(laPlata);
-                adapterLaPlata.notifyItemRangeInserted(0, laPlata.size());
+
+                adapterNataga.actualizarHorarios(listaNataga);
+                adapterLaPlata.actualizarHorarios(listaLaPlata);
             }
 
             @Override
             public void onError(String error) {
                 Log.e("Firebase", error);
+                Toast.makeText(InicioUsuarios.this, "Error al cargar horarios", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
     /**
      * 🔹 Valida si el usuario ha iniciado sesión.
-     * @return true si está autenticado, false si no.
      */
     private boolean validarLogIn() {
         FirebaseUser usuario = auth.getCurrentUser();
         if (usuario == null) {
+            Toast.makeText(this, "Debes iniciar sesión", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, InicioDeSesion.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            finish();
             return false;
         }
         return true;
@@ -139,6 +128,7 @@ public class InicioUsuarios extends AppCompatActivity {
      */
     private void cerrarSesion() {
         auth.signOut();
+        Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, InicioDeSesion.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
