@@ -30,10 +30,7 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Horario horario = horarios.get(position);
         if (horario != null) {
-            String ruta = (horario.getRuta() != null) ? horario.getRuta().trim() : "Ruta desconocida";
-            String hora = (horario.getHora() != null) ? horario.getHora() : "Hora no disponible";
-
-            holder.tvHora.setText(hora);
+            holder.bind(horario);
         }
     }
 
@@ -42,12 +39,40 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
         return horarios.size();
     }
 
+    public void actualizarHorarios(List<Horario> nuevosHorarios) {
+        this.horarios = (nuevosHorarios != null) ? nuevosHorarios : new java.util.ArrayList<>();
+        notifyDataSetChanged();
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView tvHora,tvInfoAdicional, badgeDiponibilidad;
+        public TextView tvHora, tvRuta;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvHora = itemView.findViewById(R.id.tvHora);
+            tvRuta = itemView.findViewById(R.id.tvRuta);
+        }
+
+        public void bind(Horario horario) {
+            try {
+                // Hora
+                String hora = horario.getHora() != null ? horario.getHora() : "--:--";
+                // Limpiar formato si es necesario
+                if (hora.length() > 5 && hora.contains(":")) {
+                    hora = hora.substring(0, 5);
+                }
+                tvHora.setText(hora);
+
+                // Ruta
+                String ruta = horario.getRuta() != null ? horario.getRuta() : "Ruta no disponible";
+                tvRuta.setText(ruta);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Valores por defecto
+                tvHora.setText("--:--");
+                tvRuta.setText("Ruta no disponible");
+            }
         }
     }
 }
