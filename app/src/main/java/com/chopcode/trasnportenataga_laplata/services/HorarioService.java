@@ -40,14 +40,25 @@ public class HorarioService {
                 List<Horario> listaLaPlata = new ArrayList<>();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Horario horario = snapshot.getValue(Horario.class);
-                    if (horario != null) {
-                        String ruta = horario.getRuta().trim();
+                    // Obtener valores manualmente para asegurar que funcionen
+                    String hora = snapshot.child("hora").getValue(String.class);
+                    String ruta = snapshot.child("ruta").getValue(String.class);
+
+                    // Crear horario solo con los datos esenciales
+                    Horario horario = new Horario();
+                    horario.setHora(hora != null ? hora : "--:--");
+                    horario.setRuta(ruta != null ? ruta : "Ruta no disponible");
+
+                    if (ruta != null) {
+                        ruta = ruta.trim();
                         if (ruta.equals("Natagá -> La Plata")) {
                             listaNataga.add(horario);
                         } else if (ruta.equals("La Plata -> Natagá")) {
                             listaLaPlata.add(horario);
                         }
+                    } else {
+                        // Si no hay ruta, agregar a alguna lista por defecto
+                        listaNataga.add(horario);
                     }
                 }
                 callback.onHorariosCargados(listaNataga, listaLaPlata);
