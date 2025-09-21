@@ -5,6 +5,7 @@ public class Ruta {
     private String origen;  // Lugar de salida
     private String destino; // Lugar de llegada
     private double tarifa;  // Precio del pasaje
+    private Horario hora;
 
     public Ruta() { }
 
@@ -13,6 +14,7 @@ public class Ruta {
         this.origen = origen;
         this.destino = destino;
         this.tarifa = tarifa;
+        this.hora = hora;
     }
 
     // Getters y Setters
@@ -24,7 +26,14 @@ public class Ruta {
 
     public String getDestino() { return destino; }
     public void setDestino(String destino) { this.destino = destino; }
-
     public double getTarifa() { return tarifa; }
     public void setTarifa(double tarifa) { this.tarifa = tarifa; }
+
+    public Horario getHora() {
+        return hora;
+    }
+
+    public void setHora(Horario hora) {
+        this.hora = hora;
+    }
 }
