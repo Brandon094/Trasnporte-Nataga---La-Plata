@@ -115,7 +115,7 @@
                         style="@style/TextAppearance.MaterialComponents.Subtitle1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/reservasActivas"
+                        android:text="@string/reservasPendientes"
                         android:textColor="@color/primary_text"/>
 
                     <View
