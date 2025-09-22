@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.*;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.services.IniciarService;
+import com.chopcode.trasnportenataga_laplata.services.RegistroConductoresService;
 import com.google.android.gms.auth.api.identity.SignInCredential;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.material.textfield.TextInputEditText;
@@ -70,6 +71,7 @@ public class InicioDeSesion extends AppCompatActivity {
                 iniciarService.iniciarSesionCorreo(correo, password, new IniciarService.LoginCallback() {
                     @Override
                     public void onLoginSuccess() {
+                        // El tipo de usuario ya fue detectado en el servicio, solo redirigir
                         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                         if (user != null) {
                             iniciarService.detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
@@ -84,7 +86,7 @@ public class InicioDeSesion extends AppCompatActivity {
 
                                 @Override
                                 public void onError(String error) {
-                                    Toast.makeText(InicioDeSesion.this, "Error al detectar tipo de usuario: " + error, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -97,14 +99,6 @@ public class InicioDeSesion extends AppCompatActivity {
                 });
             }
         });
-
-        // Manejar botón de registro
-        if (buttonRegistro != null) {
-            buttonRegistro.setOnClickListener(v -> {
-                Intent intent = new Intent(InicioDeSesion.this, RegistroUsuarios.class);
-                startActivity(intent);
-            });
-        }
 
         // Manejar inicio de sesión con Google
         btnGoogleSignIn.setOnClickListener(v -> {
@@ -137,6 +131,18 @@ public class InicioDeSesion extends AppCompatActivity {
                 }
             });
         });
+
+        // En onCreate o en un botón de administración
+        /*RegistroConductoresService registroService = new RegistroConductoresService();
+        registroService.registrarConductoresExistentes();*/
+
+        // Manejar botón de registro
+        if (buttonRegistro != null) {
+            buttonRegistro.setOnClickListener(v -> {
+                Intent intent = new Intent(InicioDeSesion.this, RegistroUsuarios.class);
+                startActivity(intent);
+            });
+        }
     }
 
     // Recibir el resultado del One Tap Sign-In de Google
