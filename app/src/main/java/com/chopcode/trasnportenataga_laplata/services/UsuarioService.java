@@ -75,31 +75,67 @@ public class UsuarioService {
      * 🔥 Carga la información del primer conductor disponible en la base de datos.
      */
     public void cargarInformacionConductor(@NonNull final ConductorCallback callback) {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            callback.onError("No hay un usuario autenticado.");
+            return;
+        }
+
+        String conductorUid = currentUser.getUid();
         DatabaseReference refConductores = FirebaseDatabase.getInstance().getReference("conductores");
 
-        refConductores.addListenerForSingleValueEvent(new ValueEventListener() {
+        // 🔥 Cambio importante: usar child(conductorUid) en lugar de iterar
+        refConductores.child(conductorUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    callback.onError("No se encontraron conductores registrados.");
+                    callback.onError("No se encontró información para el conductor autenticado.");
                     return;
                 }
 
-                for (DataSnapshot conductorSnapshot : snapshot.getChildren()) {
-                    Conductor conductor = conductorSnapshot.getValue(Conductor.class);
-                    if (conductor != null) {
-                        conductor.setId(conductorSnapshot.getKey()); // por si necesitas usarlo
-                        callback.onConductorCargado(conductor);
-                        return; // usamos solo el primer conductor
-                    }
+                Conductor conductor = snapshot.getValue(Conductor.class);
+                if (conductor != null) {
+                    conductor.setId(snapshot.getKey());
+                    callback.onConductorCargado(conductor);
+                } else {
+                    callback.onError("Error al obtener los datos del conductor.");
                 }
-
-                callback.onError("No se pudo obtener la información del conductor.");
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                callback.onError("Error al cargar el conductor: " + error.getMessage());
+                callback.onError("Error al cargar la información del conductor: " + error.getMessage());
+            }
+        });
+    }
+
+    /**
+     * 🔥 NUEVO MÉTODO: Carga información de conductor por UID específico
+     * (útil si necesitas cargar desde otra actividad)
+     */
+    public void cargarInformacionConductorPorUid(String conductorUid, @NonNull final ConductorCallback callback) {
+        DatabaseReference refConductores = FirebaseDatabase.getInstance().getReference("conductores");
+
+        refConductores.child(conductorUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    callback.onError("No se encontró información para el conductor con UID: " + conductorUid);
+                    return;
+                }
+
+                Conductor conductor = snapshot.getValue(Conductor.class);
+                if (conductor != null) {
+                    conductor.setId(snapshot.getKey());
+                    callback.onConductorCargado(conductor);
+                } else {
+                    callback.onError("Error al obtener los datos del conductor.");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError("Error al cargar la información del conductor: " + error.getMessage());
             }
         });
     }
