@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,71 +25,69 @@ public class PerfilConductor extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perfil_conductor);
 
-        // Referencias a la UI
+        auth = FirebaseAuth.getInstance();
+        inicializarVistas();
+        cargarInfoConductor();
+        configurarBotones();
+    }
+
+    private void inicializarVistas() {
         tvConductor = findViewById(R.id.tvNombreUsuario);
         tvEmail = findViewById(R.id.tvEmail);
         tvTelefono = findViewById(R.id.tvPhone);
-
-        //Datos del vehiculo
         tvPlaca = findViewById(R.id.tvPlacaVehiculo);
         tvModVehiculo = findViewById(R.id.tvModeloVehiculo);
         tvCapacidad = findViewById(R.id.tvCapacidadVehiculo);
-        // Cargar info conductor
-        cargarInfoConductor();
-
-        // 🔹 Manejo del botón Cerrar Sesión
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
-        btnCerrarSesion.setOnClickListener(view -> cerrarSesion());
-
-        // 🔹 Manejo del botón Historial de reservas
         btnHistorialReservas = findViewById(R.id.btnHistorialReservas);
-        btnHistorialReservas.setOnClickListener(view -> irHistorialReservas());
-
-        // 🔹 Manejo del botón Historial de reservas
         btnEditarPerfil = findViewById(R.id.btnEditarPerfil);
+    }
+
+    private void configurarBotones() {
+        btnCerrarSesion.setOnClickListener(view -> cerrarSesion());
+        btnHistorialReservas.setOnClickListener(view -> irHistorialReservas());
         btnEditarPerfil.setOnClickListener(view -> irEditarPerfil());
     }
-    /**Metodo para abrir el editor del perfil
-     */
-    public void irEditarPerfil(){
-        Intent intent = new Intent(PerfilConductor.this, EditarPerfilConductor.class);
-    }
-    /**
-     * Metodo para abrir el hsitorial de reservas
-     */
-    public void irHistorialReservas(){
-        Intent intent = new Intent(PerfilConductor.this, HistorialReservas.class);
-        startActivity(intent);
-    }
 
     /**
-     *  Metodo para obtener la informacion del conductor desde un callBack
+     * Método para cargar la información del conductor autenticado
      */
     private void cargarInfoConductor(){
         usuarioService.cargarInformacionConductor(new UsuarioService.ConductorCallback() {
             @Override
             public void onConductorCargado(Conductor conductor) {
-                // Informacion del conductor
-                tvConductor.setText("\uD83D\uDC68\u200D✈️ Nombre Conductor: " + conductor.getNombre());
-                tvTelefono.setText("\uD83D\uDCDE Teléfono Conductor: " + conductor.getTelefono());
-                tvEmail.setText("\uD83D\uDCE7 Email: " + conductor.getEmail());
-                // Informacion del vehiculo
-                tvPlaca.setText("\uD83D\uDE98 Placa del Vehículo: " + conductor.getPlacaVehiculo());
-                tvCapacidad.setText("\uD83D\uDC65 Capacidad: " +conductor.getCapacidadVehiculo() );
-                tvModVehiculo.setText("#️⃣ Modelo: " +conductor.getModeloVehiculo());
+                // Información del conductor - Solo los valores, sin etiquetas
+                tvConductor.setText(conductor.getNombre());
+                tvTelefono.setText(conductor.getTelefono());
+                tvEmail.setText(conductor.getEmail());
+                // Información del vehículo - Solo los valores, sin etiquetas
+                tvPlaca.setText(conductor.getPlacaVehiculo());
+                tvCapacidad.setText(String.valueOf(conductor.getCapacidadVehiculo()));
+                tvModVehiculo.setText(conductor.getModeloVehiculo());
             }
 
             @Override
             public void onError(String error) {
-                Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(PerfilConductor.this, error, Toast.LENGTH_SHORT).show();
+                Log.e("PerfilConductor", error);
             }
         });
     }
-    /**
-     * 🔹 Cierra la sesión y redirige a la pantalla de inicio.
-     */
+
+    public void irEditarPerfil(){
+        Intent intent = new Intent(PerfilConductor.this, EditarPerfilConductor.class);
+        startActivity(intent);
+    }
+
+    public void irHistorialReservas(){
+        Intent intent = new Intent(PerfilConductor.this, HistorialReservas.class);
+        startActivity(intent);
+    }
+
     private void cerrarSesion() {
-        auth.signOut();
+        if (auth != null) {
+            auth.signOut();
+        }
         Intent intent = new Intent(this, InicioDeSesion.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
