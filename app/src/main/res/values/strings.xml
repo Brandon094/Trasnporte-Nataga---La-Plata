@@ -71,8 +71,8 @@
     <!-- ==================== -->
     <string name="panelConductor">Panel del conductor</string>
     <string name="verReservas">Ver reservas</string>
-    <string name="ingresosDiarios">Ingresos diarios: $%.2f</string>
-    <string name="totalIngresos">Ingresos mensuales: $%.2f</string>
+    <string name="ingresosDiarios">Ingresos diarios:</string>
+    <string name="totalIngresos">$%1$.0f COP</string>
     <string name="verEstadisticas">Ver estadísticas</string>
     <string name="perfilConductor">Perfil conductor</string>
     <string name="actualizarDatos">Actualizar datos</string>
