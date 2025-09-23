@@ -147,7 +147,7 @@ public class PerfilUsuario extends AppCompatActivity {
                 .setMessage("¿Estás seguro de que quieres cerrar sesión?")
                 .setPositiveButton("Sí", (dialog, which) -> cerrarSesion())
                 .setNegativeButton("Cancelar", null)
-                .setIcon(R.drawable.baseline_logout_24)
+                .setIcon(R.drawable.ic_logout)
                 .show();
     }
 
