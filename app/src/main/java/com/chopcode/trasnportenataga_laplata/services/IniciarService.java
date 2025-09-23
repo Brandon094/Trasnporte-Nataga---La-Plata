@@ -103,7 +103,23 @@ public class IniciarService {
         auth.signInWithEmailAndPassword(correo, password)
                 .addOnCompleteListener(activity, task -> {
                     if (task.isSuccessful()) {
-                        callback.onLoginSuccess();
+                        FirebaseUser user = auth.getCurrentUser();
+                        if (user != null) {
+                            // 🔎 Detectar tipo de usuario después del login exitoso
+                            detectarTipoUsuario(user, new TipoUsuarioCallback() {
+                                @Override
+                                public void onTipoDetectado(String tipo) {
+                                    callback.onLoginSuccess(); // Éxito, el callback manejará la redirección
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    callback.onLoginFailure("Usuario no encontrado en conductores ni usuarios: " + error);
+                                }
+                            });
+                        } else {
+                            callback.onLoginFailure("No se pudo obtener el usuario después del login");
+                        }
                     } else {
                         callback.onLoginFailure(task.getException().getMessage());
                     }
