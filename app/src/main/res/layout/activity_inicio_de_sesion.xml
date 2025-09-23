@@ -63,7 +63,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:startIconDrawable="@drawable/baseline_email"
+                app:startIconDrawable="@drawable/ic_email"
                 app:startIconTint="@color/primary_color"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
@@ -82,8 +82,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:startIconDrawable="@drawable/baseline_key_24"
-                app:endIconDrawable="@drawable/baseline_visibility_off_24"
+                app:startIconDrawable="@drawable/ic_key"
+                app:endIconDrawable="@drawable/ic_visibility_off"
                 app:startIconTint="@color/primary_color"                app:endIconMode="password_toggle"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
@@ -111,7 +111,7 @@
             <!-- Boton ingresar -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonIngresar"
-                app:icon="@drawable/baseline_login"
+                app:icon="@drawable/ic_login"
                 app:iconGravity="textStart"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"

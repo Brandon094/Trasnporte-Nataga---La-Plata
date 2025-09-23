@@ -33,7 +33,7 @@
                     android:id="@+id/ivProfilePhoto"
                     android:layout_width="90dp"
                     android:layout_height="90dp"
-                    android:src="@drawable/baseline_person_24"
+                    android:src="@drawable/ic_person"
                     android:scaleType="centerCrop"
                     app:civ_border_color="@color/text_on_primary"
                     app:civ_border_width="3dp" />
@@ -110,7 +110,7 @@
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/baseline_email"
+                            android:src="@drawable/ic_email"
                             android:tint="@color/text_tertiary" />
 
                         <TextView
@@ -164,7 +164,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Correo electrónico"
-                        app:startIconDrawable="@drawable/baseline_lock_24"
+                        app:startIconDrawable="@drawable/ic_lock"
                         app:startIconTint="@color/text_tertiary"
                         app:boxStrokeColor="@color/text_tertiary"
                         app:boxCornerRadiusTopStart="12dp"
@@ -223,7 +223,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Nuevo nombre completo"
-                    app:startIconDrawable="@drawable/baseline_person_24"
+                    app:startIconDrawable="@drawable/ic_person"
                     app:startIconTint="@color/primary_500"
                     app:boxStrokeColor="@color/primary_500"
                     app:boxCornerRadiusTopStart="16dp"
@@ -261,7 +261,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Nuevo número de teléfono"
-                    app:startIconDrawable="@drawable/baseline_phone_enabled_24"
+                    app:startIconDrawable="@drawable/ic_phone_enabled"
                     app:startIconTint="@color/primary_500"
                     app:boxStrokeColor="@color/primary_500"
                     app:boxCornerRadiusTopStart="16dp"
@@ -299,7 +299,7 @@
                         android:textSize="12sp"
                         android:textColor="@color/text_secondary"
                         app:cornerRadius="16dp"
-                        app:icon="@drawable/baseline_arrow_back_24"
+                        app:icon="@drawable/ic_arrow_back"
                         app:iconSize="18dp"
                         app:iconGravity="textStart"
                         app:iconTint="@color/text_secondary"
@@ -317,7 +317,7 @@
                         android:textSize="12sp"
                         android:textColor="@color/text_on_primary"
                         app:cornerRadius="16dp"
-                        app:icon="@drawable/baseline_check_24"
+                        app:icon="@drawable/ic_check"
                         app:iconSize="18dp"
                         app:iconGravity="textStart"
                         app:iconTint="@color/text_on_primary"

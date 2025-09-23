@@ -151,7 +151,7 @@
                         android:textAllCaps="false"
                         app:cornerRadius="8dp"
                         app:backgroundTint="?attr/colorPrimary"
-                        app:icon="@drawable/baseline_event_seat_24"
+                        app:icon="@drawable/ic_seat"
                         app:iconGravity="textStart"/>
 
                     <com.google.android.material.button.MaterialButton
@@ -164,7 +164,7 @@
                         android:text="@string/cerrarSesion"
                         android:textAllCaps="false"
                         app:cornerRadius="8dp"
-                        app:icon="@drawable/baseline_exit_to_app_24"
+                        app:icon="@drawable/ic_exit_to_app"
                         app:iconGravity="textStart"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

@@ -53,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/nombreCompleto"
                     app:endIconMode="clear_text"
-                    app:startIconDrawable="@drawable/baseline_person_24"
+                    app:startIconDrawable="@drawable/ic_person"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -70,7 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="@string/correo"
-                    app:startIconDrawable="@drawable/baseline_email"
+                    app:startIconDrawable="@drawable/ic_email"
                     app:endIconMode="clear_text"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
@@ -89,7 +89,7 @@
                     android:layout_marginTop="8dp"
                     android:hint="@string/telefono"
                     app:endIconMode="clear_text"
-                    app:startIconDrawable="@drawable/baseline_phone_enabled_24"
+                    app:startIconDrawable="@drawable/ic_phone_enabled"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -106,7 +106,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="@string/contraseña"
-                    app:startIconDrawable="@drawable/baseline_key_24"
+                    app:startIconDrawable="@drawable/ic_key"
                     app:endIconMode="password_toggle"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
@@ -124,7 +124,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:hint="@string/confirmarContraseña"
-                    app:startIconDrawable="@drawable/baseline_key_24"
+                    app:startIconDrawable="@drawable/ic_key"
                     app:endIconMode="password_toggle"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 

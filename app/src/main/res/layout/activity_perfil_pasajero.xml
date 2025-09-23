@@ -36,7 +36,7 @@
                     android:id="@+id/ivProfilePicture"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:src="@drawable/baseline_person_24"
+                    android:src="@drawable/ic_person"
                     android:scaleType="centerCrop"
                     app:civ_border_color="@color/text_on_primary"
                     app:civ_border_width="4dp" />
@@ -129,7 +129,7 @@
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/baseline_email"
+                            android:src="@drawable/ic_email"
                             android:tint="@color/primary_500" />
 
                         <LinearLayout
@@ -189,7 +189,7 @@
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/baseline_phone_enabled_24"
+                            android:src="@drawable/ic_phone_enabled"
                             android:tint="@color/primary_500" />
 
                         <LinearLayout
@@ -272,7 +272,7 @@
                             <ImageView
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
-                                android:src="@drawable/baseline_edit_24"
+                                android:src="@drawable/ic_edit"
                                 android:tint="@color/text_on_primary" />
 
                             <TextView
@@ -313,7 +313,7 @@
                             <ImageView
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
-                                android:src="@drawable/baseline_history_24"
+                                android:src="@drawable/ic_history"
                                 android:tint="@color/text_on_primary" />
 
                             <TextView
@@ -395,7 +395,7 @@
                             <ImageView
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
-                                android:src="@drawable/baseline_logout_24"
+                                android:src="@drawable/ic_logout"
                                 android:tint="@color/text_on_primary" />
 
                             <TextView
