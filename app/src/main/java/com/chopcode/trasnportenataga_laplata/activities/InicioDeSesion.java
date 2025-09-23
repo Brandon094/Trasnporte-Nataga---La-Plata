@@ -2,17 +2,12 @@ package com.chopcode.trasnportenataga_laplata.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.widget.*;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.services.IniciarService;
-import com.chopcode.trasnportenataga_laplata.services.RegistroConductoresService;
-import com.google.android.gms.auth.api.identity.SignInCredential;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.*;
@@ -43,18 +38,18 @@ public class InicioDeSesion extends AppCompatActivity {
         TextInputEditText editTextPassword = findViewById(R.id.editTextPassword);
 
         // Establecer el icono inicial (contraseña oculta)
-        passwordInputLayout.setEndIconDrawable(R.drawable.baseline_visibility_off_24);
+        passwordInputLayout.setEndIconDrawable(R.drawable.ic_visibility_off);
 
         // Manejar clic en el icono de visibilidad
         passwordInputLayout.setEndIconOnClickListener(v -> {
             if (editTextPassword.getTransformationMethod() instanceof PasswordTransformationMethod) {
                 // Si está oculta, mostrarla
                 editTextPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                passwordInputLayout.setEndIconDrawable(R.drawable.baseline_remove_red_eye_24);
+                passwordInputLayout.setEndIconDrawable(R.drawable.ic_visibility_on);
             } else {
                 // Si está visible, ocultarla
                 editTextPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                passwordInputLayout.setEndIconDrawable(R.drawable.baseline_visibility_off_24);
+                passwordInputLayout.setEndIconDrawable(R.drawable.ic_visibility_off);
             }
             // Mover cursor al final
             editTextPassword.setSelection(editTextPassword.getText().length());
