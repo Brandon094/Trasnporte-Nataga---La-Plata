@@ -133,10 +133,10 @@
                     android:id="@+id/recyclerReservas"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="180dp"
                     android:clipToPadding="false"
+                    android:minHeight="180dp"
                     android:paddingVertical="8dp"
-                    tools:listitem="@layout/item_reserva"/>
+                    tools:listitem="@layout/item_reserva" />
 
                 <TextView
                     android:id="@+id/tvEmptyReservas"
