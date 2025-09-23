@@ -123,8 +123,11 @@ public class RegistroService {
             }
         });
     }
-    /** Metodo para editar el perfil del pasajero*/
-    public void editarPerfilPasajero(String nuevoNombre, String nuevoTelefono, String nuevoEmail, RegistroService.RegistroCallback callback) {
+    /**
+     * Metodo para editar el perfil del pasajero
+     * Solo permite editar nombre y teléfono (el correo no es editable)
+     */
+    public void editarPerfilPasajero(String nuevoNombre, String nuevoTelefono, RegistroService.RegistroCallback callback) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user == null) {
