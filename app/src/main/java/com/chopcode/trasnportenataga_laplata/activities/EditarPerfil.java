@@ -15,9 +15,9 @@ import com.chopcode.trasnportenataga_laplata.services.UsuarioService;
 
 public class EditarPerfil extends AppCompatActivity {
 
-    private Button btnGuardar;
-    private EditText nombre, correo, telefono;
-    private TextView nombreActual, telefonoActual, correoActual;
+    private Button btnGuardar, btnCancelar;
+    private EditText etNombre, etTelefono;
+    private TextView tvNombreActual, tvTelefonoActual, tvCorreoActual;
     private RegistroService registroService;
     private UsuarioService usuarioService;
 
@@ -26,54 +26,63 @@ public class EditarPerfil extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_perfil_pasajero);
 
-        // Inicializar servicios y UI
+        // Inicializar servicios
         registroService = new RegistroService();
         usuarioService = new UsuarioService();
 
-        nombre = findViewById(R.id.etNombre);
-        correo = findViewById(R.id.etCorreo);
-        telefono = findViewById(R.id.etTelefono);
-
-        nombreActual = findViewById(R.id.tvNombreActual);
-        correoActual = findViewById(R.id.tvCorreoActual);
-        telefonoActual = findViewById(R.id.tvTelefonoActual);
-        btnGuardar = findViewById(R.id.btnGuardarCambios);
+        // Inicializar vistas
+        inicializarVistas();
 
         // Cargar datos actuales
         cargarInfoUsuario();
 
-        btnGuardar.setOnClickListener(view -> {
-            String nuevoNombre = nombre.getText().toString().trim();
-            String nuevoCorreo = correo.getText().toString().trim();
-            String nuevoTelefono = telefono.getText().toString().trim();
+        // Configurar listeners
+        configurarListeners();
+    }
 
-            if (nuevoNombre.isEmpty()) {
-                nombre.setError("Ingresa tu nombre");
-                return;
+    private void inicializarVistas() {
+        etNombre = findViewById(R.id.etNombre);
+        etTelefono = findViewById(R.id.etTelefono);
+
+        tvNombreActual = findViewById(R.id.tvNombreActual);
+        tvTelefonoActual = findViewById(R.id.tvTelefonoActual);
+        tvCorreoActual = findViewById(R.id.tvCorreoActual);
+
+        btnGuardar = findViewById(R.id.btnGuardarCambios);
+        btnCancelar = findViewById(R.id.btnCancelar);
+    }
+
+    private void configurarListeners() {
+        btnGuardar.setOnClickListener(view -> guardarCambios());
+        btnCancelar.setOnClickListener(view -> finish());
+    }
+
+    private void guardarCambios() {
+        String nuevoNombre = etNombre.getText().toString().trim();
+        String nuevoTelefono = etTelefono.getText().toString().trim();
+
+        if (nuevoNombre.isEmpty()) {
+            etNombre.setError("Ingresa tu nombre");
+            return;
+        }
+
+        if (nuevoTelefono.isEmpty()) {
+            etTelefono.setError("Ingresa tu número de teléfono");
+            return;
+        }
+
+        // ✅ CORRECTO: Solo pasar nombre y teléfono
+        registroService.editarPerfilPasajero(nuevoNombre, nuevoTelefono, new RegistroService.RegistroCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(EditarPerfil.this, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
+                finish();
             }
 
-           /** if (nuevoCorreo.isEmpty()) {
-                correo.setError("Ingresa tu correo");
-                return;
-            }*/
-
-            if (nuevoTelefono.isEmpty()) {
-                telefono.setError("Ingresa tu número de teléfono");
-                return;
+            @Override
+            public void onFailure(String error) {
+                Toast.makeText(EditarPerfil.this, "Error al actualizar: " + error, Toast.LENGTH_LONG).show();
             }
-
-            registroService.editarPerfilPasajero(nuevoNombre, nuevoTelefono, nuevoCorreo, new RegistroService.RegistroCallback() {
-                @Override
-                public void onSuccess() {
-                    Toast.makeText(EditarPerfil.this, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-
-                @Override
-                public void onFailure(String error) {
-                    Toast.makeText(EditarPerfil.this, "Error al actualizar: " + error, Toast.LENGTH_LONG).show();
-                }
-            });
         });
     }
 
@@ -81,14 +90,19 @@ public class EditarPerfil extends AppCompatActivity {
         usuarioService.cargarInformacionPasajero(new UsuarioService.UsuarioCallback() {
             @Override
             public void onUsuarioCargado(Pasajero pasajero) {
-                nombreActual.setText("👤 Nombre actual: " + pasajero.getNombre());
-                telefonoActual.setText("📞 Teléfono actual: " + pasajero.getTelefono());
-                correoActual.setText("📧 Email actual: " + pasajero.getEmail());
+                // Mostrar valores actuales en los TextViews
+                tvNombreActual.setText("Nombre actual: " + pasajero.getNombre());
+                tvTelefonoActual.setText("Teléfono actual: " + pasajero.getTelefono());
+                tvCorreoActual.setText("Correo actual: " + pasajero.getEmail());
+
+                // Poblar los campos editables con los valores actuales
+                etNombre.setText(pasajero.getNombre());
+                etTelefono.setText(pasajero.getTelefono());
             }
 
             @Override
             public void onError(String error) {
-                Toast.makeText(EditarPerfil.this, error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditarPerfil.this, "Error al cargar datos: " + error, Toast.LENGTH_SHORT).show();
             }
         });
     }
