@@ -1,9 +1,9 @@
 package com.chopcode.trasnportenataga_laplata.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -49,39 +49,106 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ReservaV
 
     @Override
     public int getItemCount() {
-        return reservas.size();
+        return reservas != null ? reservas.size() : 0;
     }
 
+    // 🔥 MÉTODO MEJORADO: Actualizar la lista completa
     public void actualizarReservas(List<Reserva> nuevasReservas) {
-        reservas.clear();
-        reservas.addAll(nuevasReservas);
+        this.reservas = nuevasReservas;
         notifyDataSetChanged();
     }
 
     static class ReservaViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvNombre, tvOrigen, tvDestino, tvHora, tvPrecio;
+        private TextView tvNombre, tvTelefono, tvOrigenDestino, tvFechaHora, tvAsiento, tvEstado;
         private MaterialButton btnConfirmar, btnCancelar;
 
         public ReservaViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvNombre = itemView.findViewById(R.id.tvNombreUsuario);
-            tvOrigen = itemView.findViewById(R.id.tvOrigen);
-            tvDestino = itemView.findViewById(R.id.tvDestino);
-            tvHora = itemView.findViewById(R.id.tvFechaHora);
-            tvPrecio = itemView.findViewById(R.id.tvPrecio);
+            tvNombre = itemView.findViewById(R.id.tvNombrePasajero);
+            tvTelefono = itemView.findViewById(R.id.tvTelefono);
+            tvOrigenDestino = itemView.findViewById(R.id.tvOrigenDestino);
+            tvFechaHora = itemView.findViewById(R.id.tvFechaHora);
+            tvAsiento = itemView.findViewById(R.id.tvAsiento);
+            tvEstado = itemView.findViewById(R.id.tvEstado);
             btnConfirmar = itemView.findViewById(R.id.btnConfirmar);
             btnCancelar = itemView.findViewById(R.id.btnCancelar);
         }
 
         public void bind(Reserva reserva, OnReservaClickListener listener) {
-            tvNombre.setText(reserva.getNombre());
-            tvOrigen.setText(reserva.getOrigen());
-            tvDestino.setText(reserva.getDestino());
-            tvHora.setText(reserva.getHorarioId());
-            tvPrecio.setText(String.format(Locale.getDefault(), "$%.2f", reserva.getPrecio()));
+            // 🔥 DATOS DEL PASAJERO
+            tvNombre.setText(reserva.getNombre() != null ? reserva.getNombre() : "Nombre no disponible");
+            tvTelefono.setText(reserva.getTelefono() != null ? "📞 " + reserva.getTelefono() : "📞 Teléfono no disponible");
 
-            btnConfirmar.setOnClickListener(v -> listener.onConfirmarClick(reserva));
-            btnCancelar.setOnClickListener(v -> listener.onCancelarClick(reserva));
+            // 🔥 RUTA Y ORIGEN-DESTINO
+            if (reserva.getOrigen() != null && reserva.getDestino() != null) {
+                tvOrigenDestino.setText("📍 " + reserva.getOrigen() + " → " + reserva.getDestino());
+            } else {
+                tvOrigenDestino.setText("📍 Ruta no especificada");
+            }
+
+            // 🔥 ASIENTO
+            if (reserva.getPuestoReservado() != null) {
+                tvAsiento.setText("💺 Asiento " + reserva.getPuestoReservado());
+            } else {
+                tvAsiento.setText("💺 Asiento no asignado");
+            }
+
+            // 🔥 FECHA Y HORA
+            if (reserva.getFechaReserva() > 0) {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+                String fechaFormateada = "🕒 " + sdf.format(new Date(reserva.getFechaReserva()));
+                tvFechaHora.setText(fechaFormateada);
+            } else {
+                tvFechaHora.setText("🕒 Fecha no disponible");
+            }
+
+            // 🔥 ESTADO DE LA RESERVA CON COLORES DINÁMICOS
+            if (reserva.getEstadoReserva() != null) {
+                tvEstado.setText(reserva.getEstadoReserva());
+
+                // Cambiar color según el estado
+                switch (reserva.getEstadoReserva()) {
+                    case "Por confirmar":
+                        tvEstado.setBackgroundResource(R.drawable.bg_estado_pendiente);
+                        btnConfirmar.setVisibility(View.VISIBLE);
+                        btnCancelar.setVisibility(View.VISIBLE);
+                        break;
+                    case "Confirmada":
+                        tvEstado.setBackgroundResource(R.drawable.bg_estado_confirmado);
+                        btnConfirmar.setVisibility(View.GONE);
+                        btnCancelar.setVisibility(View.GONE);
+                        break;
+                    case "Cancelada":
+                        tvEstado.setBackgroundResource(R.drawable.bg_estado_cancelado);
+                        btnConfirmar.setVisibility(View.GONE);
+                        btnCancelar.setVisibility(View.GONE);
+                        break;
+                    default:
+                        tvEstado.setBackgroundResource(R.drawable.bg_estado_pendiente);
+                        break;
+                }
+            } else {
+                tvEstado.setText("Desconocido");
+                tvEstado.setBackgroundResource(R.drawable.bg_estado_pendiente);
+            }
+
+            // 🔥 LISTENERS DE BOTONES
+            btnConfirmar.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onConfirmarClick(reserva);
+                }
+            });
+
+            btnCancelar.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onCancelarClick(reserva);
+                }
+            });
+
+            // 🔥 LOG PARA DEBUG
+            Log.d("RESERVA_ADAPTER", "Reserva mostrada: " + reserva.getNombre() +
+                    " - Asiento: " + reserva.getPuestoReservado() +
+                    " - Estado: " + reserva.getEstadoReserva());
         }
     }
 }
