@@ -61,7 +61,7 @@
             android:textSize="14sp"
             android:textColor="@color/text_secondary"
             android:gravity="center"
-            android:drawableStart="@drawable/baseline_access_time_24"
+            android:drawableStart="@drawable/ic_time"
             android:drawablePadding="4dp"
             android:drawableTint="@color/text_secondary"/>
 
