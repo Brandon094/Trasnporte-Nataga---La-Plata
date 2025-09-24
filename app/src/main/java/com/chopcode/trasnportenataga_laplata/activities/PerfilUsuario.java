@@ -9,10 +9,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.models.Pasajero;
-import com.chopcode.trasnportenataga_laplata.services.UsuarioService;
+import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
+import com.chopcode.trasnportenataga_laplata.models.Usuario;
+import com.chopcode.trasnportenataga_laplata.services.UserService;
 import com.google.android.material.card.MaterialCardView;
-import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * Actividad para mostrar el perfil del usuario (pasajero) - Diseño Moderno
@@ -20,18 +20,26 @@ import com.google.firebase.auth.FirebaseAuth;
 public class PerfilUsuario extends AppCompatActivity {
     private TextView tvNombre, tvCorreo, tvTelefono;
     private MaterialCardView cardEditarPerfil, cardHistorialReservas, cardVolverInicio, cardCerrarSesion;
-    private FirebaseAuth auth;
-    private UsuarioService usuarioService = new UsuarioService();
+    private AuthManager authManager;
+    private UserService userService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perfil_pasajero);
 
-        // Inicializar FirebaseAuth
-        auth = FirebaseAuth.getInstance();
+        // Inicializar servicios
+        authManager = AuthManager.getInstance();
+        userService = new UserService();
 
-        // Referencias a elementos de la UI - Nuevo diseño
+        // Verificar si el usuario está logueado
+        if (!authManager.isUserLoggedIn()) {
+            authManager.redirectToLogin(this);
+            finish();
+            return;
+        }
+
+        // Referencias a elementos de la UI
         inicializarVistas();
 
         // Cargar los datos del usuario desde Firebase
@@ -59,7 +67,6 @@ public class PerfilUsuario extends AppCompatActivity {
         cardEditarPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Efecto de pulsación
                 cardEditarPerfil.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100)
                         .withEndAction(new Runnable() {
                             @Override
@@ -152,48 +159,60 @@ public class PerfilUsuario extends AppCompatActivity {
     }
 
     /**
-     * Método para obtener la información del usuario desde un callback
+     * Método para obtener la información del usuario usando loadUserData
      */
     private void cargarInfoUsuario() {
-        usuarioService.cargarInformacionPasajero(new UsuarioService.UsuarioCallback() {
-            @Override
-            public void onUsuarioCargado(Pasajero pasajero) {
-                // Actualizar la UI con los datos del usuario
-                tvNombre.setText(pasajero.getNombre());
-                tvTelefono.setText(pasajero.getTelefono());
-                tvCorreo.setText(pasajero.getEmail());
+        String userId = authManager.getUserId();
 
-                // Opcional: Cargar foto de perfil si está disponible
-                // cargarFotoPerfil(pasajero.getFotoUrl());
+        if (userId == null) {
+            Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        userService.loadUserData(userId, new UserService.UserDataCallback() {
+            @Override
+            public void onUserDataLoaded(Usuario usuario) {
+                // Actualizar la UI con los datos del usuario
+                runOnUiThread(() -> {
+                    if (usuario.getNombre() != null) {
+                        tvNombre.setText(usuario.getNombre());
+                    } else {
+                        tvNombre.setText("Nombre no disponible");
+                    }
+
+                    if (usuario.getTelefono() != null) {
+                        tvTelefono.setText(usuario.getTelefono());
+                    } else {
+                        tvTelefono.setText("Teléfono no disponible");
+                    }
+
+                    if (usuario.getEmail() != null) {
+                        tvCorreo.setText(usuario.getEmail());
+                    } else {
+                        tvCorreo.setText("Email no disponible");
+                    }
+                });
             }
 
             @Override
             public void onError(String error) {
-                Toast.makeText(PerfilUsuario.this, "Error: " + error, Toast.LENGTH_SHORT).show();
+                runOnUiThread(() -> {
+                    Toast.makeText(PerfilUsuario.this, "Error cargando datos: " + error, Toast.LENGTH_SHORT).show();
+                    // Mostrar datos por defecto en caso de error
+                    tvNombre.setText("Usuario");
+                    tvTelefono.setText("Teléfono no disponible");
+                    tvCorreo.setText(authManager.getCurrentUser().getEmail());
+                });
             }
         });
-    }
-
-    /**
-     * Método opcional para cargar foto de perfil
-     */
-    private void cargarFotoPerfil(String fotoUrl) {
-        if (fotoUrl != null && !fotoUrl.isEmpty()) {
-            // Usar Picasso o Glide para cargar la imagen
-            // Picasso.get().load(fotoUrl).into(ivProfilePicture);
-        }
     }
 
     /**
      * Cierra la sesión y redirige a la pantalla de inicio de sesión.
      */
     private void cerrarSesion() {
-        auth.signOut();
-        Intent intent = new Intent(this, InicioDeSesion.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        authManager.signOut(this);
+        Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show();
     }
 
     @Override
