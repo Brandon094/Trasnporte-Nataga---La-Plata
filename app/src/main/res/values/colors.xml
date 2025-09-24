@@ -65,4 +65,5 @@
     <color name="secondary_text">@color/text_secondary</color>
     <color name="background_color">@color/background</color>
     <color name="card_background">@color/surface_variant</color>
+    <color name="success_light">#E8F5E8</color>
 </resources>
