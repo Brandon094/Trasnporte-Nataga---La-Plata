@@ -30,7 +30,8 @@ public class UserService {
     }
 
     public interface DriverDataCallback {
-        void onDriverDataLoaded(String nombre, String placa, List<String> horariosAsignados);
+        void onDriverDataLoaded(String nombre, String telefono, String placa,
+                                List<String> horariosAsignados);
         void onError(String error);
     }
 
@@ -98,6 +99,7 @@ public class UserService {
     }
 
     // 🔥 MÉTODOS ESPECÍFICOS DE CONDUCTOR
+    // 🔥 MÉTODOS ESPECÍFICOS DE CONDUCTOR - VERSIÓN CORREGIDA
     public void loadDriverData(String userId, DriverDataCallback callback) {
         DatabaseReference conductorRef = FirebaseDatabase.getInstance()
                 .getReference("conductores")
@@ -108,6 +110,7 @@ public class UserService {
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     String nombre = snapshot.child("nombre").getValue(String.class);
+                    String telefono = snapshot.child("telefono").getValue(String.class); // ✅ TELÉFONO DESDE CONDUCTORES
                     String placa = snapshot.child("placaVehiculo").getValue(String.class);
                     List<String> horariosAsignados = new ArrayList<>();
 
@@ -120,7 +123,8 @@ public class UserService {
                         }
                     }
 
-                    callback.onDriverDataLoaded(nombre, placa, horariosAsignados);
+                    // ✅ PASA EL TELÉFONO AL CALLBACK
+                    callback.onDriverDataLoaded(nombre, telefono, placa, horariosAsignados);
                 } else {
                     callback.onError("No se encontró el conductor en la BD");
                 }
