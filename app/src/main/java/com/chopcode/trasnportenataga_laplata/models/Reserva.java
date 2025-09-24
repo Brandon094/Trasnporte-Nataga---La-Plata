@@ -6,16 +6,16 @@ public class Reserva {
             estadoReserva, nombre, telefono, telefonoC, email;
     private long fechaReserva;
     private double precio;
-    private int  puestoReservado;
-    // Constructor vacio
+    private int puestoReservado;
+
+    // Constructor vacío (OBLIGATORIO para Firebase)
     public Reserva() { }
 
     public Reserva(String idReserva, String usuarioId, String horarioId, Integer puestoReservado,
                    String conductor, String telefonoC, String vehiculoId, double precio,
-                   String origen,
-                   String destino,
-                   String tiempoEstimado, String metodoPago, String estadoReserva, long fechaReserva,
-                   String nombre, String telefono, String email) {
+                   String origen, String destino, String tiempoEstimado, String metodoPago,
+                   String estadoReserva, long fechaReserva, String nombre, String telefono,
+                   String email) {
         this.idReserva = idReserva;
         this.usuarioId = usuarioId;
         this.horarioId = horarioId;
@@ -35,7 +35,7 @@ public class Reserva {
         this.email = email;
     }
 
-    // 🔥 Getters y Setters
+    // Getters y Setters
     public String getIdReserva() { return idReserva; }
     public void setIdReserva(String idReserva) { this.idReserva = idReserva; }
 
@@ -48,8 +48,9 @@ public class Reserva {
     public Integer getPuestoReservado() { return puestoReservado; }
     public void setPuestoReservado(Integer puestoReservado) { this.puestoReservado = puestoReservado; }
 
-    public String getConductorId() { return conductor; }
-    public void setConductorId(String conductorId) { this.conductor = conductorId; }
+    // ✅ CORREGIDO: Firebase espera getConductor() para el campo "conductor"
+    public String getConductor() { return conductor; }
+    public void setConductor(String conductor) { this.conductor = conductor; }
 
     public String getVehiculoId() { return vehiculoId; }
     public void setVehiculoId(String vehiculoId) { this.vehiculoId = vehiculoId; }
@@ -84,11 +85,6 @@ public class Reserva {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public String getTelefonoC() {
-        return telefonoC;
-    }
-
-    public void setTelefonoC(String telefonoC) {
-        this.telefonoC = telefonoC;
-    }
+    public String getTelefonoC() { return telefonoC; }
+    public void setTelefonoC(String telefonoC) { this.telefonoC = telefonoC; }
 }
