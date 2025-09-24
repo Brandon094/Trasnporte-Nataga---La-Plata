@@ -30,32 +30,42 @@ public class ReservaService {
     private FirebaseAuth auth;
 
     /**
-     * Interfaz para manejar la carga de la reserva de manera asíncrona.
+     * INTERFACES CONSOLIDADAS - Todas las funcionalidades de reservas
      */
     public interface ReservaCallback {
         void onReservaExitosa();
         void onError(String error);
     }
-    /**
-     * Interfaz para la carga de asientos de forma asincronica
-     */
+
     public interface AsientosCallback {
         void onAsientosObtenidos(int[] asientosOcupados);
         void onError(String error);
     }
-    /**
-     * Interfaz para la carga de la disponibilidad de asientos
-     * */
+
     public interface DisponibilidadCallback {
         void onDisponible(boolean disponible);
         void onError(String error);
     }
-    /**
-     * Interfaz para la carga de las reservas
-     * */
+
     public interface ReservaCargadaCallback {
         void onCargaExitosa(List<Reserva> reservas);
         void onError(String mensaje);
+    }
+
+    // 🔥 NUEVAS INTERFACES DEL RESERVATION MANAGER
+    public interface ReservationsCallback {
+        void onReservationsLoaded(List<Reserva> reservas);
+        void onError(String error);
+    }
+
+    public interface ReservationUpdateCallback {
+        void onSuccess();
+        void onError(String error);
+    }
+
+    public interface DriverReservationsCallback {
+        void onDriverReservationsLoaded(List<Reserva> reservas);
+        void onError(String error);
     }
 
     public ReservaService() {
@@ -63,13 +73,14 @@ public class ReservaService {
         db = FirebaseFirestore.getInstance();
         this.auth = FirebaseAuth.getInstance();
     }
+
     /**
-     * 🔥 Actualiza la disponibilidad de asientos y guarda la reserva en Firebase
+     * 🔥 MÉTODOS EXISTENTES (sin cambios)
      */
     public void actualizarDisponibilidadAsientos(Context context, String horarioId, int asientoSeleccionado,
                                                  String origen, String destino, String tiempoEstimado,
                                                  String metodoPago, String estadoReserva,
-                                                 String placa,Double precio,
+                                                 String placa, Double precio,
                                                  String conductor, String telefonoC,
                                                  ReservaCallback callback) {
         FirebaseUser currentUser = auth.getCurrentUser();
@@ -81,7 +92,6 @@ public class ReservaService {
         String uid = currentUser.getUid();
         DatabaseReference userRef = databaseReference.child("usuarios").child(uid);
 
-        // Recuperar datos del usuario antes de registrar la reserva
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -110,18 +120,13 @@ public class ReservaService {
 
                         DisponibilidadAsientos disponibilidad = snapshot.getValue(DisponibilidadAsientos.class);
                         if (disponibilidad != null && disponibilidad.getAsientosDisponibles() > 0) {
-                            // 🔹 Restar un asiento y actualizar Firebase
                             int nuevosAsientosDisponibles = disponibilidad.getAsientosDisponibles() - 1;
                             refDisponibilidad.child("asientosDisponibles").setValue(nuevosAsientosDisponibles);
-
-                            // 🔹 Guardar el asiento reservado en `asientosOcupados`
                             marcarAsientoComoOcupado(horarioId, asientoSeleccionado);
 
-                            // 🔹 Registrar la reserva en Firebase con los datos del usuario
                             registrarReserva(context, uid, nombre, telefono, email, horarioId, asientoSeleccionado,
                                     origen, destino, tiempoEstimado, metodoPago, estadoReserva,
-                                    placa, precio,
-                                    conductor, telefonoC, callback);
+                                    placa, precio, conductor, telefonoC, callback);
                         } else {
                             callback.onError("No hay asientos disponibles.");
                         }
@@ -141,24 +146,19 @@ public class ReservaService {
         });
     }
 
-    /**
-     * 🔥 Marca un asiento como ocupado en Firebase.
-     */
     private void marcarAsientoComoOcupado(String horarioId, int asiento) {
         DatabaseReference refAsientosOcupados = databaseReference
                 .child("disponibilidadAsientos")
                 .child(horarioId)
                 .child("asientosOcupados");
 
-        // Guardar el asiento como ocupado
         refAsientosOcupados.child(String.valueOf(asiento)).setValue(true);
     }
 
-    // 🔥 Registra la reserva en Firebase con los datos del usuario.
     private void registrarReserva(Context context, String uid, String nombre, String telefono, String email,
                                   String horarioId, int asientoSeleccionado, String origen, String destino,
                                   String tiempoEstimado, String metodoPago, String estadoReserva,
-                                  String placa, double precio,String conductor, String telefonoC,
+                                  String placa, double precio, String conductor, String telefonoC,
                                   ReservaCallback callback) {
         String idReserva = UUID.randomUUID().toString();
         long fechaReserva = System.currentTimeMillis();
@@ -178,9 +178,7 @@ public class ReservaService {
                     callback.onError("Error al guardar reserva: " + e.getMessage());
                 });
     }
-    /**
-     * 🔥 Obtiene los asientos ocupados de Firebase y los envía al callback.
-     */
+
     public void obtenerAsientosOcupados(String horarioId, AsientosCallback callback) {
         DatabaseReference refAsientosOcupados = databaseReference
                 .child("disponibilidadAsientos")
@@ -191,18 +189,16 @@ public class ReservaService {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    callback.onAsientosObtenidos(new int[0]); // 🔹 No hay asientos ocupados
+                    callback.onAsientosObtenidos(new int[0]);
                     return;
                 }
 
                 List<Integer> asientosOcupadosList = new ArrayList<>();
-
                 for (DataSnapshot asientoSnapshot : snapshot.getChildren()) {
                     try {
                         int numeroAsiento = Integer.parseInt(asientoSnapshot.getKey());
                         asientosOcupadosList.add(numeroAsiento);
                     } catch (NumberFormatException e) {
-                        // 🔴 Registro del error si el valor no es un número válido
                         System.err.println("Error al convertir asiento: " + asientoSnapshot.getKey());
                     }
                 }
@@ -221,9 +217,7 @@ public class ReservaService {
             }
         });
     }
-    /**
-     * Método para cargar todas las reservas"
-     */
+
     public void cargarReservas(@NonNull final ReservaCargadaCallback callback) {
         databaseReference.child("reservas")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -244,5 +238,169 @@ public class ReservaService {
                         callback.onError("Error al cargar reservas: " + error.getMessage());
                     }
                 });
+    }
+
+    /**
+     * 🔥 NUEVOS MÉTODOS INTEGRADOS DEL RESERVATION MANAGER
+     */
+
+    /**
+     * Carga las reservas específicas de un conductor con filtros por horarios asignados
+     */
+    public void cargarReservasConductor(String conductorNombre, List<String> horariosAsignados, DriverReservationsCallback callback) {
+        if (conductorNombre == null) {
+            callback.onError("Nombre del conductor es nulo");
+            return;
+        }
+
+        DatabaseReference reservasRef = databaseReference.child("reservas");
+
+        reservasRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Reserva> reservas = new ArrayList<>();
+
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Reserva reserva = dataSnapshot.getValue(Reserva.class);
+                    if (reserva != null) {
+                        reserva.setIdReserva(dataSnapshot.getKey());
+
+                        String conductorIdReserva = reserva.getConductor();
+                        if (conductorIdReserva == null && dataSnapshot.hasChild("conductorId")) {
+                            conductorIdReserva = dataSnapshot.child("conductorId").getValue(String.class);
+                        }
+
+                        String horarioIdReserva = reserva.getHorarioId();
+                        if (horarioIdReserva == null && dataSnapshot.hasChild("horarioId")) {
+                            horarioIdReserva = dataSnapshot.child("horarioId").getValue(String.class);
+                            reserva.setHorarioId(horarioIdReserva);
+                        }
+
+                        boolean esDelConductor = conductorNombre.equals(conductorIdReserva);
+                        boolean esEstadoValido = "Por confirmar".equals(reserva.getEstadoReserva());
+                        boolean esDeHorarioAsignado = horariosAsignados.isEmpty() ||
+                                horarioIdReserva == null ||
+                                horariosAsignados.contains(horarioIdReserva);
+
+                        if (esDelConductor && esEstadoValido && esDeHorarioAsignado) {
+                            reservas.add(reserva);
+                        }
+                    }
+                }
+
+                callback.onDriverReservationsLoaded(reservas);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError("Error al cargar reservas del conductor: " + error.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Actualiza el estado de una reserva (Confirmar/Cancelar)
+     */
+    public void actualizarEstadoReserva(String reservaId, String nuevoEstado, ReservationUpdateCallback callback) {
+        DatabaseReference reservaRef = databaseReference
+                .child("reservas")
+                .child(reservaId)
+                .child("estadoReserva");
+
+        reservaRef.setValue(nuevoEstado)
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
+    }
+
+    /**
+     * Carga todas las reservas con un estado específico
+     */
+    public void cargarReservasPorEstado(String estado, ReservationsCallback callback) {
+        DatabaseReference reservasRef = databaseReference.child("reservas");
+
+        reservasRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Reserva> reservas = new ArrayList<>();
+
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Reserva reserva = dataSnapshot.getValue(Reserva.class);
+                    if (reserva != null && estado.equals(reserva.getEstadoReserva())) {
+                        reserva.setIdReserva(dataSnapshot.getKey());
+                        reservas.add(reserva);
+                    }
+                }
+
+                callback.onReservationsLoaded(reservas);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError("Error al cargar reservas: " + error.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Carga reservas por conductor y estado
+     */
+    public void cargarReservasConductorYEstado(String conductorNombre, String estado, ReservationsCallback callback) {
+        DatabaseReference reservasRef = databaseReference.child("reservas");
+
+        reservasRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Reserva> reservas = new ArrayList<>();
+
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Reserva reserva = dataSnapshot.getValue(Reserva.class);
+                    if (reserva != null) {
+                        String conductorIdReserva = reserva.getConductor();
+                        if (conductorIdReserva == null && dataSnapshot.hasChild("conductorId")) {
+                            conductorIdReserva = dataSnapshot.child("conductorId").getValue(String.class);
+                        }
+
+                        boolean esDelConductor = conductorNombre.equals(conductorIdReserva);
+                        boolean esEstadoCorrecto = estado.equals(reserva.getEstadoReserva());
+
+                        if (esDelConductor && esEstadoCorrecto) {
+                            reserva.setIdReserva(dataSnapshot.getKey());
+                            reservas.add(reserva);
+                        }
+                    }
+                }
+
+                callback.onReservationsLoaded(reservas);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError("Error al cargar reservas: " + error.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Verifica si un asiento está disponible para un horario específico
+     */
+    public void verificarDisponibilidadAsiento(String horarioId, int asiento, DisponibilidadCallback callback) {
+        DatabaseReference asientoRef = databaseReference
+                .child("disponibilidadAsientos")
+                .child(horarioId)
+                .child("asientosOcupados")
+                .child(String.valueOf(asiento));
+
+        asientoRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Si existe el asiento en ocupados, entonces NO está disponible
+                callback.onDisponible(!snapshot.exists());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError("Error al verificar disponibilidad: " + error.getMessage());
+            }
+        });
     }
 }
