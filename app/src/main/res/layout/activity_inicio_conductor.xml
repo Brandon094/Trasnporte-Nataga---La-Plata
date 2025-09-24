@@ -79,6 +79,176 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- 🔥 TARJETA DE ESTADÍSTICAS MEJORADA -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardEstadisticas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/success_light"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="12dp"
+            app:layout_constraintTop_toBottomOf="@id/cardHeader"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_stast"
+                        android:layout_marginEnd="12dp"
+                        android:tint="@color/success"/>
+
+                    <TextView
+                        android:id="@+id/tvTituloEstadisticas"
+                        style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Estadísticas del Día"
+                        android:textColor="@color/primary_text"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp">
+
+                    <!-- 🔥 TARJETA DE RESERVAS CONFIRMADAS - MÁS GRANDE -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="140dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="10dp"
+                        app:cardBackgroundColor="@color/surface"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="3dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_checklist"
+                                android:tint="@color/success" />
+
+                            <TextView
+                                android:id="@+id/tvReservasConfirmadas"
+                                style="@style/TextAppearance.MaterialComponents.Headline4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="0"
+                                android:textColor="@color/success"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Confirmadas"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp"
+                                android:layout_marginTop="4dp"
+                                android:textStyle="normal"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- 🔥 TARJETA DE ASIENTOS DISPONIBLES - MÁS GRANDE -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="140dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        app:cardBackgroundColor="@color/surface"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="3dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_seat"
+                                android:tint="@color/primary_color"/>
+
+                            <TextView
+                                android:id="@+id/tvAsientosDisponibles"
+                                style="@style/TextAppearance.MaterialComponents.Headline4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="14"
+                                android:textColor="@color/primary_color"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Disponibles"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp"
+                                android:layout_marginTop="4dp"
+                                android:textStyle="normal"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- Información de capacidad total -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:padding="12dp"
+                    android:background="@drawable/bg_info_stats">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_info"
+                        android:tint="@color/text_secondary"
+                        android:layout_marginEnd="6dp"/>
+
+                    <TextView
+                        android:id="@+id/tvInfoCapacidad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Capacidad total: 14 asientos"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary"
+                        android:textStyle="italic"/>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Sección de Reservas Activas -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardReservas"
@@ -87,7 +257,7 @@
             app:cardBackgroundColor="@color/background_color"
             app:cardElevation="4dp"
             app:cardCornerRadius="12dp"
-            app:layout_constraintTop_toBottomOf="@id/cardHeader"
+            app:layout_constraintTop_toBottomOf="@id/cardEstadisticas"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp">
@@ -102,13 +272,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:padding="12dp">
+                    android:padding="16dp">
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:src="@drawable/ic_save"
-                        android:layout_marginEnd="8dp"/>
+                        android:layout_marginEnd="12dp"/>
 
                     <TextView
                         android:id="@+id/tvReservasActivas"
@@ -116,7 +286,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/reservasPendientes"
-                        android:textColor="@color/primary_text"/>
+                        android:textColor="@color/primary_text"
+                        android:textStyle="bold"/>
 
                     <View
                         android:layout_width="0dp"
@@ -134,8 +305,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clipToPadding="false"
-                    android:minHeight="180dp"
-                    android:paddingVertical="8dp"
+                    android:minHeight="200dp"
+                    android:paddingVertical="12dp"
                     tools:listitem="@layout/item_reserva" />
 
                 <TextView
@@ -145,7 +316,7 @@
                     android:text="@string/no_hay_reservas"
                     style="@style/TextAppearance.MaterialComponents.Body1"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="20dp"
                     android:visibility="gone"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -155,7 +326,7 @@
             android:id="@+id/cardIngresos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/text_tertiary"
+            app:cardBackgroundColor="@color/surface"
             app:cardElevation="4dp"
             app:cardCornerRadius="12dp"
             app:layout_constraintTop_toBottomOf="@id/cardReservas"
@@ -167,7 +338,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -176,10 +347,11 @@
                     android:gravity="center_vertical">
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:src="@drawable/ic_monetization"
-                        android:layout_marginEnd="12dp"/>
+                        android:layout_marginEnd="12dp"
+                        android:tint="@color/primary_color"/>
 
                     <TextView
                         android:id="@+id/tvIngresosDiarios"
@@ -187,7 +359,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/ingresosDiarios"
-                        android:textColor="@color/primary_text"/>
+                        android:textColor="@color/primary_text"
+                        android:textStyle="bold"/>
                 </LinearLayout>
 
                 <TextView
@@ -197,8 +370,9 @@
                     android:layout_height="wrap_content"
                     android:text="$0.00"
                     android:gravity="center"
-                    android:layout_marginTop="8dp"
-                    android:textColor="@color/primary_color"/>
+                    android:layout_marginTop="12dp"
+                    android:textColor="@color/primary_color"
+                    android:textStyle="bold"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -207,7 +381,7 @@
             android:id="@+id/cardRutas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/text_tertiary"
+            app:cardBackgroundColor="@color/surface"
             app:cardElevation="4dp"
             app:cardCornerRadius="12dp"
             app:layout_constraintTop_toBottomOf="@id/cardIngresos"
@@ -225,13 +399,14 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:padding="12dp">
+                    android:padding="16dp">
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:src="@drawable/ic_route"
-                        android:layout_marginEnd="8dp"/>
+                        android:layout_marginEnd="12dp"
+                        android:tint="@color/primary_color"/>
 
                     <TextView
                         android:id="@+id/tvProximaRuta"
@@ -239,7 +414,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/proximasRutas"
-                        android:textColor="@color/primary_text"/>
+                        android:textColor="@color/primary_text"
+                        android:textStyle="bold"/>
                 </LinearLayout>
 
                 <View
@@ -251,9 +427,9 @@
                     android:id="@+id/recyclerProximasRutas"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="120dp"
+                    android:minHeight="140dp"
                     android:clipToPadding="false"
-                    android:paddingVertical="8dp"
+                    android:paddingVertical="12dp"
                     tools:listitem="@layout/item_reserva"/>
 
                 <TextView
@@ -263,7 +439,7 @@
                     android:text="@string/no_hay_rutas"
                     style="@style/TextAppearance.MaterialComponents.Body1"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="20dp"
                     android:visibility="gone"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -284,28 +460,30 @@
                 android:id="@+id/btnPerfilConductor"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="52dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:text="@string/perfilConductor"
                 android:textAllCaps="false"
-                app:cornerRadius="24dp"
+                app:cornerRadius="26dp"
                 app:icon="@drawable/ic_driver"
                 app:iconGravity="textStart"
                 app:iconTint="@color/primary_color"
-                app:strokeColor="@color/primary_color"/>
+                app:strokeColor="@color/primary_color"
+                app:strokeWidth="1dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCerrarSesion"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="52dp"
                 android:layout_weight="1"
                 android:text="@string/cerrarSesion"
                 android:textAllCaps="false"
-                app:cornerRadius="24dp"
+                app:cornerRadius="26dp"
                 app:icon="@drawable/ic_logout"
-                app:iconGravity="textStart"/>
+                app:iconGravity="textStart"
+                app:backgroundTint="@color/primary_color"/>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
