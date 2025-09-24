@@ -11,7 +11,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserService {
     private static final int CAPACIDAD_TOTAL = 14;
@@ -81,14 +83,16 @@ public class UserService {
         });
     }
 
-    public void updateUserProfile(String userId, String nombre, String telefono, String email, UserUpdateCallback callback) {
+    public void updateUserProfile(String userId, String nombre, String telefono, UserUpdateCallback callback) {
         DatabaseReference userRef = FirebaseDatabase.getInstance()
                 .getReference("usuarios")
                 .child(userId);
 
-        userRef.child("nombre").setValue(nombre);
-        userRef.child("telefono").setValue(telefono);
-        userRef.child("email").setValue(email)
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("nombre", nombre);
+        updates.put("telefono", telefono);
+
+        userRef.updateChildren(updates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
@@ -129,31 +133,38 @@ public class UserService {
         });
     }
 
-    public void updateDriverProfile(String userId, String nombre, String placa, List<String> horariosAsignados, UserUpdateCallback callback) {
+    public void updateDriverProfile(String userId, String nombre, String telefono, String placa, List<String> horariosAsignados, UserUpdateCallback callback) {
         DatabaseReference driverRef = FirebaseDatabase.getInstance()
                 .getReference("conductores")
                 .child(userId);
 
-        driverRef.child("nombre").setValue(nombre);
-        driverRef.child("placaVehiculo").setValue(placa);
+        Map<String, Object> driverUpdates = new HashMap<>();
+        driverUpdates.put("nombre", nombre);
+        driverUpdates.put("telefono", telefono);
+        driverUpdates.put("placaVehiculo", placa);
 
-        // Actualizar horarios asignados
+        // Actualizar horarios asignados si se proporcionan
         if (horariosAsignados != null) {
-            driverRef.child("horariosAsignados").setValue(horariosAsignados);
+            driverUpdates.put("horariosAsignados", horariosAsignados);
         }
 
-        // También actualizar en usuarios para consistencia
-        updateUserProfile(userId, nombre, "", "", new UserUpdateCallback() {
-            @Override
-            public void onSuccess() {
-                callback.onSuccess();
-            }
+        // Actualizar datos del conductor
+        driverRef.updateChildren(driverUpdates)
+                .addOnSuccessListener(aVoid -> {
+                    // También actualizar en usuarios para consistencia
+                    updateUserProfile(userId, nombre, telefono, new UserUpdateCallback() {
+                        @Override
+                        public void onSuccess() {
+                            callback.onSuccess();
+                        }
 
-            @Override
-            public void onError(String error) {
-                callback.onError(error);
-            }
-        });
+                        @Override
+                        public void onError(String error) {
+                            callback.onError("Conductor actualizado pero error en usuario: " + error);
+                        }
+                    });
+                })
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
     // 🔥 MÉTODOS DE RUTAS

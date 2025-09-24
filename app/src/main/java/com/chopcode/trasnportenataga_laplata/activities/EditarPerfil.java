@@ -86,7 +86,7 @@ public class EditarPerfil extends AppCompatActivity {
         }
 
         // Usar el método correcto del UserService
-        userService.updateUserProfile(userId, nuevoNombre, nuevoTelefono, nuevoEmail,
+        userService.updateUserProfile(userId, nuevoNombre, nuevoTelefono,
                 new UserService.UserUpdateCallback() {
                     @Override
                     public void onSuccess() {
