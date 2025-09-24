@@ -1,8 +1,7 @@
 package com.chopcode.trasnportenataga_laplata.managers;
 
-import android.util.Log;
-
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
+import com.chopcode.trasnportenataga_laplata.services.UserService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,7 +16,7 @@ public class StatisticsManager {
         void onError(String error);
     }
 
-    public void calculateDailyStatistics(String conductorNombre, StatisticsCallback callback) {
+    public void calculateDailyStatistics(String conductorNombre, UserService.StatisticsCallback callback) {
         if (conductorNombre == null) {
             callback.onError("Nombre del conductor es nulo");
             return;
@@ -70,7 +69,7 @@ public class StatisticsManager {
         });
     }
 
-    public void updateIncomeInFirebase(String userId, double nuevosIngresos, IncomeUpdateCallback callback) {
+    public void updateIncomeInFirebase(String userId, double nuevosIngresos, UserService.IncomeUpdateCallback callback) {
         DatabaseReference conductorRef = FirebaseDatabase.getInstance()
                 .getReference("conductores")
                 .child(userId)
