@@ -9,17 +9,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.models.Pasajero;
-import com.chopcode.trasnportenataga_laplata.services.RegistroService;
-import com.chopcode.trasnportenataga_laplata.services.UsuarioService;
+import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
+import com.chopcode.trasnportenataga_laplata.models.Usuario;
+import com.chopcode.trasnportenataga_laplata.services.UserService;
 
 public class EditarPerfil extends AppCompatActivity {
 
     private Button btnGuardar, btnCancelar;
-    private EditText etNombre, etTelefono;
+    private EditText etNombre, etTelefono, etEmail;
     private TextView tvNombreActual, tvTelefonoActual, tvCorreoActual;
-    private RegistroService registroService;
-    private UsuarioService usuarioService;
+    private UserService userService;
+    private AuthManager authManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +27,15 @@ public class EditarPerfil extends AppCompatActivity {
         setContentView(R.layout.edit_perfil_pasajero);
 
         // Inicializar servicios
-        registroService = new RegistroService();
-        usuarioService = new UsuarioService();
+        userService = new UserService();
+        authManager = AuthManager.getInstance();
+
+        // Verificar autenticación
+        if (!authManager.isUserLoggedIn()) {
+            authManager.redirectToLogin(this);
+            finish();
+            return;
+        }
 
         // Inicializar vistas
         inicializarVistas();
@@ -60,6 +67,7 @@ public class EditarPerfil extends AppCompatActivity {
     private void guardarCambios() {
         String nuevoNombre = etNombre.getText().toString().trim();
         String nuevoTelefono = etTelefono.getText().toString().trim();
+        String nuevoEmail = etEmail != null ? etEmail.getText().toString().trim() : "";
 
         if (nuevoNombre.isEmpty()) {
             etNombre.setError("Ingresa tu nombre");
@@ -71,38 +79,64 @@ public class EditarPerfil extends AppCompatActivity {
             return;
         }
 
-        // ✅ CORRECTO: Solo pasar nombre y teléfono
-        registroService.editarPerfilPasajero(nuevoNombre, nuevoTelefono, new RegistroService.RegistroCallback() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(EditarPerfil.this, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
-                finish();
-            }
+        String userId = authManager.getUserId();
+        if (userId == null) {
+            Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            @Override
-            public void onFailure(String error) {
-                Toast.makeText(EditarPerfil.this, "Error al actualizar: " + error, Toast.LENGTH_LONG).show();
-            }
-        });
+        // Usar el método correcto del UserService
+        userService.updateUserProfile(userId, nuevoNombre, nuevoTelefono, nuevoEmail,
+                new UserService.UserUpdateCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(EditarPerfil.this, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(EditarPerfil.this, "Error al actualizar: " + error, Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     private void cargarInfoUsuario() {
-        usuarioService.cargarInformacionPasajero(new UsuarioService.UsuarioCallback() {
+        String userId = authManager.getUserId();
+        if (userId == null) {
+            Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        userService.loadUserData(userId, new UserService.UserDataCallback() {
             @Override
-            public void onUsuarioCargado(Pasajero pasajero) {
+            public void onUserDataLoaded(Usuario usuario) {
                 // Mostrar valores actuales en los TextViews
-                tvNombreActual.setText("Nombre actual: " + pasajero.getNombre());
-                tvTelefonoActual.setText("Teléfono actual: " + pasajero.getTelefono());
-                tvCorreoActual.setText("Correo actual: " + pasajero.getEmail());
+                tvNombreActual.setText("Nombre actual: " +
+                        (usuario.getNombre() != null ? usuario.getNombre() : "No disponible"));
+                tvTelefonoActual.setText("Teléfono actual: " +
+                        (usuario.getTelefono() != null ? usuario.getTelefono() : "No disponible"));
+                tvCorreoActual.setText("Correo actual: " +
+                        (usuario.getEmail() != null ? usuario.getEmail() : "No disponible"));
 
                 // Poblar los campos editables con los valores actuales
-                etNombre.setText(pasajero.getNombre());
-                etTelefono.setText(pasajero.getTelefono());
+                etNombre.setText(usuario.getNombre() != null ? usuario.getNombre() : "");
+                etTelefono.setText(usuario.getTelefono() != null ? usuario.getTelefono() : "");
+
+                if (etEmail != null) {
+                    etEmail.setText(usuario.getEmail() != null ? usuario.getEmail() : "");
+                }
             }
 
             @Override
             public void onError(String error) {
                 Toast.makeText(EditarPerfil.this, "Error al cargar datos: " + error, Toast.LENGTH_SHORT).show();
+
+                // Mostrar datos por defecto en caso de error
+                tvNombreActual.setText("Nombre actual: No disponible");
+                tvTelefonoActual.setText("Teléfono actual: No disponible");
+                tvCorreoActual.setText("Correo actual: " +
+                        (authManager.getCurrentUser() != null ? authManager.getCurrentUser().getEmail() : "No disponible"));
             }
         });
     }
