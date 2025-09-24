@@ -11,13 +11,11 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
+import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Horario;
 import com.chopcode.trasnportenataga_laplata.adapters.HorarioAdapter;
 import com.chopcode.trasnportenataga_laplata.services.HorarioService;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,19 +28,18 @@ public class InicioUsuarios extends AppCompatActivity {
     private List<Horario> listaLaPlata = new ArrayList<>();
     private Button btnReservas, btnCerrarSesion;
     private HorarioService horarioService;
-    private FirebaseAuth auth;
+    private AuthManager authManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inicio_usuarios);
 
+        // 🔹 Inicializar AuthManager
+        authManager = AuthManager.getInstance();
+
         // 🔹 Referencia a la barra superior
         MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
-
-        // 🔹 Inicializar Firebase
-        FirebaseApp.initializeApp(this);
-        auth = FirebaseAuth.getInstance();
 
         // 🔹 Configurar RecyclerViews
         recyclerViewNataga = findViewById(R.id.recyclerViewNataga);
@@ -110,28 +107,22 @@ public class InicioUsuarios extends AppCompatActivity {
     }
 
     /**
-     * 🔹 Valida si el usuario ha iniciado sesión.
+     * 🔹 Valida si el usuario ha iniciado sesión usando AuthManager.
      */
     private boolean validarLogIn() {
-        FirebaseUser usuario = auth.getCurrentUser();
-        if (usuario == null) {
+        if (!authManager.isUserLoggedIn()) {
             Toast.makeText(this, "Debes iniciar sesión", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, InicioDeSesion.class);
-            startActivity(intent);
+            authManager.redirectToLogin(this);
             return false;
         }
         return true;
     }
 
     /**
-     * 🔹 Cierra la sesión y redirige a la pantalla de inicio.
+     * 🔹 Cierra la sesión usando AuthManager.
      */
     private void cerrarSesion() {
-        auth.signOut();
+        authManager.signOut(this);
         Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, InicioDeSesion.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
     }
 }
