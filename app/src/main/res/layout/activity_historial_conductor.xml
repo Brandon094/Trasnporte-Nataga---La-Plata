@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <!-- AppBar con título y filtros -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary_500"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="@string/historial_reservas"
+            app:titleTextColor="@color/text_on_primary"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:menu="@menu/menu_historial_filtros" />
+
+        <!-- ChipGroup para filtros rápidos -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupFiltros"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            app:singleLine="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipTodas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/todas"
+                app:checkedIconVisible="false" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipConfirmadas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/confirmadas"
+                app:checkedIconVisible="false" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipCanceladas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/canceladas"
+                app:checkedIconVisible="false" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipHoy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/hoy"
+                app:checkedIconVisible="false" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Contenido principal -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Tarjeta de estadísticas rápidas -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/surface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <!-- Estadística: Total reservas -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="128"
+                            android:textColor="@color/primary_500"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/total_reservas"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <!-- Estadística: Confirmadas -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvConfirmadas"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="98"
+                            android:textColor="@color/success"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/reservas_confirmadas"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <!-- Estadística: Canceladas -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvCanceladas"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="30"
+                            android:textColor="@color/error"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/reservas_canceladas"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Título de la lista -->
+            <TextView
+                android:id="@+id/tvTituloLista"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Últimas reservas"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <!-- RecyclerView para las reservas -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerHistorial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                tools:listitem="@layout/item_historial_reserva" />
+
+            <!-- Estado vacío -->
+            <LinearLayout
+                android:id="@+id/layoutEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:visibility="gone"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:src="@drawable/ic_history"
+                    android:tint="@color/text_secondary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No hay reservas en el historial"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="16sp"
+                    android:layout_marginTop="16dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="280dp"
+                    android:layout_height="wrap_content"
+                    android:text="Las reservas confirmadas o canceladas aparecerán aquí"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Botón flotante para exportar/actualizar -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabExportar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_export"
+        app:tint="@color/text_on_primary"
+        app:backgroundTint="@color/primary_500" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
