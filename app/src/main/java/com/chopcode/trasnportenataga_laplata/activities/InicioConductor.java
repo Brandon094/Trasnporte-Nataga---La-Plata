@@ -65,6 +65,7 @@ public class InicioConductor extends AppCompatActivity {
             authManager = AuthManager.getInstance();
             userService = new UserService();
             reservaService = new ReservaService();
+            statisticsManager = new StatisticsManager();
 
             if (!authManager.validateLogin(this)) {
                 finish();
@@ -140,7 +141,7 @@ public class InicioConductor extends AppCompatActivity {
 
         userService.loadDriverData(userId, new UserService.DriverDataCallback() {
             @Override
-            public void onDriverDataLoaded(String nombre, String placa, List<String> horarios) {
+            public void onDriverDataLoaded(String nombre, String telefono, String placa, List<String> horarios) {
                 runOnUiThread(() -> {
                     tvConductor.setText(nombre != null ? nombre : "N/A");
                     tvPlacaVehiculo.setText(getString(R.string.placaVehiculo, placa != null ? placa : "N/A"));
