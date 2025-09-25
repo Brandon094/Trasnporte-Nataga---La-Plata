@@ -12,9 +12,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TrasnporteNatagaLaPlata"
         tools:targetApi="31">
+
         <activity
             android:name=".activities.EditarPerfil"
             android:exported="false" />
+        <activity
+            android:name=".activities.HistorialViajesConductor"
+            android:label="@string/historial_reservas"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
         <activity
             android:name=".activities.PerfilConductor"
             android:exported="false" />
@@ -39,10 +44,10 @@
             android:theme="@style/Theme.TrasnporteNatagaLaPlata" />
         <activity
             android:name=".activities.InicioDeSesion"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
