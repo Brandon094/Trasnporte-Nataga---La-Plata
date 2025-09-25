@@ -43,7 +43,7 @@ public class PerfilConductor extends AppCompatActivity {
         }
 
         inicializarVistas();
-        cargarInfoConductorYVehiculo();
+        cargarInfoConductorCompleta(); // ✅ LLAMAR AL MÉTODO CORRECTO
         configurarBotones();
     }
 
@@ -87,27 +87,48 @@ public class PerfilConductor extends AppCompatActivity {
     }
 
     /**
-     * Método para cargar la información del conductor y su vehículo
+     * Método unificado para cargar toda la información del conductor, usuario y vehículo
      */
-    private void cargarInfoConductorYVehiculo() {
+    private void cargarInfoConductorCompleta() {
         String userId = authManager.getUserId();
         if (userId == null) {
             Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
+            mostrarDatosPorDefecto();
             return;
         }
 
+        // 🔥 CARGAR TODO EN PARALELO: conductor + usuario + vehículo
         userService.loadDriverData(userId, new UserService.DriverDataCallback() {
             @Override
-            public void onDriverDataLoaded(String nombre, String placaVehiculo, List<String> horariosAsignados) {
+            public void onDriverDataLoaded(String nombre, String telefono, String placaVehiculo, List<String> horariosAsignados) {
+                // ✅ CARGAR DATOS DE USUARIO (email) EN PARALELO
+                cargarDatosUsuarioYCompletar(nombre, telefono, placaVehiculo, userId);
+            }
+
+            @Override
+            public void onError(String error) {
                 runOnUiThread(() -> {
-                    // Información del conductor
-                    tvConductor.setText(nombre != null ? nombre : "Conductor");
-                    tvPlaca.setText(placaVehiculo != null ? placaVehiculo : "No asignado");
+                    Log.e("PerfilConductor", "Error cargando conductor: " + error);
+                    Toast.makeText(PerfilConductor.this, "Error al cargar datos del conductor", Toast.LENGTH_SHORT).show();
+                    // Intentar cargar solo datos básicos del usuario como fallback
+                    cargarSoloDatosUsuario(userId);
+                });
+            }
+        });
+    }
 
-                    // Cargar información adicional del usuario
-                    cargarInformacionUsuarioCompleta(userId);
+    /**
+     * Método unificado que carga datos de usuario y luego completa con vehículo
+     */
+    private void cargarDatosUsuarioYCompletar(String nombreConductor, String telefonoConductor, String placaVehiculo, String userId) {
+        userService.loadUserData(userId, new UserService.UserDataCallback() {
+            @Override
+            public void onUserDataLoaded(com.chopcode.trasnportenataga_laplata.models.Usuario usuario) {
+                runOnUiThread(() -> {
+                    // ✅ ACTUALIZAR UI CON TODOS LOS DATOS RECOLECTADOS
+                    actualizarUICompleta(nombreConductor, telefonoConductor, placaVehiculo, usuario);
 
-                    // Si hay placa de vehículo, cargar información detallada
+                    // ✅ CARGAR DATOS DEL VEHÍCULO (si existe placa)
                     if (placaVehiculo != null && !placaVehiculo.isEmpty()) {
                         cargarInformacionVehiculo(placaVehiculo);
                     } else {
@@ -119,48 +140,97 @@ public class PerfilConductor extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 runOnUiThread(() -> {
-                    Toast.makeText(PerfilConductor.this, "Error al cargar conductor: " + error, Toast.LENGTH_SHORT).show();
-                    Log.e("PerfilConductor", error);
-                    cargarInformacionUsuarioCompleta(userId);
-                    mostrarVehiculoNoDisponible();
+                    Log.e("PerfilConductor", "Error cargando usuario: " + error);
+                    // ✅ USAR DATOS DEL CONDUCTOR COMO FALLBACK
+                    actualizarUIConDatosMinimos(nombreConductor, telefonoConductor, placaVehiculo);
+
+                    if (placaVehiculo != null && !placaVehiculo.isEmpty()) {
+                        cargarInformacionVehiculo(placaVehiculo);
+                    } else {
+                        mostrarVehiculoNoDisponible();
+                    }
                 });
             }
         });
     }
 
     /**
-     * Cargar información completa del usuario (email, teléfono)
+     * Actualizar UI con todos los datos disponibles
      */
-    private void cargarInformacionUsuarioCompleta(String userId) {
+    private void actualizarUICompleta(String nombre, String telefono, String placa, com.chopcode.trasnportenataga_laplata.models.Usuario usuario) {
+        // ✅ INFORMACIÓN PERSONAL
+        tvConductor.setText(nombre != null ? nombre : "Conductor");
+
+        // ✅ TELÉFONO: Prioridad conductor -> usuario -> por defecto
+        String telefonoFinal = telefono != null ? telefono :
+                (usuario.getTelefono() != null ? usuario.getTelefono() : "No disponible");
+        tvTelefono.setText(telefonoFinal);
+
+        // ✅ EMAIL: Prioridad usuario -> auth -> por defecto
+        String emailFinal = usuario.getEmail() != null ? usuario.getEmail() :
+                (authManager.getCurrentUser() != null ? authManager.getCurrentUser().getEmail() : "No disponible");
+        tvEmail.setText(emailFinal);
+
+        // ✅ PLACA DEL VEHÍCULO
+        tvPlaca.setText(placa != null ? placa : "No asignado");
+    }
+
+    /**
+     * Fallback: Actualizar UI solo con datos mínimos del conductor
+     */
+    private void actualizarUIConDatosMinimos(String nombre, String telefono, String placa) {
+        tvConductor.setText(nombre != null ? nombre : "Conductor");
+        tvTelefono.setText(telefono != null ? telefono : "No disponible");
+        tvPlaca.setText(placa != null ? placa : "No asignado");
+
+        // ✅ EMAIL de fallback desde Auth
+        if (authManager.getCurrentUser() != null) {
+            tvEmail.setText(authManager.getCurrentUser().getEmail());
+        } else {
+            tvEmail.setText("No disponible");
+        }
+    }
+
+    /**
+     * Cargar solo datos básicos del usuario como último fallback
+     */
+    private void cargarSoloDatosUsuario(String userId) {
         userService.loadUserData(userId, new UserService.UserDataCallback() {
             @Override
             public void onUserDataLoaded(com.chopcode.trasnportenataga_laplata.models.Usuario usuario) {
                 runOnUiThread(() -> {
-                    if (usuario.getEmail() != null) {
-                        tvEmail.setText(usuario.getEmail());
-                    } else {
-                        tvEmail.setText(authManager.getCurrentUser() != null ?
-                                authManager.getCurrentUser().getEmail() : "No disponible");
-                    }
-
-                    if (usuario.getTelefono() != null) {
-                        tvTelefono.setText(usuario.getTelefono());
-                    } else {
-                        tvTelefono.setText("No disponible");
-                    }
+                    tvConductor.setText("Conductor");
+                    tvTelefono.setText(usuario.getTelefono() != null ? usuario.getTelefono() : "No disponible");
+                    tvEmail.setText(usuario.getEmail() != null ? usuario.getEmail() : "No disponible");
+                    tvPlaca.setText("No asignado");
+                    mostrarVehiculoNoDisponible();
                 });
             }
 
             @Override
             public void onError(String error) {
                 runOnUiThread(() -> {
-                    if (authManager.getCurrentUser() != null) {
-                        tvEmail.setText(authManager.getCurrentUser().getEmail());
-                    }
-                    tvTelefono.setText("No disponible");
+                    mostrarDatosPorDefecto();
                 });
             }
         });
+    }
+
+    /**
+     * Mostrar datos por defecto cuando todo falla
+     */
+    private void mostrarDatosPorDefecto() {
+        tvConductor.setText("Conductor");
+        tvTelefono.setText("No disponible");
+        tvPlaca.setText("No asignado");
+
+        if (authManager.getCurrentUser() != null) {
+            tvEmail.setText(authManager.getCurrentUser().getEmail());
+        } else {
+            tvEmail.setText("No disponible");
+        }
+
+        mostrarVehiculoNoDisponible();
     }
 
     /**
@@ -172,14 +242,13 @@ public class PerfilConductor extends AppCompatActivity {
             public void onVehiculoCargado(Vehiculo vehiculo) {
                 runOnUiThread(() -> {
                     if (vehiculo != null) {
-                        // Mostrar información detallada del vehículo
+                        // ✅ INFORMACIÓN COMPLETA DEL VEHÍCULO
                         tvPlaca.setText(vehiculo.getPlaca() != null ? vehiculo.getPlaca() : "No disponible");
-                        tvModVehiculo.setText(vehiculo.getModelo() != null ?
-                                vehiculo.getMarca() + " " + vehiculo.getModelo() : "No disponible");
+                        tvModVehiculo.setText(vehiculo.getModelo() != null ? vehiculo.getModelo() : "No disponible");
                         tvCapacidad.setText(String.valueOf(vehiculo.getCapacidad()));
 
-                        if (vehiculo.getAnio() > 0) {
-                            tvAnioVehiculo.setText(String.valueOf(vehiculo.getAnio()));
+                        if (vehiculo.getAno() != null && !vehiculo.getAno().isEmpty()) {
+                            tvAnioVehiculo.setText(vehiculo.getAno());
                         } else {
                             tvAnioVehiculo.setText("N/A");
                         }
@@ -269,6 +338,6 @@ public class PerfilConductor extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        cargarInfoConductorYVehiculo();
+        cargarInfoConductorCompleta(); // ✅ LLAMAR AL MÉTODO CORRECTO
     }
 }
