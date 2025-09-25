@@ -4,28 +4,25 @@ public class Vehiculo {
     private String id;
     private String placa;
     private String modelo;
-    private String marca;
-    private int anio;
-    private int capacidad;
     private String color;
-    private String tipo; // Sedan, SUV, Camioneta, etc.
-    private boolean activo;
+    private String ano;
+    private int capacidad;
+    private String conductorId;
+    private String estado;
 
-    public Vehiculo() {
-        // Constructor vacío requerido para Firebase
-    }
+    // ✅ Constructor vacío requerido para Firebase
+    public Vehiculo() {}
 
-    public Vehiculo(String id, String placa, String modelo, String marca, int anio,
-                    int capacidad, String color, String tipo) {
+    public Vehiculo(String id, String placa, String modelo, String color, String ano,
+                    int capacidad, String conductorId, String estado) {
         this.id = id;
         this.placa = placa;
         this.modelo = modelo;
-        this.marca = marca;
-        this.anio = anio;
-        this.capacidad = capacidad;
         this.color = color;
-        this.tipo = tipo;
-        this.activo = true;
+        this.ano = ano;
+        this.capacidad = capacidad;
+        this.conductorId = conductorId;
+        this.estado = estado;
     }
 
     // Getters y Setters
@@ -38,21 +35,18 @@ public class Vehiculo {
     public String getModelo() { return modelo; }
     public void setModelo(String modelo) { this.modelo = modelo; }
 
-    public String getMarca() { return marca; }
-    public void setMarca(String marca) { this.marca = marca; }
+    public String getColor() { return color; }
+    public void setColor(String color) { this.color = color; }
 
-    public int getAnio() { return anio; }
-    public void setAnio(int anio) { this.anio = anio; }
+    public String getAno() { return ano; }
+    public void setAno(String ano) { this.ano = ano; }  // ✅ CORREGIDO
 
     public int getCapacidad() { return capacidad; }
     public void setCapacidad(int capacidad) { this.capacidad = capacidad; }
 
-    public String getColor() { return color; }
-    public void setColor(String color) { this.color = color; }
+    public String getConductorId() { return conductorId; }
+    public void setConductorId(String conductorId) { this.conductorId = conductorId; }
 
-    public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { this.tipo = tipo; }
-
-    public boolean isActivo() { return activo; }
-    public void setActivo(boolean activo) { this.activo = activo; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 }
