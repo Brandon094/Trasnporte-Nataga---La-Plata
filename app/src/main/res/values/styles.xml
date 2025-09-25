@@ -1,11 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- ==================== -->
+    <!-- STYLES PARA ASIENTOS -->
+    <!-- ==================== -->
     <style name="AsientoStyle">
         <item name="android:layout_width">70dp</item>
         <item name="android:layout_height">64dp</item>
-        <item name="android:backgroundTint">@android:color/holo_green_light</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:backgroundTint">@color/seat_available</item>
+        <item name="android:textColor">@color/text_on_primary</item>
         <item name="android:textSize">25sp</item>
         <item name="android:layout_margin">4dp</item>
+    </style>
+
+    <!-- ==================== -->
+    <!-- STYLES PARA FILTROS CHIP (MD2) - MODE ADAPTIVE -->
+    <!-- ==================== -->
+    <style name="FilterChip" parent="Widget.MaterialComponents.Chip.Filter">
+        <item name="chipMinTouchTargetSize">0dp</item>
+        <item name="chipStartPadding">12dp</item>
+        <item name="chipEndPadding">12dp</item>
+        <item name="chipMinHeight">32dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+
+        <item name="checkedIcon">@null</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipStrokeColor">?attr/colorOutline</item>
+    </style>
+
+    <style name="FilterChipSelected" parent="FilterChip">
+        <item name="chipBackgroundColor">@color/chip_background_selected</item>
+        <item name="android:textColor">@color/chip_text_selected</item>
+    </style>
+
+    <!-- ==================== -->
+    <!-- STYLES PARA BOTONES (MD2) - MODE ADAPTIVE -->
+    <!-- ==================== -->
+    <style name="ButtonOutlineSmall" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:layout_height">32dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:paddingHorizontal">12dp</item>
+        <item name="strokeColor">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+
+    <style name="ButtonFilledSmall" parent="Widget.MaterialComponents.Button">
+        <item name="android:layout_height">32dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:paddingHorizontal">12dp</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <!-- ==================== -->
+    <!-- STYLES PARA FAB (MD2) - MODE ADAPTIVE -->
+    <!-- ==================== -->
+    <style name="FabStyle" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="tint">?attr/colorOnPrimary</item>
+        <item name="elevation">6dp</item>
+        <item name="rippleColor">?attr/colorPrimaryContainer</item>
+        <item name="hoveredFocusedTranslationZ">8dp</item>
+    </style>
+
+    <!-- ==================== -->
+    <!-- STYLES PARA CARDS DE RESERVA - MODE ADAPTIVE -->
+    <!-- ==================== -->
+    <style name="ReservaCardStyle" parent="CardView">
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
+        <item name="strokeColor">?attr/colorOutline</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="ReservaCardElevated" parent="ReservaCardStyle">
+        <item name="cardElevation">4dp</item>
+        <item name="cardMaxElevation">8dp</item>
+    </style>
+
+    <!-- ==================== -->
+    <!-- STYLES PARA TEXTOS - MODE ADAPTIVE -->
+    <!-- ==================== -->
+    <style name="TextTitleLarge">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+    </style>
+
+    <style name="TextTitleMedium">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+    </style>
+
+    <style name="TextBodyMedium">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextBodySmall">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="TextCaption">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <!-- ==================== -->
+    <!-- STYLES PARA ESTADOS DE RESERVA -->
+    <!-- ==================== -->
+    <style name="StatusBadgeConfirmed">
+        <item name="android:background">@drawable/bg_estado_confirmado</item>
+        <item name="android:textColor">@color/status_confirmed</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:paddingVertical">2dp</item>
+    </style>
+
+    <style name="StatusBadgePending">
+        <item name="android:background">@drawable/bg_estado_pendiente</item>
+        <item name="android:textColor">@color/status_pending</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:paddingVertical">2dp</item>
+    </style>
+
+    <style name="StatusBadgeCancelled">
+        <item name="android:background">@drawable/bg_estado_cancelado</item>
+        <item name="android:textColor">@color/status_cancelled</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:paddingVertical">2dp</item>
+    </style>
+
+    <!-- ==================== -->
+    <!-- STYLES PARA DIVIDERS -->
+    <!-- ==================== -->
+    <style name="DividerHorizontal">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?attr/colorOutline</item>
+    </style>
+
+    <style name="DividerVertical">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">?attr/colorOutline</item>
     </style>
 </resources>
