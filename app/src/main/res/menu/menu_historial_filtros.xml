@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Ítem de filtro por fecha -->
+    <item
+        android:id="@+id/action_filter_date"
+        android:icon="@drawable/ic_calendar"
+        android:title="@string/filtrar_fecha"
+        app:showAsAction="ifRoom"
+        app:actionViewClass="android.widget.TextView" />
+
+    <!-- Ítem de ordenamiento -->
+    <item
+        android:id="@+id/action_sort"
+        android:icon="@drawable/ic_sort"
+        android:title="@string/ordenar"
+        app:showAsAction="ifRoom" />
+
+    <!-- Ítem de búsqueda -->
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search"
+        android:title="@string/buscar"
+        app:showAsAction="ifRoom"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+    <!-- Menú desplegable con más opciones -->
+    <item
+        android:id="@+id/action_more"
+        android:icon="@drawable/ic_more_ver"
+        android:title="@string/mas_opciones"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <!-- Exportar historial -->
+            <item
+                android:id="@+id/action_export"
+                android:icon="@drawable/ic_export"
+                android:title="@string/exportar_historial" />
+
+            <!-- Estadísticas detalladas -->
+            <item
+                android:id="@+id/action_stats"
+                android:icon="@drawable/ic_stast"
+                android:title="@string/estadisticas_detalladas" />
+
+            <!-- Filtros avanzados -->
+            <item
+                android:id="@+id/action_advanced_filters"
+                android:icon="@drawable/ic_filter_list"
+                android:title="@string/filtros_avanzados" />
+
+            <!-- Limpiar filtros -->
+            <item
+                android:id="@+id/action_clear_filters"
+                android:icon="@drawable/ic_clear"
+                android:title="@string/limpiar_filtros" />
+
+            <!-- Separador -->
+            <group android:id="@+id/group_separator">
+                <item
+                    android:id="@+id/action_separator"
+                    android:enabled="false">
+                    <menu>
+                        <item android:title=""/>
+                    </menu>
+                </item>
+            </group>
+
+            <!-- Configuración de vista -->
+            <item
+                android:id="@+id/action_view_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="@string/configuracion_vista" />
+        </menu>
+    </item>
+
+</menu>
