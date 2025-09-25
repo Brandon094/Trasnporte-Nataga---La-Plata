@@ -100,6 +100,119 @@
     <string name="pago_transferencia">Transferencia</string>
 
     <!-- ==================== -->
+    <!-- HISTORIAL DE RESERVAS - NUEVOS -->
+    <!-- ==================== -->
+    <string name="historial_reservas">Historial de Reservas</string>
+    <string name="filtros">Filtros</string>
+    <string name="todas">Todas</string>
+    <string name="confirmadas">Confirmadas</string>
+    <string name="canceladas">Canceladas</string>
+    <string name="hoy">Hoy</string>
+    <string name="semana">Esta semana</string>
+    <string name="mes">Este mes</string>
+
+    <!-- Estadísticas -->
+    <string name="estadisticas">Estadísticas</string>
+    <string name="total_reservas">Total</string>
+    <string name="reservas_confirmadas">Confirmadas</string>
+    <string name="reservas_canceladas">Canceladas</string>
+    <string name="ingresos_totales">Ingresos totales</string>
+
+    <!-- Estados de reserva -->
+    <string name="estado_confirmada">Confirmada</string>
+    <string name="estado_cancelada">Cancelada</string>
+    <string name="estado_pendiente">Pendiente</string>
+    <string name="estado_completada">Completada</string>
+
+    <!-- Información de reserva -->
+    <string name="fecha_hora">%s - %s</string>
+    <string name="pasajero_label">Pasajero</string>
+    <string name="telefono_label">Teléfono</string>
+    <string name="ruta_label">Ruta</string>
+    <string name="puesto_label">Puesto</string>
+    <string name="precio_label">Precio</string>
+
+    <!-- Empty states -->
+    <string name="empty_historial_titulo">No hay reservas en el historial</string>
+    <string name="empty_historial_descripcion">Las reservas confirmadas o canceladas aparecerán aquí</string>
+    <string name="empty_filtro_titulo">No hay resultados</string>
+    <string name="empty_filtro_descripcion">Intenta con otros filtros o fechas</string>
+
+    <!-- Acciones -->
+    <string name="ver_detalles">Detalles</string>
+    <string name="exportar">Exportar</string>
+    <string name="actualizar">Actualizar</string>
+    <string name="aplicar_filtros">Aplicar filtros</string>
+    <string name="limpiar_filtros">Limpiar filtros</string>
+
+    <!-- ==================== -->
+    <!-- STRINGS PARA EL MENÚ DE FILTROS -->
+    <!-- ==================== -->
+    <string name="filtrar_fecha">Filtrar por fecha</string>
+    <string name="ordenar">Ordenar</string>
+    <string name="buscar">Buscar</string>
+    <string name="mas_opciones">Más opciones</string>
+    <string name="exportar_historial">Exportar historial</string>
+    <string name="estadisticas_detalladas">Estadísticas detalladas</string>
+    <string name="filtros_avanzados">Filtros avanzados</string>
+    <string name="configuracion_vista">Configuración de vista</string>
+
+    <!-- Opciones de ordenamiento -->
+    <string name="ordenar_mas_reciente">Más reciente primero</string>
+    <string name="ordenar_mas_antiguo">Más antiguo primero</string>
+    <string name="ordenar_precio_mayor">Precio mayor a menor</string>
+    <string name="ordenar_precio_menor">Precio menor a mayor</string>
+    <string name="ordenar_pasajero">Por nombre de pasajero</string>
+    <string name="ordenar_estado">Por estado</string>
+
+    <!-- Placeholders para búsqueda -->
+    <string name="buscar_pasajero">Buscar por pasajero…</string>
+    <string name="buscar_telefono">Buscar por teléfono…</string>
+    <string name="buscar_ruta">Buscar por ruta…</string>
+
+    <!-- Filtros de fecha -->
+    <string name="fecha_hoy">Hoy</string>
+    <string name="fecha_ayer">Ayer</string>
+    <string name="fecha_ultima_semana">Última semana</string>
+    <string name="fecha_ultimo_mes">Último mes</string>
+    <string name="fecha_personalizada">Fecha personalizada</string>
+    <string name="seleccionar_fecha_inicio">Seleccionar fecha inicio</string>
+    <string name="seleccionar_fecha_fin">Seleccionar fecha fin</string>
+    <string name="rango_fechas">Rango de fechas</string>
+
+    <!-- Configuración de vista -->
+    <string name="vista_lista">Vista de lista</string>
+    <string name="vista_tarjetas">Vista de tarjetas</string>
+    <string name="vista_compacta">Vista compacta</string>
+    <string name="mostrar_imagenes">Mostrar imágenes</string>
+    <string name="ocultar_imagenes">Ocultar imágenes</string>
+    <string name="tamano_texto">Tamaño del texto</string>
+    <string name="tamano_pequeno">Pequeño</string>
+    <string name="tamano_medio">Mediano</string>
+    <string name="tamano_grande">Grande</string>
+
+    <!-- Mensajes de exportación -->
+    <string name="exportando">Exportando historial…</string>
+    <string name="exportacion_exitosa">Historial exportado exitosamente</string>
+    <string name="exportacion_error">Error al exportar el historial</string>
+    <string name="formato_pdf">PDF</string>
+    <string name="formato_excel">Excel</string>
+    <string name="formato_csv">CSV</string>
+
+    <!-- Diálogos y confirmaciones -->
+    <string name="confirmar_exportacion">¿Exportar historial de reservas?</string>
+    <string name="mensaje_exportacion">Se generará un archivo con todas las reservas del período seleccionado.</string>
+    <string name="confirmar_limpiar">¿Limpiar todos los filtros?</string>
+    <string name="mensaje_limpiar">Se restaurarán todos los filtros a su estado inicial.</string>
+
+    <!-- Tooltips y descripciones -->
+    <string name="tooltip_filtrar">Filtrar reservas</string>
+    <string name="tooltip_ordenar">Ordenar reservas</string>
+    <string name="tooltip_buscar">Buscar en el historial</string>
+    <string name="tooltip_exportar">Exportar historial</string>
+    <string name="descripcion_filtros">Aplicar filtros para refinar la búsqueda</string>
+
+    <!-- ==================== -->
     <!-- API KEYS -->
     <!-- ==================== -->
     <string name="default_web_client_id" translatable="false">175264872585-abombvqq36bqqeet86onnhkf7uep6c60.apps.googleusercontent.com</string>
