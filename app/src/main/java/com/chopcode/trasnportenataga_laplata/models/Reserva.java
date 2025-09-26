@@ -1,9 +1,9 @@
 package com.chopcode.trasnportenataga_laplata.models;
 
 public class Reserva {
-    private String idReserva, usuarioId, horarioId, conductor, vehiculoId, origen, destino,
-            tiempoEstimado, metodoPago,
-            estadoReserva, nombre, telefono, telefonoC, email;
+    private String idReserva, usuarioId, horarioId, conductorId, vehiculoId;
+    private String conductor, origen, destino, tiempoEstimado, metodoPago;
+    private String estadoReserva, nombre, telefono, telefonoC, email;
     private long fechaReserva;
     private double precio;
     private int puestoReservado;
@@ -87,4 +87,6 @@ public class Reserva {
 
     public String getTelefonoC() { return telefonoC; }
     public void setTelefonoC(String telefonoC) { this.telefonoC = telefonoC; }
+    public String getConductorId() { return conductorId; }
+    public void setConductorId(String conductorId) { this.conductorId = conductorId; }
 }
