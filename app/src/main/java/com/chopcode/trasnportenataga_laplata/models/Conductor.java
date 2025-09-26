@@ -4,8 +4,7 @@ import java.util.List;
 
 public class Conductor extends Usuario {
     private String vehiculoId;
-    private String placaVehiculo;
-    private String modeloVehiculo;
+    private String placaVehiculo, modeloVehiculo;
     private int capacidadVehiculo;
     private List<String> horariosAsignados;
 
