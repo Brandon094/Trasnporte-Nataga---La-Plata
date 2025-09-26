@@ -272,8 +272,6 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:layout_marginBottom="16dp">
-
-                <!-- Botón único de reserva que ocupa todo el ancho -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnReservar"
                     android:layout_width="match_parent"
