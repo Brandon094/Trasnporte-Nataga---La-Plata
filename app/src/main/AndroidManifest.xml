@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Agregar permisos si los necesitas (opcional) -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,44 +17,81 @@
         android:theme="@style/Theme.TrasnporteNatagaLaPlata"
         tools:targetApi="31">
 
-        <activity
-            android:name=".activities.EditarPerfil"
-            android:exported="false" />
-        <activity
-            android:name=".activities.HistorialViajesConductor"
-            android:label="@string/historial_reservas"
-            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
-        <activity
-            android:name=".activities.PerfilConductor"
-            android:exported="false" />
-        <activity
-            android:name=".activities.PerfilUsuario"
-            android:exported="false" />
-        <activity
-            android:name=".activities.InicioConductor"
-            android:exported="false" />
-        <activity
-            android:name=".activities.RegistroUsuarios"
-            android:exported="false" />
-        <activity
-            android:name=".activities.InicioUsuarios"
-            android:exported="false" />
+        <!-- Ordenar actividades alfabéticamente para mejor organización -->
         <activity
             android:name=".activities.ConfirmarReserva"
-            android:exported="false" />
-        <activity
-            android:name=".activities.Reservas"
             android:exported="false"
-            android:theme="@style/Theme.TrasnporteNatagaLaPlata" />
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
+
+        <activity
+            android:name=".activities.EditarPerfil"
+            android:exported="false"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
+
+        <activity
+            android:name=".activities.EditarPerfilConductor"
+            android:exported="false"
+            android:label="Editar Perfil Conductor"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
+
+        <activity
+            android:name=".activities.HistorialViajesConductor"
+            android:exported="false"
+            android:label="@string/historial_reservas"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
+
+        <activity
+            android:name=".activities.InicioConductor"
+            android:exported="false"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
+
         <activity
             android:name=".activities.InicioDeSesion"
             android:exported="true"
-            android:theme="@style/Theme.TrasnporteNatagaLaPlata.Splash">
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activities.InicioUsuarios"
+            android:exported="false"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
+
+        <activity
+            android:name=".activities.PerfilConductor"
+            android:exported="false"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
+
+        <activity
+            android:name=".activities.PerfilUsuario"
+            android:exported="false"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
+
+        <activity
+            android:name=".activities.RegistroUsuarios"
+            android:exported="false"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
+
+        <activity
+            android:name=".activities.Reservas"
+            android:exported="false"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
+
+        <!-- Servicios de Firebase (si los usas) -->
+        <service
+            android:name="com.google.firebase.components.ComponentDiscoveryService"
+            android:exported="false">
+            <meta-data
+                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data
+                android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
+        </service>
+
     </application>
 
 </manifest>
