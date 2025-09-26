@@ -1,9 +1,540 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.EditarPerfil">
+    android:background="@drawable/bg_gradient_edit_profile"
+    android:padding="16dp"
+    android:fitsSystemWindows="true">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="240dp"
+            android:background="@drawable/header_gradient_driver"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="36dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Círculo para foto de perfil con borde -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_circle_photo"
+                android:padding="4dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/ivProfilePhoto"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:src="@drawable/ic_person"
+                    android:scaleType="centerCrop"
+                    app:civ_border_color="@color/text_on_primary"
+                    app:civ_border_width="3dp" />
+
+            </LinearLayout>
+
+            <!-- Título -->
+            <TextView
+                android:id="@+id/tvEditarPerfilTitulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Editar Perfil Conductor"
+                android:textColor="@color/text_on_primary"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.5" />
+
+            <!-- Subtítulo mejorado -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:text="Actualiza tu información personal y del vehículo"
+                android:textColor="@color/text_tertiary"
+                android:textSize="10sp"
+                android:letterSpacing="0.2"
+                android:gravity="center"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:lineSpacingExtra="4dp" />
+
+        </LinearLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardEditarPerfil"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="250dp"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@color/surface"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@color/primary_50"
+            app:strokeWidth="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="32dp">
+
+                <!-- SECCIÓN CORREO (PRIMERO) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:background="@drawable/bg_setion_correo"
+                    android:layout_marginBottom="24dp">
+
+                    <!-- Header sección correo -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_email"
+                            android:tint="@color/text_tertiary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:text="Correo Electrónico"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="NO EDITABLE"
+                            android:textColor="@color/error"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:background="@drawable/bg_badge_error"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="2dp" />
+
+                    </LinearLayout>
+
+                    <!-- Mensaje informativo -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="El correo electrónico no se puede modificar porque está vinculado a tu cuenta de autenticación y es tu identificador único en el sistema."
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="2dp"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Valor actual del correo -->
+                    <TextView
+                        android:id="@+id/tvCorreoActual"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Correo actual: cargando..."
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="12dp"
+                        android:textStyle="italic" />
+
+                    <!-- Campo Correo (no editable) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/inputLayoutCorreo"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Correo electrónico"
+                        app:startIconDrawable="@drawable/ic_lock"
+                        app:startIconTint="@color/text_tertiary"
+                        app:boxStrokeColor="@color/text_tertiary"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:hintTextColor="@color/text_tertiary">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etCorreo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textEmailAddress"
+                            android:enabled="false"
+                            android:textColor="@color/text_tertiary"
+                            android:textColorHint="@color/text_tertiary" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+                <!-- Divider decorativo -->
+                <View
+                    android:layout_width="120dp"
+                    android:layout_height="2dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/gradient_divider_small"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- SECCIÓN INFORMACIÓN PERSONAL -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Información Personal"
+                    android:textColor="@color/primary_500"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Valor actual del nombre -->
+                <TextView
+                    android:id="@+id/tvNombreActual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nombre actual: cargando..."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"
+                    android:textStyle="italic" />
+
+                <!-- Campo Nombre -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputLayoutNombre"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Nombre completo"
+                    app:startIconDrawable="@drawable/ic_person"
+                    app:startIconTint="@color/primary_500"
+                    app:boxStrokeColor="@color/primary_500"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:hintTextColor="@color/primary_500"
+                    android:layout_marginBottom="20dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etNombre"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Valor actual del teléfono -->
+                <TextView
+                    android:id="@+id/tvTelefonoActual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Teléfono actual: cargando..."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"
+                    android:textStyle="italic" />
+
+                <!-- Campo Teléfono -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputLayoutTelefono"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Número de teléfono"
+                    app:startIconDrawable="@drawable/ic_phone_enabled"
+                    app:startIconTint="@color/primary_500"
+                    app:boxStrokeColor="@color/primary_500"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:hintTextColor="@color/primary_500"
+                    android:layout_marginBottom="32dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etTelefono"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="phone"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Divider decorativo -->
+                <View
+                    android:layout_width="120dp"
+                    android:layout_height="2dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/gradient_divider_small"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- SECCIÓN INFORMACIÓN DEL VEHÍCULO -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Información del Vehículo"
+                    android:textColor="@color/secondary_500"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Valor actual de la placa -->
+                <TextView
+                    android:id="@+id/tvPlacaActual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Placa actual: cargando..."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"
+                    android:textStyle="italic" />
+
+                <!-- Campo Placa del Vehículo -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputLayoutPlaca"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Placa del vehículo"
+                    app:startIconDrawable="@drawable/ic_license"
+                    app:startIconTint="@color/secondary_500"
+                    app:boxStrokeColor="@color/secondary_500"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:hintTextColor="@color/secondary_500"
+                    android:layout_marginBottom="20dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPlaca"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapCharacters"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Valor actual del modelo -->
+                <TextView
+                    android:id="@+id/tvModeloActual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Modelo actual: cargando..."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"
+                    android:textStyle="italic" />
+
+                <!-- Campo Modelo del Vehículo -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputLayoutModelo"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Modelo del vehículo"
+                    app:startIconDrawable="@drawable/ic_car_model"
+                    app:startIconTint="@color/secondary_500"
+                    app:boxStrokeColor="@color/secondary_500"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:hintTextColor="@color/secondary_500"
+                    android:layout_marginBottom="20dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etModelo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+                <!-- Valor actual del color -->
+                <TextView
+                    android:id="@+id/tvColorActual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Color actual: cargando..."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"
+                    android:textStyle="italic" />
+
+                <!-- Campo Color del Vehículo -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputLayoutColor"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Color del vehículo"
+                    app:startIconDrawable="@drawable/ic_color_lens"
+                    app:startIconTint="@color/secondary_500"
+                    app:boxStrokeColor="@color/secondary_500"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:hintTextColor="@color/secondary_500"
+                    android:layout_marginBottom="20dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etColor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Valor actual de la capacidad -->
+                <TextView
+                    android:id="@+id/tvCapacidadActual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Capacidad actual: cargando..."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"
+                    android:textStyle="italic" />
+
+                <!-- Campo Capacidad -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputLayoutCapacidad"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Capacidad de pasajeros"
+                    app:startIconDrawable="@drawable/ic_capacidad"
+                    app:startIconTint="@color/secondary_500"
+                    app:boxStrokeColor="@color/secondary_500"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:hintTextColor="@color/secondary_500"
+                    android:layout_marginBottom="20dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etCapacidad"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Valor actual del año -->
+                <TextView
+                    android:id="@+id/tvAnioActual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Año actual: cargando..."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"
+                    android:textStyle="italic" />
+
+                <!-- Campo Año del Vehículo -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputLayoutAnio"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Año del vehículo"
+                    app:startIconDrawable="@drawable/ic_calendar_today"
+                    app:startIconTint="@color/secondary_500"
+                    app:boxStrokeColor="@color/secondary_500"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:hintTextColor="@color/secondary_500"
+                    android:layout_marginBottom="32dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etAnio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Botones más compactos -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCancelar"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="Cancelar"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        app:cornerRadius="16dp"
+                        app:icon="@drawable/ic_arrow_back"
+                        app:iconSize="18dp"
+                        app:iconGravity="textStart"
+                        app:iconTint="@color/text_secondary"
+                        app:strokeColor="@color/text_secondary"
+                        app:strokeWidth="1dp"
+                        app:iconPadding="6dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGuardarCambios"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="Guardar"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_on_primary"
+                        app:cornerRadius="16dp"
+                        app:icon="@drawable/ic_check"
+                        app:iconSize="18dp"
+                        app:iconGravity="textStart"
+                        app:iconTint="@color/text_on_primary"
+                        app:iconPadding="6dp"
+                        android:backgroundTint="@color/primary_500" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
