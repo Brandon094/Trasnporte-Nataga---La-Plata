@@ -1,7 +1,5 @@
 package com.chopcode.trasnportenataga_laplata.services;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.chopcode.trasnportenataga_laplata.models.Pasajero;
@@ -13,9 +11,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Servicio encargado de registrar un usuario en Firebase.
@@ -123,30 +118,6 @@ public class RegistroService {
             }
         });
     }
-    /**
-     * Metodo para editar el perfil del pasajero
-     * Solo permite editar nombre y teléfono (el correo no es editable)
-     */
-    public void editarPerfilPasajero(String nuevoNombre, String nuevoTelefono, RegistroService.RegistroCallback callback) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (user == null) {
-            callback.onFailure("Usuario no autenticado.");
-            return;
-        }
-
-        String uid = user.getUid();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("usuarios").child(uid);
-
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("nombre", nuevoNombre);
-        updates.put("telefono", nuevoTelefono);
-
-        ref.updateChildren(updates)
-                .addOnSuccessListener(aVoid -> callback.onSuccess())
-                .addOnFailureListener(e -> callback.onFailure("Error al actualizar perfil: " + e.getMessage()));
-    }
-
     /** Metodo para editar el perfil del conductor*/
     public void editarPerfilConductor(){
 
