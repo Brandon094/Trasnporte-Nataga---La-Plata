@@ -5,38 +5,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="3dp"
     app:cardBackgroundColor="@color/surface"
-    app:strokeColor="@color/primary_200"
+    app:strokeColor="@color/primary_500"
     app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="20dp"
         android:gravity="center_vertical">
 
-        <!-- Hora -->
-        <TextView
-            android:id="@+id/tvHora"
+        <!-- Indicador de tiempo -->
+        <LinearLayout
             android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:textColor="@color/primary_500"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:layout_height="80dp"
+            android:background="@drawable/bg_time_circle"
             android:gravity="center"
-            tools:text="08:00 AM" />
+            android:orientation="vertical">
 
-        <!-- Separador CON COLOR -->
+            <TextView
+                android:id="@+id/tvHora"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_500"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="08:00" />
+
+            <TextView
+                android:id="@+id/tvAmPm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:textSize="10sp"
+                tools:text="AM" />
+        </LinearLayout>
+
+        <!-- Separador -->
         <View
             android:layout_width="1dp"
-            android:layout_height="24dp"
-            android:background="@color/primary_200"
-            android:layout_marginHorizontal="12dp" />
+            android:layout_height="40dp"
+            android:background="@color/divider"
+            android:layout_marginHorizontal="16dp" />
 
         <!-- Información de la ruta -->
         <LinearLayout
@@ -51,12 +66,55 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
-                android:maxLines="1"
-                android:ellipsize="end"
+                android:textStyle="bold"
                 tools:text="Natagá → La Plata" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_seat"
+                    android:tint="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/tvAsientos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    tools:text="12 asientos disponibles" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="2dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_price"
+                    android:tint="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/tvPrecio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:textColor="@color/success"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:text="$12.000" />
+            </LinearLayout>
         </LinearLayout>
-
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>
