@@ -67,7 +67,6 @@ public class EditarPerfil extends AppCompatActivity {
     private void guardarCambios() {
         String nuevoNombre = etNombre.getText().toString().trim();
         String nuevoTelefono = etTelefono.getText().toString().trim();
-        String nuevoEmail = etEmail != null ? etEmail.getText().toString().trim() : "";
 
         if (nuevoNombre.isEmpty()) {
             etNombre.setError("Ingresa tu nombre");
@@ -119,15 +118,14 @@ public class EditarPerfil extends AppCompatActivity {
                 tvCorreoActual.setText("Correo actual: " +
                         (usuario.getEmail() != null ? usuario.getEmail() : "No disponible"));
 
-                // Poblar los campos editables con los valores actuales
-                etNombre.setText(usuario.getNombre() != null ? usuario.getNombre() : "");
-                etTelefono.setText(usuario.getTelefono() != null ? usuario.getTelefono() : "");
+                // Poblar los campos editables con los valores actuales (CORREGIDO)
+                etNombre.setText("");
+                etTelefono.setText("");
 
                 if (etEmail != null) {
                     etEmail.setText(usuario.getEmail() != null ? usuario.getEmail() : "");
                 }
             }
-
             @Override
             public void onError(String error) {
                 Toast.makeText(EditarPerfil.this, "Error al cargar datos: " + error, Toast.LENGTH_SHORT).show();
