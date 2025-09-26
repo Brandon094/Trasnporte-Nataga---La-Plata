@@ -192,8 +192,8 @@ public class EditarPerfilConductor extends AppCompatActivity {
                 (conductorActual.getEmail() != null ? conductorActual.getEmail() : "No definido"));
 
         // Llenar campos editables
-        if (conductorActual.getNombre() != null) etNombre.setText(conductorActual.getNombre());
-        if (conductorActual.getTelefono() != null) etTelefono.setText(conductorActual.getTelefono());
+        if (conductorActual.getNombre() != null) etNombre.setText("");
+        if (conductorActual.getTelefono() != null) etTelefono.setText("");
         if (conductorActual.getEmail() != null) etCorreo.setText(conductorActual.getEmail());
     }
 
