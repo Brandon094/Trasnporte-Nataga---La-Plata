@@ -11,7 +11,6 @@ import com.google.firebase.auth.FirebaseUser;
 public class AuthManager {
     private static AuthManager instance;
     private FirebaseAuth auth;
-
     private AuthManager() {
         auth = FirebaseAuth.getInstance();
     }
