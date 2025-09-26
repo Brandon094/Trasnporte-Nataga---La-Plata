@@ -342,9 +342,9 @@ public class ReservaService {
     }
 
     /**
-     * Carga reservas por conductor y estado
+     * Carga TODAS las reservas de un conductor
      */
-    public void cargarReservasConductorYEstado(String conductorNombre, String estado, ReservationsCallback callback) {
+    public void cargarReservasConductorPorUID(String conductorUID, String estado, ReservationsCallback callback) {
         DatabaseReference reservasRef = databaseReference.child("reservas");
 
         reservasRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -354,22 +354,32 @@ public class ReservaService {
 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Reserva reserva = dataSnapshot.getValue(Reserva.class);
-                    if (reserva != null) {
-                        String conductorIdReserva = reserva.getConductor();
-                        if (conductorIdReserva == null && dataSnapshot.hasChild("conductorId")) {
-                            conductorIdReserva = dataSnapshot.child("conductorId").getValue(String.class);
+                    if (reserva != null && reserva.getConductorId() != null) {
+
+                        // Comparar por UID del conductor
+                        boolean esDelConductor = reserva.getConductorId().equals(conductorUID);
+
+                        // ✅ CORREGIDO: Lógica correcta para filtrar por estado
+                        boolean estadoCoincide;
+
+                        if ("TODAS".equalsIgnoreCase(estado) || estado == null || estado.isEmpty()) {
+                            // Cargar TODAS las reservas sin filtrar por estado
+                            estadoCoincide = true;
+                        } else {
+                            // Filtrar por estado específico
+                            estadoCoincide = reserva.getEstadoReserva() != null &&
+                                    reserva.getEstadoReserva().equalsIgnoreCase(estado);
                         }
 
-                        boolean esDelConductor = conductorNombre.equals(conductorIdReserva);
-                        boolean esEstadoCorrecto = estado.equals(reserva.getEstadoReserva());
-
-                        if (esDelConductor && esEstadoCorrecto) {
+                        if (esDelConductor && estadoCoincide) {
                             reserva.setIdReserva(dataSnapshot.getKey());
                             reservas.add(reserva);
                         }
                     }
                 }
 
+                // Ordenar por fecha (más recientes primero)
+                Collections.sort(reservas, (r1, r2) -> Long.compare(r2.getFechaReserva(), r1.getFechaReserva()));
                 callback.onReservationsLoaded(reservas);
             }
 
