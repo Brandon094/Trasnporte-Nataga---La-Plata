@@ -102,7 +102,7 @@
                             android:id="@+id/tvTotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="128"
+                            android:text="0"
                             android:textColor="@color/secondary_500"
                             android:textSize="24sp"
                             android:textStyle="bold" />
@@ -128,7 +128,7 @@
                             android:id="@+id/tvConfirmadas"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="98"
+                            android:text="0"
                             android:textColor="@color/success"
                             android:textSize="24sp"
                             android:textStyle="bold" />
@@ -154,7 +154,7 @@
                             android:id="@+id/tvCanceladas"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="30"
+                            android:text="0"
                             android:textColor="@color/error"
                             android:textSize="24sp"
                             android:textStyle="bold" />
