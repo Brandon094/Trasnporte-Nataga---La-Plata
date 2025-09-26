@@ -42,8 +42,6 @@ public class RegistroUsuarios extends AppCompatActivity {
         // Manejar el clic del botón de registro
         buttonRegistrar.setOnClickListener(v -> registrarUsuario());
 
-        // Configurar limpieza de campos al hacer clic en los iconos de clear
-        setupClearTextFunctionality();
     }
 
     /**
@@ -68,25 +66,6 @@ public class RegistroUsuarios extends AppCompatActivity {
             // Regresar a la actividad anterior
             onBackPressed();
         });
-    }
-
-    /**
-     * Configura la funcionalidad de limpiar campos con los iconos
-     */
-    private void setupClearTextFunctionality() {
-        // Los iconos de clear text funcionan automáticamente con TextInputLayout
-        // pero podemos agregar validaciones adicionales si es necesario
-
-        // Limpiar mensajes de error cuando el usuario comience a escribir
-        setupTextWatchers();
-    }
-
-    /**
-     * Configura listeners para limpiar errores cuando el usuario escribe
-     */
-    private void setupTextWatchers() {
-        // Puedes agregar TextWatchers aquí para validación en tiempo real
-        // Por ejemplo, limpiar errores cuando el usuario comience a corregir
     }
 
     /**
