@@ -1,0 +1,67 @@
+package com.chopcode.trasnportenataga_laplata.fragments;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.chopcode.trasnportenataga_laplata.R;
+import com.chopcode.trasnportenataga_laplata.adapters.HorarioAdapter;
+import com.chopcode.trasnportenataga_laplata.models.Horario;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class HorarioFragment extends Fragment {
+
+    private static final String ARG_HORARIOS = "horarios";
+    private static final String ARG_TITULO = "titulo";
+
+    private RecyclerView recyclerView;
+    private HorarioAdapter adapter;
+    private List<Horario> horarios = new ArrayList<>();
+
+    public static HorarioFragment newInstance(List<Horario> horarios, String titulo) {
+        HorarioFragment fragment = new HorarioFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_HORARIOS, new ArrayList<>(horarios));
+        args.putString(ARG_TITULO, titulo);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_horarios, container, false);
+
+        recyclerView = view.findViewById(R.id.recyclerViewHorarios);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        adapter = new HorarioAdapter(horarios);
+        recyclerView.setAdapter(adapter);
+
+        // Cargar datos desde los argumentos
+        if (getArguments() != null) {
+            horarios.clear();
+            List<Horario> horariosArgs = (List<Horario>) getArguments().getSerializable(ARG_HORARIOS);
+            if (horariosArgs != null) {
+                horarios.addAll(horariosArgs);
+                adapter.actualizarHorarios(horarios);
+            }
+        }
+
+        return view;
+    }
+
+    public void actualizarHorarios(List<Horario> nuevosHorarios) {
+        if (adapter != null) {
+            horarios.clear();
+            horarios.addAll(nuevosHorarios);
+            adapter.actualizarHorarios(horarios);
+        }
+    }
+}
