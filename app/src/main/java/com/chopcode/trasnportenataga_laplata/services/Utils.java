@@ -11,16 +11,16 @@ public class Utils {
 
     public static void configurarVisibilidadContraseña(TextInputLayout passwordInputLayout, TextInputEditText editTextPassword) {
         // Icono inicial
-        passwordInputLayout.setEndIconDrawable(R.drawable.baseline_visibility_off_24);
+        passwordInputLayout.setEndIconDrawable(R.drawable.ic_visibility_off);
 
         // Listener para alternar visibilidad
         passwordInputLayout.setEndIconOnClickListener(v -> {
             if (editTextPassword.getTransformationMethod() instanceof PasswordTransformationMethod) {
                 editTextPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                passwordInputLayout.setEndIconDrawable(R.drawable.baseline_remove_red_eye_24);
+                passwordInputLayout.setEndIconDrawable(R.drawable.ic_visibility_on);
             } else {
                 editTextPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                passwordInputLayout.setEndIconDrawable(R.drawable.baseline_visibility_off_24);
+                passwordInputLayout.setEndIconDrawable(R.drawable.ic_visibility_off);
             }
 
             // Coloca el cursor al final del texto
