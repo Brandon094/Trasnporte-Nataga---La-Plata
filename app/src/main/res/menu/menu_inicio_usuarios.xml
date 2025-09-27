@@ -6,5 +6,6 @@
         android:id="@+id/action_perfil"
         android:icon="@drawable/ic_account_circle"
         android:title="Perfil"
+        android:iconTint="@color/background"
         app:showAsAction="always" />
 </menu>
