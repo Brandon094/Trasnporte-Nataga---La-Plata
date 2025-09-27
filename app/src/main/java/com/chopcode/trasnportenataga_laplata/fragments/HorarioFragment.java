@@ -1,6 +1,7 @@
 package com.chopcode.trasnportenataga_laplata.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ public class HorarioFragment extends Fragment {
     private RecyclerView recyclerView;
     private HorarioAdapter adapter;
     private List<Horario> horarios = new ArrayList<>();
+    private String titulo;
 
     public static HorarioFragment newInstance(List<Horario> horarios, String titulo) {
         HorarioFragment fragment = new HorarioFragment();
@@ -32,6 +34,20 @@ public class HorarioFragment extends Fragment {
         args.putString(ARG_TITULO, titulo);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Cargar datos iniciales desde los argumentos
+        if (getArguments() != null) {
+            List<Horario> horariosArgs = (List<Horario>) getArguments().getSerializable(ARG_HORARIOS);
+            if (horariosArgs != null) {
+                horarios.clear();
+                horarios.addAll(horariosArgs);
+            }
+            titulo = getArguments().getString(ARG_TITULO);
+        }
     }
 
     @Override
@@ -44,15 +60,7 @@ public class HorarioFragment extends Fragment {
         adapter = new HorarioAdapter(horarios);
         recyclerView.setAdapter(adapter);
 
-        // Cargar datos desde los argumentos
-        if (getArguments() != null) {
-            horarios.clear();
-            List<Horario> horariosArgs = (List<Horario>) getArguments().getSerializable(ARG_HORARIOS);
-            if (horariosArgs != null) {
-                horarios.addAll(horariosArgs);
-                adapter.actualizarHorarios(horarios);
-            }
-        }
+        Log.d("HorarioFragment", "Fragment creado para: " + titulo + " con " + horarios.size() + " horarios");
 
         return view;
     }
@@ -60,8 +68,17 @@ public class HorarioFragment extends Fragment {
     public void actualizarHorarios(List<Horario> nuevosHorarios) {
         if (adapter != null) {
             horarios.clear();
-            horarios.addAll(nuevosHorarios);
+            if (nuevosHorarios != null) {
+                horarios.addAll(nuevosHorarios);
+            }
             adapter.actualizarHorarios(horarios);
+            Log.d("HorarioFragment", "Horarios actualizados para: " + titulo + " - " + horarios.size() + " elementos");
+        } else {
+            // Si el adapter aún no está creado, guardar los datos para cuando se cree
+            horarios.clear();
+            if (nuevosHorarios != null) {
+                horarios.addAll(nuevosHorarios);
+            }
         }
     }
 }
