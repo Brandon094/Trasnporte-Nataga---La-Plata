@@ -9,7 +9,7 @@
     android:layout_marginVertical="4dp"
     app:cardCornerRadius="20dp"
     app:cardElevation="3dp"
-    app:cardBackgroundColor="@color/surface"
+    app:cardBackgroundColor="@color/chip_background"
     app:strokeColor="@color/primary_500"
     app:strokeWidth="1dp">
 
@@ -35,7 +35,7 @@
                 android:textColor="@color/primary_500"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                tools:text="08:00" />
+                tools:text="@string/hora" />
 
             <TextView
                 android:id="@+id/tvAmPm"
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_secondary"
                 android:textSize="10sp"
-                tools:text="AM" />
+                tools:text="@string/am_pm" />
         </LinearLayout>
 
         <!-- Separador -->
@@ -67,7 +67,7 @@
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                tools:text="Natagá → La Plata" />
+                tools:text="@string/nataga" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -89,7 +89,7 @@
                     android:layout_marginStart="4dp"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp"
-                    tools:text="12 asientos disponibles" />
+                    tools:text="@string/asiento_disponible" />
             </LinearLayout>
 
             <LinearLayout
