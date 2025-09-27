@@ -1,136 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- ==================== -->
-    <!-- COLORES PRIMARIOS EXISTENTES -->
+    <!-- COLORES BASE (PARA AMBOS TEMAS) -->
     <!-- ==================== -->
-    <color name="primary_100">#BBDEFB</color>
-    <color name="primary_500">#1A73E8</color>
-    <color name="primary_300">#64B5F6</color>
-    <color name="primary_700">#0D47A1</color>
-    <color name="primary_200">#8AB4F8</color>
     <color name="primary_50">#E8F0FE</color>
+    <color name="primary_100">#BBDEFB</color>
+    <color name="primary_200">#8AB4F8</color>
+    <color name="primary_300">#64B5F6</color>
+    <color name="primary_500">#1A73E8</color> <!-- Más oscuro en claro -->
+    <color name="primary_700">#0D47A1</color>
+    <color name="primary_800">#062F6B</color>
+    <color name="primary_900">#041E45</color>
 
-    <!-- NUEVOS TONOS MÁS OSCUROS -->
-    <color name="primary_800">#083C87</color>
-    <color name="primary_900">#062F6B</color>
-
-    <!-- COLOR SECUNDARIO -->
-    <color name="secondary_500">#FF6D00</color>
-    <color name="secondary_700">#E65100</color>
-    <color name="secondary_200">#FFAB40</color>
     <color name="secondary_50">#FFF3E0</color>
+    <color name="secondary_200">#FFAB40</color>
+    <color name="secondary_500">#FF6D00</color> <!-- Más oscuro en claro -->
+    <color name="secondary_700">#E65100</color>
     <color name="secondary_800">#CC4500</color>
 
-    <!-- ==================== -->
-    <!-- COLORES PARA MODO OSCURO -->
-    <!-- ==================== -->
-    <!-- Fondos oscuros -->
-    <color name="dark_background">#121212</color>  <!-- Fondo principal muy oscuro -->
-    <color name="dark_surface">#1E1E1E</color>    <!-- Superficies como cards -->
-    <color name="dark_surface_variant">#2D2D2D</color>  <!-- Variante de superficie -->
-    <color name="dark_status_bar">#000000</color>  <!-- Status bar negro puro -->
-    <color name="dark_navigation_bar">#000000</color>  <!-- Navigation bar negro -->
-
-    <!-- Textos para modo oscuro -->
-    <color name="dark_text_primary">#FFFFFF</color>  <!-- Texto principal blanco -->
-    <color name="dark_text_secondary">#B3B3B3</color>  <!-- Texto secundario gris claro -->
-    <color name="dark_text_tertiary">#808080</color>  <!-- Texto terciario gris medio -->
-    <color name="dark_on_background">#FFFFFF</color>  <!-- Texto sobre fondo oscuro -->
-    <color name="dark_on_surface">#FFFFFF</color>  <!-- Texto sobre superficie oscura -->
-
-    <!-- ==================== -->
-    <!-- COLORES DE TEXTO EXISTENTES (modo claro) -->
-    <!-- ==================== -->
-    <color name="text_primary">#202124</color>
-    <color name="text_secondary">#5F6368</color>
-    <color name="text_tertiary">#9AA0A6</color>
-    <color name="text_on_primary">#FFFFFF</color>
-    <color name="text_on_secondary">#FFFFFF</color>
-
-    <!-- ==================== -->
-    <!-- COLORES DE FONDO EXISTENTES -->
-    <!-- ==================== -->
-    <color name="background">#FFFFFF</color>
-    <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#F1F3F4</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
     <color name="error">#D32F2F</color>
 
     <!-- ==================== -->
-    <!-- COLORES PARA ASIENTOS (adaptados para oscuro) -->
+    <!-- COLORES PARA TEMA CLARO -->
     <!-- ==================== -->
-    <color name="seat_available">#34A853</color>
-    <color name="seat_selected">#1A73E8</color>
-    <color name="seat_booked">#666666</color>  <!-- Gris más visible en oscuro -->
-    <color name="seat_disabled">#404040</color>  <!-- Gris oscuro -->
+    <color name="background">#FFFFFF</color>
+    <color name="surface">#FFFFFF</color>
+
+    <!-- Textos para tema claro -->
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#666666</color>
+    <color name="text_tertiary">#999999</color>
+    <color name="text_on_primary">#FFFFFF</color>
+    <color name="text_on_secondary">#FFFFFF</color>
+
+    <!-- Superficies para tema claro -->
+    <color name="surface_variant">#F5F5F5</color>
+    <color name="surface_1">#F8F9FA</color>
+    <color name="surface_2">#E9ECEF</color>
+    <color name="surface_3">#DEE2E6</color>
+    <color name="surface_4">#CED4DA</color>
+
+    <!-- Elementos UI para tema claro -->
+    <color name="divider">#E0E0E0</color>
+    <color name="outline">#BDBDBD</color>
+    <color name="overlay">#33000000</color>
+    <color name="shadow">#1A000000</color>
 
     <!-- ==================== -->
-    <!-- COLORES PARA ESTADOS -->
+    <!-- COLORES PARA TEMA OSCURO -->
     <!-- ==================== -->
+
+    <!-- Colores de fondo oscuros -->
+    <color name="dark_background">#121212</color>
+    <color name="dark_surface">#1E1E1E</color>
+
+    <!-- Colores de texto para modo oscuro -->
+    <color name="dark_on_background">#FFFFFF</color>
+    <color name="dark_on_surface">#FFFFFF</color>
+    <color name="dark_text_primary">#FFFFFF</color>
+    <color name="dark_text_secondary">#B3B3B3</color>
+
+    <!-- Colores de barras del sistema -->
+    <color name="dark_status_bar">#041E45</color>
+    <color name="dark_navigation_bar">#000000</color>
+
+    <!-- Colores de superficie/variantes oscuros -->
+    <color name="dark_surface_variant">#2D2D2D</color>
+    <color name="dark_surface_1">#242424</color>
+    <color name="dark_surface_2">#272727</color>
+    <color name="dark_surface_3">#2C2C2C</color>
+    <color name="dark_surface_4">#2E2E2E</color>
+
+    <!-- Elementos UI oscuros -->
+    <color name="dark_divider">#383838</color>
+    <color name="dark_outline">#404040</color>
+    <color name="dark_overlay">#CC000000</color>
+    <color name="dark_shadow">#80000000</color>
+
+    <!-- ==================== -->
+    <!-- COLORES ESPECÍFICOS PARA COMPONENTES (IGUALES EN AMBOS) -->
+    <!-- ==================== -->
+    <color name="seat_available">#34A853</color>
+    <color name="seat_selected">#1A73E8</color> <!-- Primary 500 claro -->
+    <color name="seat_booked">#666666</color>
+    <color name="seat_disabled">#B0B0B0</color>
+
     <color name="status_confirmed">#34A853</color>
     <color name="status_pending">#FBBC04</color>
     <color name="status_cancelled">#D32F2F</color>
     <color name="status_completed">#5F6368</color>
 
-    <!-- Estados de reserva para modo oscuro -->
-    <color name="status_confirmed_dark">#1B3A1E</color>  <!-- Fondo verde oscuro -->
-    <color name="status_cancelled_dark">#3A1B1B</color>  <!-- Fondo rojo oscuro -->
-    <color name="status_pending_dark">#3A3200</color>  <!-- Fondo amarillo oscuro -->
+    <!-- Colores de chips -->
+    <color name="chip_background">#E0E0E0</color>
+    <color name="chip_background_selected">#1A73E8</color>
+    <color name="chip_text_selected">#FFFFFF</color>
+
+    <color name="dark_chip_background">#383838</color>
+    <color name="dark_chip_background_selected">#8AB4F8</color>
+    <color name="dark_chip_text_selected">#000000</color>
+
+    <!-- Estados con variantes claras -->
+    <color name="status_confirmed_light">#E8F5E9</color>
+    <color name="status_pending_light">#FFF8E1</color>
+    <color name="status_cancelled_light">#FFEBEE</color>
+    <color name="status_completed_light">#F5F5F5</color>
+
+    <color name="dark_status_confirmed_light">#1B3A1E</color>
+    <color name="dark_status_pending_light">#3A3200</color>
+    <color name="dark_status_cancelled_light">#3A1B1B</color>
+    <color name="dark_status_completed_light">#2D2D2D</color>
+
+    <!-- Efectos de ripple -->
+    <color name="ripple_color">#1A000000</color>
+    <color name="ripple_primary">#1A1A73E8</color>
+
+    <color name="dark_ripple_color">#1AFFFFFF</color>
+    <color name="dark_ripple_primary">#1A8AB4F8</color>
 
     <!-- ==================== -->
-    <!-- COLORES ADICIONALES PARA MODO OSCURO -->
-    <!-- ==================== -->
-    <color name="divider_dark">#383838</color>  <!-- Separadores en modo oscuro -->
-    <color name="overlay_dark">#CC000000</color>  <!-- Overlay oscuro -->
-    <color name="shadow_dark">#80000000</color>  <!-- Sombras más intensas -->
-
-    <!-- ==================== -->
-    <!-- COLORES PARA CHIPS Y SELECTORES -->
-    <!-- ==================== -->
-    <color name="chip_background_selector">#E0E0E0</color>  <!-- Fondo normal de chips -->
-    <color name="chip_background_selected">#1A73E8</color>  <!-- Fondo chip seleccionado -->
-    <color name="chip_text_selected">#FFFFFF</color>  <!-- Texto chip seleccionado -->
-
-    <!-- Estados de chips -->
-    <color name="chip_state_pressed">#BDBDBD</color>  <!-- Cuando se presiona -->
-    <color name="chip_state_selected">#1A73E8</color>  <!-- Cuando está seleccionado -->
-    <color name="chip_state_disabled">#F5F5F5</color>  <!-- Cuando está deshabilitado -->
-
-    <!-- ==================== -->
-    <!-- COLORES PARA BADGES/ESTADOS (FONDOS CLAROS) -->
-    <!-- ==================== -->
-    <color name="status_confirmed_light">#E8F5E8</color>  <!-- Fondo verde claro -->
-    <color name="status_pending_light">#FFF8E1</color>  <!-- Fondo amarillo claro -->
-    <color name="status_cancelled_light">#FFEBEE</color>  <!-- Fondo rojo claro -->
-    <color name="status_completed_light">#F5F5F5</color>  <!-- Fondo gris claro -->
-
-    <!-- ==================== -->
-    <!-- COLORES ADICIONALES PARA COMPONENTES -->
-    <!-- ==================== -->
-    <color name="divider">#E0E0E0</color>  <!-- Separadores modo claro -->
-    <color name="outline">#E0E0E0</color>  <!-- Bordes/outlines -->
-    <color name="overlay">#66000000</color>  <!-- Overlay modo claro -->
-    <color name="shadow">#42000000</color>  <!-- Sombra modo claro -->
-
-    <!-- Colores para ripple/efectos -->
-    <color name="ripple_color">#1A000000</color>  <!-- Color ripple estándar -->
-    <color name="ripple_primary">#1A1A73E8</color>  <!-- Ripple color primario -->
-
-    <!-- ==================== -->
-    <!-- COLORES PARA SUPERFICIES Y ELEVACION -->
-    <!-- ==================== -->
-    <color name="surface_1">#FDFDFD</color>  <!-- Surface con elevación 1 -->
-    <color name="surface_2">#FAFAFA</color>  <!-- Surface con elevación 2 -->
-    <color name="surface_3">#F7F7F7</color>  <!-- Surface con elevación 3 -->
-    <color name="surface_4">#F4F4F4</color>  <!-- Surface con elevación 4 -->
-
-    <!-- ==================== -->
-    <!-- COLORES PARA SCROLLBARS Y BORDES -->
-    <!-- ==================== -->
-    <color name="scrollbar_thumb">#1A000000</color>  <!-- Scrollbar thumb -->
-    <color name="scrollbar_track">#0A000000</color>  <!-- Scrollbar track -->
-    <color name="border_light">#EEEEEE</color>  <!-- Bordes ligeros -->
-
-    <!-- ==================== -->
-    <!-- ALIAS PARA COMPATIBILIDAD -->
+    <!-- ALIAS PARA CONSISTENCIA -->
     <!-- ==================== -->
     <color name="primary_color">@color/primary_500</color>
     <color name="secondary_color">@color/secondary_500</color>
@@ -138,7 +128,7 @@
     <color name="secondary_text">@color/text_secondary</color>
     <color name="background_color">@color/background</color>
     <color name="card_background">@color/surface_variant</color>
-    <color name="success_light">#E8F5E8</color>
-    <color name="warning">@color/status_cancelled</color>
     <color name="success">@color/seat_available</color>
+    <color name="success_light">@color/status_confirmed_light</color>
+    <color name="warning">@color/status_pending</color>
 </resources>

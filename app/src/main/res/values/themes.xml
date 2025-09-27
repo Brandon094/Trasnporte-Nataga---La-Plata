@@ -1,48 +1,56 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Tema principal MD2 -->
+    <!-- Tema principal MD2 - TEMA CLARO -->
     <style name="Theme.TrasnporteNatagaLaPlata" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color -->
-        <item name="colorPrimary">@color/primary_500</item>
-        <item name="colorPrimaryDark">@color/primary_700</item>
-        <item name="colorPrimaryVariant">@color/primary_200</item>
-        <item name="colorOnPrimary">@color/text_on_primary</item>
+        <item name="colorPrimary">@color/primary_500</item> <!-- #1A73E8 -->
+        <item name="colorPrimaryDark">@color/primary_700</item> <!-- #0D47A1 -->
+        <item name="colorPrimaryVariant">@color/primary_200</item> <!-- #8AB4F8 -->
+        <item name="colorOnPrimary">@color/white</item> <!-- Blanco sobre primary -->
 
         <!-- Secondary brand color -->
-        <item name="colorSecondary">@color/secondary_500</item>
-        <item name="colorSecondaryVariant">@color/secondary_700</item>
-        <item name="colorOnSecondary">@color/text_on_primary</item>
+        <item name="colorSecondary">@color/secondary_500</item> <!-- #FF6D00 -->
+        <item name="colorSecondaryVariant">@color/secondary_700</item> <!-- #E65100 -->
+        <item name="colorOnSecondary">@color/white</item> <!-- Blanco sobre secondary -->
 
         <!-- Background colors -->
-        <item name="android:colorBackground">@color/background</item>
-        <item name="colorBackgroundFloating">@color/surface</item>
-        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="android:colorBackground">@color/background</item> <!-- #FFFFFF -->
+        <item name="colorBackgroundFloating">@color/surface</item> <!-- #FFFFFF -->
+        <item name="colorOnBackground">@color/text_primary</item> <!-- #000000 -->
 
         <!-- Surface colors -->
-        <item name="colorSurface">@color/surface</item>
-        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurface">@color/surface</item> <!-- #FFFFFF -->
+        <item name="colorOnSurface">@color/text_primary</item> <!-- #000000 -->
 
         <!-- Error color -->
-        <item name="colorError">@color/error</item>
-        <item name="colorOnError">@color/text_on_primary</item>
+        <item name="colorError">@color/error</item> <!-- #D32F2F -->
+        <item name="colorOnError">@color/white</item> <!-- Blanco sobre error -->
 
         <!-- Status and navigation bars -->
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
-        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item> <!-- #0D47A1 -->
+        <item name="android:navigationBarColor">@color/background</item> <!-- #FFFFFF -->
 
         <!-- Text colors -->
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item> <!-- #000000 -->
+        <item name="android:textColorSecondary">@color/text_secondary</item> <!-- #666666 -->
 
         <!-- Component styles -->
         <item name="materialButtonStyle">@style/ButtonStyle</item>
         <item name="cardViewStyle">@style/CardViewStyle</item>
+
+        <!-- Asegurar tema claro -->
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
     <!-- Tema sin ActionBar para actividades -->
     <style name="Theme.TrasnporteNatagaLaPlata.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowBackground">@color/background</item> <!-- #FFFFFF -->
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item> <!-- #0D47A1 -->
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
     <!-- Tema para Splash Screen (compatible) -->
@@ -50,18 +58,34 @@
         <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <!-- Estilos de componentes -->
     <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@color/primary_500</item>
-        <item name="android:textColor">@color/text_on_primary</item>
+        <item name="backgroundTint">@color/primary_500</item> <!-- #1A73E8 -->
+        <item name="android:textColor">@color/white</item> <!-- Blanco -->
         <item name="cornerRadius">8dp</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:paddingVertical">12dp</item>
     </style>
 
     <style name="CardViewStyle" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="cardBackgroundColor">@color/surface</item> <!-- #FFFFFF -->
         <item name="cardCornerRadius">12dp</item>
         <item name="cardElevation">4dp</item>
+        <item name="strokeColor">@color/outline</item> <!-- #BDBDBD -->
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <!-- Estilo adicional para TextInputLayout -->
+    <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/primary_500</item>
+        <item name="hintTextColor">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_secondary</item>
+        <item name="boxCornerRadiusBottomEnd">8dp</item>
+        <item name="boxCornerRadiusBottomStart">8dp</item>
+        <item name="boxCornerRadiusTopEnd">8dp</item>
+        <item name="boxCornerRadiusTopStart">8dp</item>
     </style>
 </resources>
