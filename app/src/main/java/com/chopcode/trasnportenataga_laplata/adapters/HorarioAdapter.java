@@ -69,7 +69,7 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
 
                 // Asientos disponibles (usar valor del modelo si existe)
                 int asientosDisponibles = horario.getAsientosDisponibles() > 0 ?
-                        horario.getAsientosDisponibles() : 12; // Valor por defecto
+                        horario.getAsientosDisponibles() : 14; // Valor por defecto
                 String textoAsientos = asientosDisponibles + " asientos disponibles";
                 tvAsientos.setText(textoAsientos);
 
