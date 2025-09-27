@@ -6,11 +6,11 @@
     android:viewportHeight="80">
 
     <path
-        android:fillColor="@color/primary_100"
+        android:fillColor="@color/background"
         android:pathData="M40,40 m-35,0 a35,35 0 1,1 70,0 a35,35 0 1,1 -70,0" />
 
     <path
-        android:strokeColor="@color/primary_300"
+        android:strokeColor="@color/primary_500"
         android:strokeWidth="2"
         android:pathData="M40,5 A35,35 0 1,1 40,75 A35,35 0 1,1 40,5 Z" />
 
