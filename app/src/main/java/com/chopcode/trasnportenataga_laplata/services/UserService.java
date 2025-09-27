@@ -99,7 +99,6 @@ public class UserService {
     }
 
     // 🔥 MÉTODOS ESPECÍFICOS DE CONDUCTOR
-    // 🔥 MÉTODOS ESPECÍFICOS DE CONDUCTOR - VERSIÓN CORREGIDA
     public void loadDriverData(String userId, DriverDataCallback callback) {
         DatabaseReference conductorRef = FirebaseDatabase.getInstance()
                 .getReference("conductores")
