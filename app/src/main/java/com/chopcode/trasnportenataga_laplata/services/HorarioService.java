@@ -67,7 +67,6 @@ public class HorarioService {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 callback.onError("Error al cargar horarios: " + databaseError.getMessage());
-                Log.e("Firebase", "Error al cargar horarios: " + databaseError.getMessage());
             }
         });
     }
