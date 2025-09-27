@@ -15,7 +15,7 @@
         <!-- Background colors oscuros -->
         <item name="android:colorBackground">@color/dark_background</item> <!-- #121212 -->
         <item name="colorBackgroundFloating">@color/dark_surface</item> <!-- #1E1E1E -->
-        <item name="colorOnBackground">@color/dark_background</item> <!-- #FFFFFF -->
+        <item name="colorOnBackground">@color/dark_on_background</item> <!-- #FFFFFF -->
 
         <!-- Surface colors oscuros -->
         <item name="colorSurface">@color/dark_surface</item> <!-- #1E1E1E -->
@@ -52,9 +52,8 @@
         <item name="android:windowLightNavigationBar">false</item>
     </style>
 
-    <!-- Tema para Splash Screen en modo oscuro -->
     <style name="Theme.TrasnporteNatagaLaPlata.Splash">
-        <item name="android:windowBackground">@drawable/splash_background_dark</item>
+        <item name="android:windowBackground">@color/dark_background</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowLightStatusBar">false</item>
@@ -76,25 +75,5 @@
         <item name="cornerRadius">8dp</item>
         <item name="android:paddingHorizontal">16dp</item>
         <item name="android:paddingVertical">12dp</item>
-    </style>
-
-    <!-- Estilo para TextInputLayout oscuro -->
-    <style name="TextInputStyleDark" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/primary_200</item> <!-- #8AB4F8 -->
-        <item name="hintTextColor">@color/dark_text_secondary</item> <!-- #B3B3B3 -->
-        <item name="android:textColorHint">@color/dark_text_secondary</item>
-        <item name="boxBackgroundColor">@color/dark_surface</item> <!-- #1E1E1E -->
-        <item name="android:textColor">@color/dark_text_primary</item> <!-- #FFFFFF -->
-        <item name="boxCornerRadiusBottomEnd">8dp</item>
-        <item name="boxCornerRadiusBottomStart">8dp</item>
-        <item name="boxCornerRadiusTopEnd">8dp</item>
-        <item name="boxCornerRadiusTopStart">8dp</item>
-    </style>
-
-    <!-- Estilo para Toolbar oscuro -->
-    <style name="ToolbarStyleDark" parent="Widget.MaterialComponents.Toolbar">
-        <item name="backgroundTint">@color/dark_surface</item> <!-- #1E1E1E -->
-        <item name="titleTextColor">@color/dark_text_primary</item> <!-- #FFFFFF -->
-        <item name="subtitleTextColor">@color/dark_text_secondary</item> <!-- #B3B3B3 -->
     </style>
 </resources>
