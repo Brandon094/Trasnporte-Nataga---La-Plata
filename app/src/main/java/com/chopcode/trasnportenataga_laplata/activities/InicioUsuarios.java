@@ -172,26 +172,35 @@ public class InicioUsuarios extends AppCompatActivity {
         horarioService.cargarHorarios(new HorarioService.HorarioCallback() {
             @Override
             public void onHorariosCargados(List<Horario> nataga, List<Horario> laPlata) {
-                listaNataga.clear();
-                listaLaPlata.clear();
+                runOnUiThread(() -> {
+                    listaNataga.clear();
+                    listaLaPlata.clear();
 
-                listaNataga.addAll(nataga);
-                listaLaPlata.addAll(laPlata);
+                    listaNataga.addAll(nataga);
+                    listaLaPlata.addAll(laPlata);
 
-                // Actualizar el adaptador del ViewPager
-                if (pagerAdapter != null) {
-                    pagerAdapter.actualizarDatos(listaNataga, listaLaPlata);
-                }
+                    // Actualizar el adaptador del ViewPager
+                    if (pagerAdapter != null) {
+                        pagerAdapter.actualizarDatos(listaNataga, listaLaPlata);
+
+                        // Forzar actualización de los fragments visibles
+                        int currentItem = viewPagerHorarios.getCurrentItem();
+                    }
+
+                    Toast.makeText(InicioUsuarios.this,
+                            "Horarios actualizados: " + (listaNataga.size() + listaLaPlata.size()) + " total",
+                            Toast.LENGTH_SHORT).show();
+                });
             }
 
             @Override
             public void onError(String error) {
-                Log.e("Firebase", error);
-                Toast.makeText(InicioUsuarios.this, "Error al cargar horarios", Toast.LENGTH_SHORT).show();
+                runOnUiThread(() -> {
+                    Toast.makeText(InicioUsuarios.this, "Error al cargar horarios: " + error, Toast.LENGTH_SHORT).show();
+                });
             }
         });
     }
-
     private void navegarAReservas() {
         Intent reservas = new Intent(InicioUsuarios.this, Reservas.class);
         startActivity(reservas);
