@@ -13,7 +13,7 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="240dp"
+            android:layout_height="250dp"
             android:background="@drawable/header_gradient_driver"
             android:gravity="center"
             android:orientation="vertical"
@@ -46,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Editar Perfil Conductor"
+                android:text="Editar Perfil"
                 android:textColor="@color/text_on_primary"
                 android:textSize="26sp"
                 android:textStyle="bold"
