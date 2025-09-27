@@ -143,9 +143,6 @@ public class InicioUsuarios extends AppCompatActivity {
     private void cargarDatosUsuario() {
         FirebaseUser currentUser = authManager.getCurrentUser();
         if (currentUser != null) {
-            // Mostrar email temporalmente mientras se carga el nombre
-            tvUserName.setText(currentUser.getEmail());
-
             // Cargar datos completos del usuario desde Firebase
             userService.loadUserData(currentUser.getUid(), new UserService.UserDataCallback() {
                 @Override
@@ -155,7 +152,7 @@ public class InicioUsuarios extends AppCompatActivity {
                         tvWelcome.setText("¡Bienvenido, " + usuario.getNombre().split(" ")[0] + "!");
                     }
                     // Aquí podrías cargar también los contadores de reservas y viajes
-                    actualizarContadores(0, 0); // Valores temporales
+                    actualizarContadores(10, 10); // Valores temporales
                 }
 
                 @Override
