@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary_50"
     tools:context=".activities.InicioUsuarios">
 
     <!-- AppBar con efecto de scroll -->
@@ -13,14 +12,13 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
         android:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/transparent"
+            android:background="@color/primary_500"
             app:title="@string/horarios"
             app:titleTextColor="@color/text_on_primary"
             app:menu="@menu/menu_inicio_usuarios"
@@ -63,7 +61,7 @@
                         android:id="@+id/tvWelcome"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="¡Bienvenido!"
+                        android:text="@string/bienvenida"
                         android:textColor="@color/text_on_primary"
                         android:textSize="14sp"
                         android:alpha="0.9" />
@@ -72,7 +70,7 @@
                         android:id="@+id/tvUserName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Cargando..."
+                        android:text="@string/cargando"
                         android:textColor="@color/text_on_primary"
                         android:textSize="20sp"
                         android:textStyle="bold"
@@ -93,7 +91,7 @@
                         android:layout_height="wrap_content"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="4dp"
-                        android:text="Activo"
+                        android:text="@string/activo"
                         android:textColor="@color/status_confirmed"
                         android:textSize="10sp"
                         android:textStyle="bold" />
@@ -128,7 +126,7 @@
                             android:id="@+id/tvReservasCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0"
+                            android:text="@string/cont_reservas"
                             android:textColor="@color/primary_500"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -136,7 +134,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Reservas"
+                            android:text="@string/reservas"
                             android:textColor="@color/text_secondary"
                             android:textSize="10sp" />
                     </LinearLayout>
@@ -162,7 +160,7 @@
                             android:id="@+id/tvViajesCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0"
+                            android:text="@string/cont_viajes"
                             android:textColor="@color/secondary_500"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -170,7 +168,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Viajes"
+                            android:text="@string/viajes"
                             android:textColor="@color/text_secondary"
                             android:textSize="10sp" />
                     </LinearLayout>
@@ -187,7 +185,7 @@
         app:cardCornerRadius="32dp"
         app:cardElevation="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:cardBackgroundColor="@color/surface">
+        app:cardBackgroundColor="@color/dark_chip_background">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -214,8 +212,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:text="Horarios Disponibles"
-                    android:textColor="@color/text_primary"
+                    android:text="@string/horarios_disponibles"
+                    android:textColor="@color/text_on_primary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -249,15 +247,15 @@
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Natagá → La Plata" />
+                    android:text="@string/nataga" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="La Plata → Natagá" />
+                    android:text="@string/laPlata" />
             </com.google.android.material.tabs.TabLayout>
 
-            <!-- ViewPager2 con altura dinámica -->
+            <!-- ViewPager2 -->
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewPagerHorarios"
                 android:layout_width="match_parent"
@@ -265,7 +263,7 @@
                 android:layout_weight="1"
                 android:layout_marginBottom="24dp" />
 
-            <!-- SOLUCIÓN: Botón de reserva centrado y único -->
+            <!-- Botón de reserva centrado y único -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -276,7 +274,7 @@
                     android:id="@+id/btnReservar"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="Nueva Reserva"
+                    android:text="@string/nueva_reserva"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     app:cornerRadius="16dp"
@@ -319,7 +317,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:text="Gestiona tu perfil."
+                        android:text="@string/gestion_perifl"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -328,7 +326,7 @@
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Editar"
+                        android:text="@string/editar_rapido"
                         android:textSize="12sp"
                         android:textColor="@color/primary_500"
                         app:icon="@drawable/ic_edit"
