@@ -16,7 +16,7 @@ import com.chopcode.trasnportenataga_laplata.services.UserService;
 public class EditarPerfil extends AppCompatActivity {
 
     private Button btnGuardar, btnCancelar;
-    private EditText etNombre, etTelefono, etEmail;
+    private EditText etNombre, etTelefono, etCorreo;
     private TextView tvNombreActual, tvTelefonoActual, tvCorreoActual;
     private UserService userService;
     private AuthManager authManager;
@@ -50,6 +50,7 @@ public class EditarPerfil extends AppCompatActivity {
     private void inicializarVistas() {
         etNombre = findViewById(R.id.etNombre);
         etTelefono = findViewById(R.id.etTelefono);
+        etCorreo = findViewById(R.id.etCorreo);
 
         tvNombreActual = findViewById(R.id.tvNombreActual);
         tvTelefonoActual = findViewById(R.id.tvTelefonoActual);
@@ -118,14 +119,12 @@ public class EditarPerfil extends AppCompatActivity {
                 tvCorreoActual.setText("Correo actual: " +
                         (usuario.getEmail() != null ? usuario.getEmail() : "No disponible"));
 
-                // Poblar los campos editables con los valores actuales (CORREGIDO)
+                // Poblar los campos editables con los valores actuales
                 etNombre.setText("");
                 etTelefono.setText("");
-
-                if (etEmail != null) {
-                    etEmail.setText(usuario.getEmail() != null ? usuario.getEmail() : "");
-                }
+                etCorreo.setText(usuario.getEmail());
             }
+
             @Override
             public void onError(String error) {
                 Toast.makeText(EditarPerfil.this, "Error al cargar datos: " + error, Toast.LENGTH_SHORT).show();
