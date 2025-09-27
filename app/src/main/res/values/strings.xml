@@ -41,6 +41,22 @@
     <string name="proximasRutas">Próxima ruta</string>
     <string name="tiempoEstimado">Tiempo estimado: %s</string>
 
+    <string name="bienvenida">¡Bienvenido!</string>
+    <string name="cargando">Cargando...</string>
+
+    <string name="activo">Activo</string>
+    <string name="desactivo">Desactivo</string>
+
+    <string name="cont_reservas">%d</string>
+    <string name="cont_viajes">%d</string>
+    <string name="reservas">Reservas</string>
+    <string name="viajes">Viajes</string>
+    <string name="horarios_disponibles">Horarios disponibles</string>
+    <string name="nueva_reserva">NUEVA
+    RESERVA</string>
+    <string name="gestion_perifl">Gestiona tu perfil.</string>
+
+
     <!-- ==================== -->
     <!-- RESERVATIONS -->
     <!-- ==================== -->
@@ -55,16 +71,20 @@
     <string name="destino">Destino: %s</string>
     <string name="metodoPago">Método de pago: %s</string>
     <string name="estadoReserva">Estado: %s</string>
-    <string name="reservasPendientes">Reservas pendientes: %d</string>
+    <string name="reservasPendientes">Reservas por confirmar: %d</string>
     <string name="historial">Historial de reservas</string>
-    <string name="no_hay_reservas">No hay reservas activas</string>
+    <string name="no_hay_reservas">No hay reservas por confirmar</string>
     <string name="no_hay_rutas">No hay rutas programadas</string>
+    <string name="editar_rapido">Editar</string>
+    <string name="hora">--:--</string>
+    <string name="am_pm">-:-</string>
 
     <!-- SEATS -->
     <string name="asientosCabina">Asientos en cabina</string>
     <string name="asientosAtras">Asientos traseros</string>
     <string name="asiento_chofer">Conductor</string>
     <string name="asiento_number">Asiento %d</string>
+    <string name="asiento_disponible">%d Asientos disponibles</string>
 
     <!-- ==================== -->
     <!-- DRIVER PANEL -->
