@@ -157,14 +157,6 @@
                                 android:layout_marginTop="2dp" />
 
                         </LinearLayout>
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_copy"
-                            android:tint="@color/primary_500"
-                            android:contentDescription="Copiar email" />
-
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -217,14 +209,6 @@
                                 android:layout_marginTop="2dp" />
 
                         </LinearLayout>
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_call"
-                            android:tint="@color/primary_500"
-                            android:contentDescription="Llamar" />
-
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
