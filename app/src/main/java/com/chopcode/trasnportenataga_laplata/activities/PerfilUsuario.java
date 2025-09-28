@@ -14,9 +14,6 @@ import com.chopcode.trasnportenataga_laplata.models.Usuario;
 import com.chopcode.trasnportenataga_laplata.services.UserService;
 import com.google.android.material.card.MaterialCardView;
 
-/**
- * Actividad para mostrar el perfil del usuario (pasajero) - Diseño Moderno
- */
 public class PerfilUsuario extends AppCompatActivity {
     private TextView tvNombre, tvCorreo, tvTelefono;
     private MaterialCardView cardEditarPerfil, cardHistorialReservas, cardVolverInicio, cardCerrarSesion;
