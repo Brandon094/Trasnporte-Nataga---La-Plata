@@ -313,7 +313,7 @@ public class PerfilConductor extends AppCompatActivity {
      * Método para ir al historial de viajes
      */
     public void irHistorialViajes(){
-        Intent intent = new Intent(PerfilConductor.this, HistorialViajesConductor.class);
+        Intent intent = new Intent(PerfilConductor.this, HistorialConductor.class);
         startActivity(intent);
     }
 

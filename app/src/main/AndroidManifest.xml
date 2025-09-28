@@ -40,7 +40,7 @@
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.HistorialViajesConductor"
+            android:name=".activities.HistorialConductor"
             android:exported="false"
             android:label="@string/historial_reservas"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
