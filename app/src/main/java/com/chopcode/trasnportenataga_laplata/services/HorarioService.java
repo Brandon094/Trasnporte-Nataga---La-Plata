@@ -43,9 +43,11 @@ public class HorarioService {
                     // Obtener valores manualmente para asegurar que funcionen
                     String hora = snapshot.child("hora").getValue(String.class);
                     String ruta = snapshot.child("ruta").getValue(String.class);
+                    String id = snapshot.getKey(); // 🔥 OBTENER EL ID DEL HORARIO
 
                     // Crear horario solo con los datos esenciales
                     Horario horario = new Horario();
+                    horario.setId(id); // 🔥 ASIGNAR EL ID
                     horario.setHora(hora != null ? hora : "--:--");
                     horario.setRuta(ruta != null ? ruta : "Ruta no disponible");
 
