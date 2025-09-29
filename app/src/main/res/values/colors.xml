@@ -131,4 +131,5 @@
     <color name="success">@color/seat_available</color>
     <color name="success_light">@color/status_confirmed_light</color>
     <color name="warning">@color/status_pending</color>
+    <color name="info">@color/status_pending</color>
 </resources>
