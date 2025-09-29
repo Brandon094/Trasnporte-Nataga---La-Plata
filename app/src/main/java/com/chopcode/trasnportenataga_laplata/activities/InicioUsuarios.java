@@ -18,7 +18,6 @@ import com.chopcode.trasnportenataga_laplata.services.HorarioService;
 import com.chopcode.trasnportenataga_laplata.services.UserService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,8 +34,7 @@ public class InicioUsuarios extends AppCompatActivity {
 
     // Views del nuevo layout
     private TextView tvUserName, tvWelcome, tvReservasCount, tvViajesCount;
-    private MaterialButton btnReservar, btnMiPerfil, btnEditarPerfil, btnRefresh;
-    private FloatingActionButton fabReservar;
+    private MaterialButton btnEditarPerfil, btnRefresh;
     private TabLayout tabLayout;
     private ViewPager2 viewPagerHorarios;
     private HorarioPagerAdapter pagerAdapter;
@@ -82,7 +80,6 @@ public class InicioUsuarios extends AppCompatActivity {
         tvViajesCount = findViewById(R.id.tvViajesCount);
 
         // Botones
-        btnReservar = findViewById(R.id.btnReservar);
         btnEditarPerfil = findViewById(R.id.btnEditarPerfil);
         btnRefresh = findViewById(R.id.btnRefresh);
 
@@ -118,13 +115,6 @@ public class InicioUsuarios extends AppCompatActivity {
     }
 
     private void configurarListeners() {
-        // Botón Reservar principal
-        btnReservar.setOnClickListener(view -> {
-            if (validarLogIn()) {
-                navegarAReservas();
-            }
-        });
-
         // Botón Editar Perfil
         btnEditarPerfil.setOnClickListener(view -> {
             if (validarLogIn()) {
@@ -200,10 +190,6 @@ public class InicioUsuarios extends AppCompatActivity {
                 });
             }
         });
-    }
-    private void navegarAReservas() {
-        Intent reservas = new Intent(InicioUsuarios.this, Reservas.class);
-        startActivity(reservas);
     }
 
     private boolean validarLogIn() {
