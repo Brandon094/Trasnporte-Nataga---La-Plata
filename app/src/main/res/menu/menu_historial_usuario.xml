@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Opción para filtrar -->
+    <item
+        android:id="@+id/action_filtrar"
+        android:icon="@drawable/ic_filter"
+        android:title="Filtrar"
+        app:showAsAction="ifRoom" />
+
+    <!-- Opción para ordenar -->
+    <item
+        android:id="@+id/action_ordenar"
+        android:icon="@drawable/ic_sort"
+        android:title="Ordenar"
+        app:showAsAction="ifRoom" />
+
+    <!-- Menú desplegable -->
+    <item
+        android:id="@+id/action_mas"
+        android:icon="@drawable/ic_more_ver"
+        android:title="Más opciones"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <!-- Exportar historial -->
+            <item
+                android:id="@+id/action_exportar"
+                android:icon="@drawable/ic_export"
+                android:title="Exportar historial" />
+
+            <!-- Compartir -->
+            <item
+                android:id="@+id/action_compartir"
+                android:icon="@drawable/ic_share"
+                android:title="Compartir" />
+
+            <!-- Separador -->
+            <group android:id="@+id/group_avanzado">
+                <item
+                    android:id="@+id/action_ayuda"
+                    android:icon="@drawable/ic_help"
+                    android:title="Ayuda" />
+
+                <item
+                    android:id="@+id/action_reportar"
+                    android:icon="@drawable/ic_report"
+                    android:title="Reportar problema" />
+            </group>
+
+        </menu>
+
+    </item>
+
+</menu>
