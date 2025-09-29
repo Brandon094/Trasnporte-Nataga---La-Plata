@@ -413,4 +413,35 @@ public class ReservaService {
             }
         });
     }
+
+    // Método para cargar las reservas de en la interfaz de historial de reservas del usuario
+    // pasajero
+    public void obtenerHistorialUsuario(String usuarioId, HistorialCallback callback) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("reservas");
+
+        ref.orderByChild("usuarioId").equalTo(usuarioId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        List<Reserva> reservas = new ArrayList<>();
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            Reserva reserva = snapshot.getValue(Reserva.class);
+                            if (reserva != null) {
+                                reservas.add(reserva);
+                            }
+                        }
+                        callback.onHistorialCargado(reservas);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        callback.onError(databaseError.getMessage());
+                    }
+                });
+    }
+
+    public interface HistorialCallback {
+        void onHistorialCargado(List<Reserva> reservas);
+        void onError(String error);
+    }
 }
