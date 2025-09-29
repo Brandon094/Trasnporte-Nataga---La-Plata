@@ -185,7 +185,7 @@ public class InicioDeSesion extends AppCompatActivity {
 
         if (volverAReserva) {
             // Si vino de intentar reservar, llevarlo directamente a reservas
-            Intent intent = new Intent(InicioDeSesion.this, Reservas.class);
+            Intent intent = new Intent(InicioDeSesion.this, CrearReservas.class);
             startActivity(intent);
         } else {
             // Caso normal: ir a la pantalla principal
