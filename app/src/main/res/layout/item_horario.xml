@@ -5,28 +5,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="3dp"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
     app:cardBackgroundColor="@color/chip_background"
-    app:strokeColor="@color/primary_500"
-    app:strokeWidth="1dp">
+    app:strokeColor="@color/primary_200"
+    app:strokeWidth="0.5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="20dp"
+        android:padding="14dp"
         android:gravity="center_vertical">
 
         <!-- Indicador de tiempo -->
         <LinearLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:background="@drawable/bg_time_circle"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:elevation="2dp">
 
             <TextView
                 android:id="@+id/tvHora"
@@ -35,86 +36,125 @@
                 android:textColor="@color/primary_500"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                tools:text="@string/hora" />
+                tools:text="06:00" />
 
             <TextView
                 android:id="@+id/tvAmPm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/primary_500"
                 android:textSize="10sp"
-                tools:text="@string/am_pm" />
+                tools:text="AM" />
         </LinearLayout>
 
         <!-- Separador -->
         <View
             android:layout_width="1dp"
-            android:layout_height="40dp"
-            android:background="@color/divider"
-            android:layout_marginHorizontal="16dp" />
+            android:layout_height="28dp"
+            android:background="@color/outline"
+            android:layout_marginHorizontal="10dp"
+            android:alpha="0.5" />
 
-        <!-- Información de la ruta -->
+        <!-- Contenedor principal de información -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
 
+            <!-- Ruta -->
             <TextView
                 android:id="@+id/tvRuta"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
-                tools:text="@string/nataga" />
+                android:lineSpacingExtra="2dp"
+                tools:text="Natagá → La Plata" />
 
+            <!-- Información de asientos y precio en vertical -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="4dp"
+                android:orientation="vertical"
+                android:layout_marginTop="6dp"
                 android:gravity="center_vertical">
 
-                <ImageView
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:src="@drawable/ic_seat"
-                    android:tint="@color/text_secondary" />
-
-                <TextView
-                    android:id="@+id/tvAsientos"
-                    android:layout_width="wrap_content"
+                <!-- Fila de asientos -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
-                    tools:text="@string/asiento_disponible" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_seat"
+                        android:tint="@color/text_secondary"
+                        android:layout_marginEnd="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvAsientos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="10sp"
+                        tools:text="14 asientos disponibles" />
+                </LinearLayout>
+
+                <!-- Fila de precio -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="2dp">
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_price"
+                        android:tint="@color/text_secondary"
+                        android:layout_marginEnd="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvPrecio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/success"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        tools:text="$12.000" />
+                </LinearLayout>
+
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- Estado de disponibilidad -->
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="2dp"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:src="@drawable/ic_price"
-                    android:tint="@color/text_secondary" />
-
-                <TextView
-                    android:id="@+id/tvPrecio"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:textColor="@color/success"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    tools:text="$12.000" />
-            </LinearLayout>
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_badge_status"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="1dp"
+                android:text="Disponible"
+                android:textColor="@color/success"
+                android:textSize="9sp" />
         </LinearLayout>
+
+        <!-- Botón de acción -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnReservar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_add"
+            app:fabSize="mini"
+            app:tint="@color/text_on_primary"
+            app:backgroundTint="@color/primary_500"
+            app:elevation="1dp"
+            app:rippleColor="@color/primary_700" />
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
