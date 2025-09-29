@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/outline"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header: Fecha y Estado (Diseño mejorado) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvFecha"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="24 Sep 2024 - 08:30 AM"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipEstado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirmado"
+                app:chipBackgroundColor="@color/success_light"
+                app:chipStrokeColor="@color/success"
+                app:chipStrokeWidth="1dp"
+                app:textStartPadding="8dp"
+                app:textEndPadding="8dp" />
+
+        </LinearLayout>
+
+        <!-- Información del viaje -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="12dp">
+
+            <!-- Ruta -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_route"
+                    android:tint="@color/primary_500"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvRuta"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Natagá → La Plata"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <!-- Conductor -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_driver"
+                    android:tint="@color/primary_500"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvConductor"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Carlos Rodríguez"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <!-- Asientos reservados -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_seat"
+                    android:tint="@color/primary_500"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvAsientos"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="2 asientos - Puestos 5 y 6"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <!-- Precio total -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_price"
+                    android:tint="@color/primary_500"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvPrecioTotal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="$24.000"
+                    android:textColor="@color/primary_500"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvMetodoPago"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Efectivo"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Separador -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/outline"
+            android:layout_marginVertical="12dp" />
+
+        <!-- Acciones específicas para usuario -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Botón para ver detalles completos -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVerDetalles"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ver Detalles"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_marginEnd="4dp" />
+
+            <!-- Botón para calificar (solo si el viaje fue confirmado) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCalificar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Calificar"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_marginStart="4dp"
+                android:visibility="gone" />
+
+            <!-- Botón para repetir reserva -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRepetir"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Repetir"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_marginStart="4dp" />
+
+        </LinearLayout>
+
+        <!-- Calificación si ya fue calificado -->
+        <LinearLayout
+            android:id="@+id/layoutCalificacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tu calificación: "
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+            <RatingBar
+                android:id="@+id/ratingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numStars="5"
+                android:rating="4"
+                android:stepSize="1"
+                android:isIndicator="true"
+                android:layout_marginStart="4dp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
