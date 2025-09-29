@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.models.Horario;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +17,28 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
 
     private static final String TAG = "HorarioAdapter";
     private List<Horario> horarios;
+    private OnReservarClickListener listener;
+
+    // Interface para el click listener
+    public interface OnReservarClickListener {
+        void onReservarClick(Horario horario);
+    }
 
     public HorarioAdapter(List<Horario> horarios) {
         this.horarios = (horarios != null) ? new ArrayList<>(horarios) : new ArrayList<>();
         Log.d(TAG, "Adapter creado con " + this.horarios.size() + " horarios");
+    }
+
+    // Nuevo constructor con listener
+    public HorarioAdapter(List<Horario> horarios, OnReservarClickListener listener) {
+        this.horarios = (horarios != null) ? new ArrayList<>(horarios) : new ArrayList<>();
+        this.listener = listener;
+        Log.d(TAG, "Adapter creado con " + this.horarios.size() + " horarios y listener");
+    }
+
+    // Método para establecer el listener después de la creación
+    public void setOnReservarClickListener(OnReservarClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -37,7 +56,7 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
             Horario horario = horarios.get(position);
             Log.d(TAG, "onBindViewHolder - Posición: " + position +
                     ", Hora: " + horario.getHora() + ", Ruta: " + horario.getRuta());
-            holder.bind(horario);
+            holder.bind(horario, listener);
         } else {
             Log.e(TAG, "Índice fuera de rango: " + position + ", tamaño: " + horarios.size());
         }
@@ -72,6 +91,7 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private static final String TAG = "HorarioViewHolder";
         public TextView tvHora, tvAmPm, tvRuta, tvAsientos, tvPrecio;
+        public FloatingActionButton btnReservar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -80,6 +100,7 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
             tvRuta = itemView.findViewById(R.id.tvRuta);
             tvAsientos = itemView.findViewById(R.id.tvAsientos);
             tvPrecio = itemView.findViewById(R.id.tvPrecio);
+            btnReservar = itemView.findViewById(R.id.btnReservar);
 
             // Verificar que las vistas se encontraron
             if (tvHora == null) Log.e(TAG, "tvHora es null");
@@ -87,9 +108,10 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
             if (tvRuta == null) Log.e(TAG, "tvRuta es null");
             if (tvAsientos == null) Log.e(TAG, "tvAsientos es null");
             if (tvPrecio == null) Log.e(TAG, "tvPrecio es null");
+            if (btnReservar == null) Log.e(TAG, "btnReservar es null");
         }
 
-        public void bind(Horario horario) {
+        public void bind(Horario horario, OnReservarClickListener listener) {
             try {
                 Log.d(TAG, "bind llamado para horario: " + horario.getHora() + " - " + horario.getRuta());
 
@@ -115,6 +137,15 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
 
                 // Cambiar colores según disponibilidad
                 actualizarColoresSegunDisponibilidad(asientosDisponibles);
+
+                // Configurar el click listener SOLO en el botón
+                if (btnReservar != null) {
+                    btnReservar.setOnClickListener(v -> {
+                        if (listener != null) {
+                            listener.onReservarClick(horario);
+                        }
+                    });
+                }
 
                 Log.d(TAG, "bind completado exitosamente");
 
@@ -181,14 +212,29 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
                     colorAsientos = itemView.getContext().getColor(R.color.error);
                     if (tvHora != null) tvHora.setTextColor(itemView.getContext().getColor(R.color.text_secondary));
                     if (tvAmPm != null) tvAmPm.setTextColor(itemView.getContext().getColor(R.color.text_tertiary));
+                    // Deshabilitar botón si no hay asientos
+                    if (btnReservar != null) {
+                        btnReservar.setEnabled(false);
+                        btnReservar.setAlpha(0.5f);
+                    }
                 } else if (asientosDisponibles < 5) {
                     colorAsientos = itemView.getContext().getColor(R.color.status_pending);
                     if (tvHora != null) tvHora.setTextColor(itemView.getContext().getColor(R.color.primary_500));
                     if (tvAmPm != null) tvAmPm.setTextColor(itemView.getContext().getColor(R.color.text_secondary));
+                    // Habilitar botón
+                    if (btnReservar != null) {
+                        btnReservar.setEnabled(true);
+                        btnReservar.setAlpha(1.0f);
+                    }
                 } else {
                     colorAsientos = itemView.getContext().getColor(R.color.success);
                     if (tvHora != null) tvHora.setTextColor(itemView.getContext().getColor(R.color.primary_500));
                     if (tvAmPm != null) tvAmPm.setTextColor(itemView.getContext().getColor(R.color.text_secondary));
+                    // Habilitar botón
+                    if (btnReservar != null) {
+                        btnReservar.setEnabled(true);
+                        btnReservar.setAlpha(1.0f);
+                    }
                 }
 
                 if (tvAsientos != null) tvAsientos.setTextColor(colorAsientos);
