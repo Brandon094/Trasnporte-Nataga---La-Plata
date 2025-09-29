@@ -261,33 +261,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:layout_marginBottom="24dp" />
-
-            <!-- Botón de reserva centrado y único -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="16dp">
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnReservar"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="@string/nueva_reserva"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="16dp"
-                    app:icon="@drawable/ic_add"
-                    app:iconGravity="textStart"
-                    app:iconSize="20dp"
-                    app:iconPadding="8dp"
-                    app:backgroundTint="@color/primary_500"
-                    android:textColor="@color/text_on_primary"
-                    app:iconTint="@color/text_on_primary"
-                    app:rippleColor="@color/primary_700" />
-
-            </LinearLayout>
+                android:layout_marginBottom="16dp" />
 
             <!-- Acceso rápido a perfil -->
             <com.google.android.material.card.MaterialCardView
