@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- ==================== -->
-    <!-- STYLES PARA ASIENTOS -->
+    <!-- STYLES PARA BOTONES DE ASIENTOS -->
     <!-- ==================== -->
-    <style name="AsientoStyle">
+    <style name="AsientoButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:layout_width">70dp</item>
-        <item name="android:layout_height">64dp</item>
-        <item name="android:backgroundTint">@color/seat_available</item>
-        <item name="android:textColor">@color/text_on_primary</item>
-        <item name="android:textSize">25sp</item>
-        <item name="android:layout_margin">4dp</item>
+        <item name="android:layout_height">70dp</item>
+        <item name="android:layout_margin">6dp</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="iconGravity">textStart</item>
+        <!-- IMPORTANTE: Deshabilitar el tint del icono -->
+        <item name="iconTint">@null</item>
+        <item name="strokeColor">@color/outline</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="backgroundTint">@android:color/transparent</item>
     </style>
 
     <!-- ==================== -->
