@@ -1,5 +1,6 @@
 package com.chopcode.trasnportenataga_laplata.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -15,12 +16,18 @@ import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Horario;
 import com.chopcode.trasnportenataga_laplata.models.Usuario;
 import com.chopcode.trasnportenataga_laplata.services.HorarioService;
+import com.chopcode.trasnportenataga_laplata.services.ReservaService;
 import com.chopcode.trasnportenataga_laplata.services.UserService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +37,7 @@ public class InicioUsuarios extends AppCompatActivity {
     // Services y Managers
     private HorarioService horarioService;
     private UserService userService;
+    private ReservaService reservaService;
     private AuthManager authManager;
 
     // Views del nuevo layout
@@ -51,6 +59,7 @@ public class InicioUsuarios extends AppCompatActivity {
         // Inicializar servicios
         authManager = AuthManager.getInstance();
         horarioService = new HorarioService();
+        reservaService = new ReservaService();
         userService = new UserService();
 
         // Inicializar vistas
@@ -126,67 +135,155 @@ public class InicioUsuarios extends AppCompatActivity {
         // Botón Actualizar
         btnRefresh.setOnClickListener(view -> {
             cargarHorarios();
-            Toast.makeText(this, "Actualizando horarios...", Toast.LENGTH_SHORT).show();
+            cargarContadoresUsuario(); // Recargar contadores al actualizar
+            Toast.makeText(this, "Actualizando información...", Toast.LENGTH_SHORT).show();
         });
     }
 
     private void cargarDatosUsuario() {
         FirebaseUser currentUser = authManager.getCurrentUser();
         if (currentUser != null) {
+            final String userId = currentUser.getUid(); // Hacerla final
+
             // Cargar datos completos del usuario desde Firebase
-            userService.loadUserData(currentUser.getUid(), new UserService.UserDataCallback() {
+            userService.loadUserData(userId, new UserService.UserDataCallback() {
                 @Override
                 public void onUserDataLoaded(Usuario usuario) {
                     if (usuario != null && usuario.getNombre() != null) {
                         tvUserName.setText(usuario.getNombre());
                         tvWelcome.setText("¡Bienvenido, " + usuario.getNombre().split(" ")[0] + "!");
                     }
-                    // Aquí podrías cargar también los contadores de reservas y viajes
-                    actualizarContadores(10, 10); // Valores temporales
+                    // Cargar contadores REALES de reservas y viajes
+                    cargarContadoresAlternativo(userId);
                 }
 
                 @Override
                 public void onError(String error) {
                     Log.e("UserData", "Error cargando datos: " + error);
+                    // Intentar cargar contadores incluso si hay error en otros datos
+                    cargarContadoresAlternativo(userId);
                 }
             });
         }
     }
 
+    private void cargarContadoresUsuario() {
+        FirebaseUser currentUser = authManager.getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            cargarContadoresAlternativo(userId);
+        }
+    }
+
+    // Método alternativo para cargar contadores de reservas y viajes - CORREGIDO
+    private void cargarContadoresAlternativo(final String userId) {
+        DatabaseReference reservasRef = FirebaseDatabase.getInstance().getReference("reservas");
+
+        reservasRef.orderByChild("usuarioId").equalTo(userId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        // Usar variables locales en lugar de modificar las del método externo
+                        final int reservasCount = contarReservasActivas(snapshot);
+                        final int viajesCount = contarViajesCompletados(snapshot);
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                actualizarContadores(reservasCount, viajesCount);
+                                Log.d("Contadores", "Reservas activas: " + reservasCount + ", Viajes completados: " + viajesCount);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                actualizarContadores(0, 0);
+                                Log.e("Contadores", "Error al cargar contadores: " + error.getMessage());
+                            }
+                        });
+                    }
+                });
+    }
+
+    // Método auxiliar para contar reservas activas
+    private int contarReservasActivas(DataSnapshot snapshot) {
+        int count = 0;
+        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+            com.chopcode.trasnportenataga_laplata.models.Reserva reserva =
+                    dataSnapshot.getValue(com.chopcode.trasnportenataga_laplata.models.Reserva.class);
+            if (reserva != null) {
+                String estado = reserva.getEstadoReserva();
+                if (estado != null && (estado.equals("Confirmada") || estado.equals("Por confirmar"))) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    // Método auxiliar para contar viajes completados
+    private int contarViajesCompletados(DataSnapshot snapshot) {
+        int count = 0;
+        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+            com.chopcode.trasnportenataga_laplata.models.Reserva reserva =
+                    dataSnapshot.getValue(com.chopcode.trasnportenataga_laplata.models.Reserva.class);
+            if (reserva != null) {
+                String estado = reserva.getEstadoReserva();
+                if (estado != null && estado.equals("Confirmada")) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    // Versión simplificada sin listener en tiempo real (para evitar complejidad)
     private void actualizarContadores(int reservasCount, int viajesCount) {
         tvReservasCount.setText(String.valueOf(reservasCount));
         tvViajesCount.setText(String.valueOf(viajesCount));
+
+        // Opcional: Mostrar mensaje informativo en logs
+        if (reservasCount == 0 && viajesCount == 0) {
+            Log.i("Contadores", "El usuario no tiene reservas activas ni viajes completados");
+        }
     }
 
     private void cargarHorarios() {
         horarioService.cargarHorarios(new HorarioService.HorarioCallback() {
             @Override
             public void onHorariosCargados(List<Horario> nataga, List<Horario> laPlata) {
-                runOnUiThread(() -> {
-                    listaNataga.clear();
-                    listaLaPlata.clear();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        listaNataga.clear();
+                        listaLaPlata.clear();
 
-                    listaNataga.addAll(nataga);
-                    listaLaPlata.addAll(laPlata);
+                        listaNataga.addAll(nataga);
+                        listaLaPlata.addAll(laPlata);
 
-                    // Actualizar el adaptador del ViewPager
-                    if (pagerAdapter != null) {
-                        pagerAdapter.actualizarDatos(listaNataga, listaLaPlata);
+                        // Actualizar el adaptador del ViewPager
+                        if (pagerAdapter != null) {
+                            pagerAdapter.actualizarDatos(listaNataga, listaLaPlata);
+                        }
 
-                        // Forzar actualización de los fragments visibles
-                        int currentItem = viewPagerHorarios.getCurrentItem();
+                        Toast.makeText(InicioUsuarios.this,
+                                "Horarios actualizados: " + (listaNataga.size() + listaLaPlata.size()) + " total",
+                                Toast.LENGTH_SHORT).show();
                     }
-
-                    Toast.makeText(InicioUsuarios.this,
-                            "Horarios actualizados: " + (listaNataga.size() + listaLaPlata.size()) + " total",
-                            Toast.LENGTH_SHORT).show();
                 });
             }
 
             @Override
             public void onError(String error) {
-                runOnUiThread(() -> {
-                    Toast.makeText(InicioUsuarios.this, "Error al cargar horarios: " + error, Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(InicioUsuarios.this, "Error al cargar horarios: " + error, Toast.LENGTH_SHORT).show();
+                    }
                 });
             }
         });
@@ -207,6 +304,7 @@ public class InicioUsuarios extends AppCompatActivity {
         // Actualizar datos cuando la actividad se reanude
         if (authManager.isUserLoggedIn()) {
             cargarDatosUsuario();
+            cargarHorarios();
         }
     }
 }
