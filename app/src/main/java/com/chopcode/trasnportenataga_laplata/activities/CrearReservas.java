@@ -17,7 +17,9 @@ import com.chopcode.trasnportenataga_laplata.services.VehiculoService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -194,9 +196,9 @@ public class CrearReservas extends AppCompatActivity {
             tvHorarioSeleccionado.setText(horarioHora);
         }
 
-        // Configurar fecha actual
-        String fechaActual = obtenerFechaActual();
-        tvFechaViaje.setText(fechaActual);
+        // Configurar fecha del viaje (considerando si el horario ya pasó hoy)
+        String fechaViaje = obtenerFechaDelViaje();
+        tvFechaViaje.setText(fechaViaje);
 
         // Configurar información por defecto del vehículo
         tvVehiculoInfo.setText("Vehículo: Cargando...");
@@ -206,13 +208,144 @@ public class CrearReservas extends AppCompatActivity {
     }
 
     /**
-     * Obtener la fecha actual formateada
+     * Obtener la fecha del viaje basándose en el horario seleccionado y la hora actual
+     * Si el horario seleccionado es en la mañana pero la hora actual es más tarde,
+     * entonces el viaje es para el día siguiente
      */
-    private String obtenerFechaActual() {
+    private String obtenerFechaDelViaje() {
+        Calendar calendar = Calendar.getInstance();
+        Calendar ahora = Calendar.getInstance();
+
+        if (horarioHora != null && esHorarioEnElPasado(horarioHora, ahora)) {
+            // Si el horario seleccionado ya pasó hoy, usar el día siguiente
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            Log.d(TAG, "Horario en el pasado detectado: " + horarioHora +
+                    " - Hora actual: " + obtenerHoraActualFormateada() +
+                    " - Usando fecha del día siguiente");
+        } else {
+            Log.d(TAG, "Horario futuro detectado: " + horarioHora +
+                    " - Hora actual: " + obtenerHoraActualFormateada() +
+                    " - Usando fecha actual");
+        }
+
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM 'del' yyyy", new Locale("es", "ES"));
-        String fecha = sdf.format(new Date());
+        String fecha = sdf.format(calendar.getTime());
+
         // Capitalizar primera letra
         return fecha.substring(0, 1).toUpperCase() + fecha.substring(1);
+    }
+
+    /**
+     * Determina si un horario seleccionado ya pasó en el día de hoy
+     * @param horarioSeleccionado Hora en formato String (ej: "6:15 AM", "10:30 PM")
+     * @param ahora Calendar con la hora actual
+     * @return true si el horario seleccionado ya pasó hoy
+     */
+    private boolean esHorarioEnElPasado(String horarioSeleccionado, Calendar ahora) {
+        try {
+            // Parsear el horario seleccionado
+            SimpleDateFormat formato12h = new SimpleDateFormat("h:mm a", Locale.US);
+            Date horaSeleccionadaDate = formato12h.parse(horarioSeleccionado);
+
+            if (horaSeleccionadaDate != null) {
+                Calendar calSeleccionado = Calendar.getInstance();
+                calSeleccionado.setTime(horaSeleccionadaDate);
+
+                // Obtener hora y minutos del horario seleccionado
+                int horaSeleccionada = calSeleccionado.get(Calendar.HOUR);
+                int minutosSeleccionados = calSeleccionado.get(Calendar.MINUTE);
+                int amPmSeleccionado = calSeleccionado.get(Calendar.AM_PM);
+
+                // Obtener hora y minutos actuales
+                int horaActual = ahora.get(Calendar.HOUR);
+                int minutosActuales = ahora.get(Calendar.MINUTE);
+                int amPmActual = ahora.get(Calendar.AM_PM);
+
+                // Convertir a formato 24 horas para comparación más fácil
+                int horaSeleccionada24 = convertirA24Horas(horaSeleccionada, amPmSeleccionado);
+                int horaActual24 = convertirA24Horas(horaActual, amPmActual);
+
+                Log.d(TAG, "Comparando horarios - Seleccionado: " + horaSeleccionada24 + ":" + minutosSeleccionados +
+                        " - Actual: " + horaActual24 + ":" + minutosActuales);
+
+                // Comparar horas y minutos
+                if (horaSeleccionada24 < horaActual24) {
+                    return true; // La hora seleccionada ya pasó hoy
+                } else if (horaSeleccionada24 == horaActual24) {
+                    return minutosSeleccionados <= minutosActuales; // Misma hora, comparar minutos
+                }
+
+                return false; // La hora seleccionada es futura hoy
+            }
+        } catch (ParseException e) {
+            Log.e(TAG, "Error al parsear horario: " + horarioSeleccionado, e);
+
+            // Fallback: lógica simple basada en texto
+            return esHorarioEnElPasadoSimple(horarioSeleccionado);
+        }
+
+        return false;
+    }
+
+    /**
+     * Convierte hora en formato 12h a 24h
+     */
+    private int convertirA24Horas(int hora12, int amPm) {
+        if (amPm == Calendar.PM && hora12 != 12) {
+            return hora12 + 12;
+        } else if (amPm == Calendar.AM && hora12 == 12) {
+            return 0; // 12 AM = 0 horas
+        }
+        return hora12;
+    }
+
+    /**
+     * Lógica simple de fallback para determinar si un horario ya pasó
+     */
+    private boolean esHorarioEnElPasadoSimple(String horario) {
+        if (horario == null) return false;
+
+        Calendar ahora = Calendar.getInstance();
+        int horaActual24 = ahora.get(Calendar.HOUR_OF_DAY);
+        int minutoActual = ahora.get(Calendar.MINUTE);
+
+        String horarioUpper = horario.toUpperCase();
+
+        try {
+            // Extraer hora y minutos del string
+            String[] partes = horario.split(":");
+            if (partes.length >= 2) {
+                int horaSeleccionada = Integer.parseInt(partes[0].trim());
+                String[] minutosYAmPm = partes[1].split(" ");
+                int minutosSeleccionados = Integer.parseInt(minutosYAmPm[0].trim());
+
+                // Convertir a 24 horas
+                if (horarioUpper.contains("PM") && horaSeleccionada != 12) {
+                    horaSeleccionada += 12;
+                } else if (horarioUpper.contains("AM") && horaSeleccionada == 12) {
+                    horaSeleccionada = 0;
+                }
+
+                // Comparar
+                if (horaSeleccionada < horaActual24) {
+                    return true;
+                } else if (horaSeleccionada == horaActual24) {
+                    return minutosSeleccionados <= minutoActual;
+                }
+            }
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "Error en fallback parser para: " + horario);
+        }
+
+        return false;
+    }
+
+    /**
+     * Obtener la hora actual formateada para logging
+     */
+    private String obtenerHoraActualFormateada() {
+        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
+        return sdf.format(new Date());
     }
 
     /**
@@ -419,6 +552,8 @@ public class CrearReservas extends AppCompatActivity {
         confirmarReserva.putExtra("rutaSelecionada", rutaSeleccionada);
         confirmarReserva.putExtra("horarioId", horarioId);
         confirmarReserva.putExtra("horarioHora", horarioHora);
+        String fechaViaje= obtenerFechaDelViaje();
+        confirmarReserva.putExtra("fechaViaje", fechaViaje);
         startActivity(confirmarReserva);
     }
 
