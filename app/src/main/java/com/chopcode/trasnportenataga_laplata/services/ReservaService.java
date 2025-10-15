@@ -34,37 +34,44 @@ public class ReservaService {
      */
     public interface ReservaCallback {
         void onReservaExitosa();
+
         void onError(String error);
     }
 
     public interface AsientosCallback {
         void onAsientosObtenidos(int[] asientosOcupados);
+
         void onError(String error);
     }
 
     public interface DisponibilidadCallback {
         void onDisponible(boolean disponible);
+
         void onError(String error);
     }
 
     public interface ReservaCargadaCallback {
         void onCargaExitosa(List<Reserva> reservas);
+
         void onError(String mensaje);
     }
 
     // 🔥 NUEVAS INTERFACES DEL RESERVATION MANAGER
     public interface ReservationsCallback {
         void onReservationsLoaded(List<Reserva> reservas);
+
         void onError(String error);
     }
 
     public interface ReservationUpdateCallback {
         void onSuccess();
+
         void onError(String error);
     }
 
     public interface DriverReservationsCallback {
         void onDriverReservationsLoaded(List<Reserva> reservas);
+
         void onError(String error);
     }
 
@@ -217,33 +224,6 @@ public class ReservaService {
             }
         });
     }
-
-    public void cargarReservas(@NonNull final ReservaCargadaCallback callback) {
-        databaseReference.child("reservas")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        List<Reserva> listaReservas = new ArrayList<>();
-                        for (DataSnapshot reservaSnap : snapshot.getChildren()) {
-                            Reserva reserva = reservaSnap.getValue(Reserva.class);
-                            if (reserva != null && "Por confirmar".equals(reserva.getEstadoReserva())) {
-                                listaReservas.add(reserva);
-                            }
-                        }
-                        callback.onCargaExitosa(listaReservas);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        callback.onError("Error al cargar reservas: " + error.getMessage());
-                    }
-                });
-    }
-
-    /**
-     * 🔥 NUEVOS MÉTODOS INTEGRADOS DEL RESERVATION MANAGER
-     */
-
     /**
      * Carga las reservas específicas de un conductor con filtros por horarios asignados
      */
@@ -389,31 +369,6 @@ public class ReservaService {
             }
         });
     }
-
-    /**
-     * Verifica si un asiento está disponible para un horario específico
-     */
-    public void verificarDisponibilidadAsiento(String horarioId, int asiento, DisponibilidadCallback callback) {
-        DatabaseReference asientoRef = databaseReference
-                .child("disponibilidadAsientos")
-                .child(horarioId)
-                .child("asientosOcupados")
-                .child(String.valueOf(asiento));
-
-        asientoRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Si existe el asiento en ocupados, entonces NO está disponible
-                callback.onDisponible(!snapshot.exists());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                callback.onError("Error al verificar disponibilidad: " + error.getMessage());
-            }
-        });
-    }
-
     // Método para cargar las reservas de en la interfaz de historial de reservas del usuario
     // pasajero
     public void obtenerHistorialUsuario(String usuarioId, HistorialCallback callback) {
