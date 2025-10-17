@@ -5,19 +5,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context=".activities.ConfirmarReserva">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:title="@string/confirmarReserva"
-            app:titleTextColor="@android:color/white"/>
+            app:title="@string/confirmar"
+            app:titleTextColor="@color/white"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationContentDescription="@string/volver" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -25,277 +29,512 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Tarjeta para Información de la Reserva -->
+            <!-- BANNER DE CONFIRMACIÓN -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardInfoReserva"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="2dp"
-                app:cardUseCompatPadding="true"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="20dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_check"
+                        android:tint="?attr/colorPrimary"
+                        android:layout_marginEnd="16dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Revisa tu reserva"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Confirma que toda la información sea correcta"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/darker_gray"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- SECCIÓN: DETALLES DEL VIAJE -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                android:layout_marginBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/infoReserva"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:textColor="?attr/colorPrimary"
-                        android:drawablePadding="8dp"/>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="?android:attr/listDivider"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="12dp"/>
-
-                    <TextView
-                        android:id="@+id/tvHoraSalida"
+                    <!-- Header de la sección -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/horaSalida"
-                        android:textSize="16sp"
-                        android:drawablePadding="8dp"
-                        android:layout_marginBottom="8dp"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
 
-                    <TextView
-                        android:id="@+id/tvAsientoReservado"
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_route"
+                            android:tint="?attr/colorPrimary"
+                            android:layout_marginEnd="12dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Detalles del Viaje"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Información principal del viaje -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/asientoReservado"
-                        android:textSize="16sp"
-                        android:drawablePadding="8dp"
-                        android:layout_marginBottom="8dp"/>
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/tvPrecio"
+                        <!-- Ruta -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="12dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Ruta:"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/darker_gray" />
+
+                            <TextView
+                                android:id="@+id/tvRuta"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Natagá → La Plata"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Fecha y Hora -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="12dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Fecha y Hora:"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/darker_gray" />
+
+                            <TextView
+                                android:id="@+id/tvFechaHora"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Viernes, 18 de octubre del 2024 - 07:15 AM"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <!-- Asiento -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="12px">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Asiento:"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/darker_gray" />
+
+                            <TextView
+                                android:id="@+id/tvAsiento"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="A5"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:background="@drawable/bg_chip_simple"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="4dp" />
+                        </LinearLayout>
+
+                        <!-- Tiempo Estimado -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="16dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Duración:"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/darker_gray" />
+
+                            <TextView
+                                android:id="@+id/tvTiempoEstimado"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="60 min"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Precio destacado -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/precio"
-                        android:textSize="16sp"
-                        android:drawablePadding="8dp"
-                        android:layout_marginBottom="8dp"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/bg_price_highlight"
+                        android:padding="16dp">
 
-                    <TextView
-                        android:id="@+id/tvOrigen"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/origen"
-                        android:textSize="16sp"
-                        android:drawablePadding="8dp"
-                        android:layout_marginBottom="8dp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Total a pagar:"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tvDestino"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/destino"
-                        android:textSize="16sp"
-                        android:drawablePadding="8dp"
-                        android:layout_marginBottom="8dp"/>
-
-                    <TextView
-                        android:id="@+id/tvTiempoEstimado"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/tiempoEstimado"
-                        android:textSize="16sp"
-                        android:drawablePadding="8dp"
-                        android:layout_marginBottom="8dp"/>
-
-                    <TextView
-                        android:id="@+id/tvMetodoPago"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/metodoPago"
-                        android:textSize="16sp"
-                        android:drawablePadding="8dp"
-                        android:layout_marginBottom="8dp"/>
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipEstadoReserva"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/estadoReserva"
-                        app:chipBackgroundColor="@color/status_pending"/>
+                        <TextView
+                            android:id="@+id/tvPrecio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="$12,000"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorPrimary" />
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Tarjeta para Información del Vehículo -->
+            <!-- SECCIÓN: INFORMACIÓN DE CONTACTO -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardInfoVehiculo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="2dp"
-                app:cardUseCompatPadding="true"
-                app:layout_constraintTop_toBottomOf="@id/cardInfoReserva"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                android:layout_marginBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
-                    <!-- Tarjeta para datos del usuario -->
+                    <!-- Header de la sección -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_contact"
+                            android:tint="?attr/colorPrimary"
+                            android:layout_marginEnd="12dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Información de Contacto"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Tarjeta del Pasajero -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
                         app:cardCornerRadius="8dp"
-                        app:cardElevation="4dp">
+                        app:cardElevation="2dp"
+                        android:layout_marginBottom="12dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
                             android:padding="16dp">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="👤 Datos del Usuario"
-                                android:textStyle="bold"
-                                android:textSize="18sp"
-                                android:textColor="?attr/colorPrimary"/>
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_passenger"
+                                android:tint="?attr/colorPrimary"
+                                android:layout_marginEnd="12dp" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="?android:attr/listDivider"
-                                android:layout_marginTop="8dp"
-                                android:layout_marginBottom="12dp"/>
-
-                            <TextView
-                                android:id="@+id/tvUsuario"
-                                android:layout_width="match_parent"
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="@string/pasajero"
-                                android:textSize="16sp"
-                                android:drawablePadding="8dp"
-                                android:layout_marginBottom="8dp"/>
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/tvTelefonoP"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="📞 Teléfono Usuario:"
-                                android:textSize="16sp"
-                                android:drawablePadding="8dp"/>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Pasajero"
+                                    android:textSize="12sp"
+                                    android:textColor="@android:color/darker_gray" />
+
+                                <TextView
+                                    android:id="@+id/tvUsuario"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Brandon Daza"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="2dp" />
+
+                                <TextView
+                                    android:id="@+id/tvTelefonoP"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="322 282 4941"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="4dp" />
+                            </LinearLayout>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Tarjeta para datos del conductor -->
+                    <!-- Tarjeta del Conductor -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:cardCornerRadius="8dp"
-                        app:cardElevation="4dp">
+                        app:cardElevation="2dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
                             android:padding="16dp">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/datosVehiculo"
-                                android:textStyle="bold"
-                                android:textSize="18sp"
-                                android:textColor="?attr/colorPrimary"/>
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_driver"
+                                android:tint="?attr/colorPrimary"
+                                android:layout_marginEnd="12dp" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="?android:attr/listDivider"
-                                android:layout_marginTop="8dp"
-                                android:layout_marginBottom="12dp"/>
-
-                            <TextView
-                                android:id="@+id/tvPlaca"
-                                android:layout_width="match_parent"
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="@string/placaVehiculo"
-                                android:textSize="16sp"
-                                android:drawablePadding="8dp"
-                                android:layout_marginBottom="8dp"/>
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/tvConductor"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="@string/nombreConductor"
-                                android:textSize="16sp"
-                                android:layout_marginBottom="8dp"
-                                android:drawablePadding="8dp"/>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Conductor"
+                                    android:textSize="12sp"
+                                    android:textColor="@android:color/darker_gray" />
 
-                            <TextView
-                                android:id="@+id/tvTelefonoC"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="@string/telefonoC"
-                                android:textSize="16sp"
-                                android:drawablePadding="8dp"/>
+                                <TextView
+                                    android:id="@+id/tvConductor"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Julian Gomez"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginTop="2dp" />
+
+                                <TextView
+                                    android:id="@+id/tvTelefonoC"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="300 123 4567"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="4dp" />
+
+                                <TextView
+                                    android:id="@+id/tvPlaca"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Vehículo: GHI789 - Mazda BT-50"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="4dp" />
+                            </LinearLayout>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Botones de acción -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnConfirmarReserva"
+            <!-- SECCIÓN: MÉTODO DE PAGO -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/confirmar"
-                android:textColor="@android:color/white"
-                app:cornerRadius="8dp"
-                android:paddingVertical="12dp"
-                app:iconGravity="textStart"
-                app:layout_constraintTop_toBottomOf="@id/cardInfoVehiculo"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="24dp"/>
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                android:layout_marginBottom="24dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCancelar"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Header de la sección -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_payment"
+                            android:tint="?attr/colorPrimary"
+                            android:layout_marginEnd="12dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Método de Pago"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Selección de método de pago simplificada -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <RadioGroup
+                            android:id="@+id/radioGroupPago"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/radioEfectivo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Efectivo"
+                                android:checked="true"
+                                android:layout_marginEnd="24dp" />
+
+                            <RadioButton
+                                android:id="@+id/radioTransferencia"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Transferencia" />
+                        </RadioGroup>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Paga directamente al conductor al momento del viaje"
+                        android:textSize="12sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:gravity="center"
+                        android:layout_marginTop="8dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- BOTONES DE ACCIÓN -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/cancelar"
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
+
+                <!-- Botón Confirmar -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnConfirmarReserva"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Confirmar Reserva"
+                    android:textSize="16sp"
+                    android:paddingVertical="16dp"
+                    app:cornerRadius="12dp"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Botón Cancelar -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCancelar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Cancelar"
+                    android:textSize="16sp"
+                    android:paddingVertical="16dp"
+                    app:cornerRadius="12dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:strokeColor="@color/error"
+                    app:strokeWidth="1dp"
+                    android:textColor="@color/error" />
+
+            </LinearLayout>
+
+            <!-- INFORMACIÓN ADICIONAL -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="✅ Tu asiento estará reservado por 15 minutos. Recuerda llegar 10 minutos antes de la salida."
+                android:textSize="12sp"
                 android:textColor="@android:color/darker_gray"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                app:cornerRadius="8dp"
-                app:strokeColor="@android:color/holo_red_dark"
-                android:textColorHint="@android:color/holo_red_dark"
-                android:paddingVertical="12dp"
-                app:iconGravity="textStart"
-                app:iconTint="@android:color/holo_red_dark"
-                android:textAlignment="center"
-                app:layout_constraintTop_toBottomOf="@id/btnConfirmarReserva"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="8dp"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:gravity="center"
+                android:lineSpacingExtra="4dp" />
+
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
