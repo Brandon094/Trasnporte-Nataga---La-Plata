@@ -16,6 +16,11 @@ import com.chopcode.trasnportenataga_laplata.services.UserService;
 import com.chopcode.trasnportenataga_laplata.services.VehiculoService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,6 +61,10 @@ public class CrearReservas extends AppCompatActivity {
     private static final String TAG = "CrearReservas";
     private static final int CAPACIDAD_TOTAL = 14;
 
+    // Agregar estas variables para almacenar información del conductor
+    private String conductorNombre = "Cargando...";
+    private String conductorId;
+
     /**
      * Método que se ejecuta al crear la actividad. Inicializa la UI y carga datos previos.
      * @param savedInstanceState Estado guardado de la actividad en caso de recreación.
@@ -71,9 +80,6 @@ public class CrearReservas extends AppCompatActivity {
             rutaSeleccionada = intent.getStringExtra("rutaSeleccionada");
             horarioId = intent.getStringExtra("horarioId");
             horarioHora = intent.getStringExtra("horarioHora");
-
-            Log.d(TAG, "Datos recibidos - Ruta: " + rutaSeleccionada +
-                    ", HorarioId: " + horarioId + ", Hora: " + horarioHora);
         }
 
         // Inicializar servicios
@@ -94,6 +100,7 @@ public class CrearReservas extends AppCompatActivity {
             asientoSeleccionado = savedInstanceState.getInt("asientoSeleccionado", -1);
             if (asientoSeleccionado == -1) asientoSeleccionado = null;
             rutaSeleccionada = savedInstanceState.getString("rutaSeleccionada");
+            conductorNombre = savedInstanceState.getString("conductorNombre", "Cargando...");
         }
 
         // Configurar asientos directamente con el horario recibido
@@ -204,7 +211,7 @@ public class CrearReservas extends AppCompatActivity {
         tvVehiculoInfo.setText("Vehículo: Cargando...");
         tvCapacidadInfo.setText("Capacidad: " + CAPACIDAD_TOTAL + " asientos");
         tvCapacidadDispo.setText("Capacidad disponible: " + CAPACIDAD_TOTAL);
-        tvNombreConductor.setText("Cargando...");
+        tvNombreConductor.setText(conductorNombre);
     }
 
     /**
@@ -354,100 +361,172 @@ public class CrearReservas extends AppCompatActivity {
     private void cargarInformacionVehiculoYConductor() {
         Log.d(TAG, "Cargando información del vehículo y conductor...");
 
-        // Primero, obtener información del horario para saber qué vehículo/conductor está asignado
-        // Por ahora, usaremos un vehículo por defecto. Puedes ajustar esto según tu estructura de datos
+        // Buscar conductor por horario (esto también cargará la info del vehículo)
+        buscarConductorPorHorario();
+    }
 
-        // Buscar vehículo por ID (puedes ajustar este ID según tu lógica)
-        String vehiculoId = "TBO550"; // o la lógica para obtener el ID correcto
+    /**
+     * Buscar conductor asignado a este horario específico
+     */
+    private void buscarConductorPorHorario() {
+        Log.d(TAG, "Buscando conductor para el horario: " + horarioId);
 
-        vehiculoService.obtenerVehiculoPorId(vehiculoId, new VehiculoService.VehiculoMapCallback() {
+        DatabaseReference conductoresRef = FirebaseDatabase.getInstance().getReference("conductores");
+
+        conductoresRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onVehiculoObtenido(Map<String, Object> vehiculoMap) {
-                runOnUiThread(() -> {
-                    if (vehiculoMap != null) {
-                        try {
-                            // Extraer información del vehículo
-                            String placa = (String) vehiculoMap.get("placa");
-                            String modelo = (String) vehiculoMap.get("modelo");
-                            String conductorId = (String) vehiculoMap.get("conductorId");
-                            Integer capacidad = (Integer) vehiculoMap.get("capacidad");
+            public void onDataChange(DataSnapshot snapshot) {
+                boolean conductorEncontrado = false;
 
-                            if (placa == null) placa = "ABC123";
-                            if (modelo == null) modelo = "Chevrolet D-Max";
-                            if (capacidad == null) capacidad = CAPACIDAD_TOTAL;
+                for (DataSnapshot conductorSnapshot : snapshot.getChildren()) {
+                    // Verificar si este conductor tiene el horario asignado
+                    if (conductorSnapshot.hasChild("horariosAsignados")) {
+                        DataSnapshot horariosAsignadosSnapshot = conductorSnapshot.child("horariosAsignados");
 
-                            // Actualizar información del vehículo
-                            tvVehiculoInfo.setText("Vehículo: " + placa + " - " + modelo);
-                            tvCapacidadInfo.setText("Capacidad: " + capacidad + " asientos");
+                        // Iterar sobre los horarios asignados
+                        for (DataSnapshot horarioAsignadoSnapshot : horariosAsignadosSnapshot.getChildren()) {
+                            String horarioAsignado = horarioAsignadoSnapshot.getValue(String.class);
+                            if (horarioId != null && horarioId.equals(horarioAsignado)) {
+                                // Este conductor está asignado a este horario
+                                conductorId = conductorSnapshot.getKey();
+                                Log.d(TAG, "Conductor encontrado: " + conductorId + " para horario: " + horarioId);
 
-                            // Si tenemos conductorId, cargar información del conductor
-                            if (conductorId != null) {
+                                // Cargar información completa del conductor y vehículo
                                 cargarInformacionConductor(conductorId);
-                            } else {
-                                // Si no hay conductorId, usar valores por defecto
-                                tvNombreConductor.setText("Oscar Mendoza");
+                                conductorEncontrado = true;
+                                break;
                             }
-
-                            Log.d(TAG, "Información del vehículo cargada: " + placa + " - " + modelo);
-
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error al procesar datos del vehículo: " + e.getMessage());
-                            configurarValoresPorDefecto();
                         }
-                    } else {
-                        Log.w(TAG, "No se encontró vehículo, usando valores por defecto");
-                        configurarValoresPorDefecto();
                     }
-                });
+                    if (conductorEncontrado) break;
+                }
+
+                // Si no se encontró conductor específico
+                if (!conductorEncontrado) {
+                    Log.w(TAG, "No se encontró conductor para el horario " + horarioId);
+                    runOnUiThread(() -> {
+                        conductorNombre = "------";
+                        tvNombreConductor.setText(conductorNombre);
+                        tvVehiculoInfo.setText("Vehículo: ------");
+                    });
+                }
             }
 
             @Override
-            public void onError(String error) {
+            public void onCancelled(DatabaseError error) {
                 runOnUiThread(() -> {
-                    Log.e(TAG, "Error al cargar vehículo: " + error);
-                    configurarValoresPorDefecto();
-                    Toast.makeText(CrearReservas.this,
-                            "Error al cargar información del vehículo", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error buscando conductor por horario: " + error.getMessage());
+                    conductorNombre = "------";
+                    tvNombreConductor.setText(conductorNombre);
+                    tvVehiculoInfo.setText("Vehículo: ------");
                 });
             }
         });
     }
-
     /**
-     * Cargar información del conductor
+     * Cargar información del conductor desde el nodo "conductores"
      */
     private void cargarInformacionConductor(String conductorId) {
-        userService.loadUserData(conductorId, new UserService.UserDataCallback() {
+        Log.d(TAG, "Cargando información del conductor: " + conductorId);
+
+        DatabaseReference conductorRef = FirebaseDatabase.getInstance().getReference("conductores").child(conductorId);
+
+        conductorRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onUserDataLoaded(com.chopcode.trasnportenataga_laplata.models.Usuario usuario) {
+            public void onDataChange(DataSnapshot snapshot) {
                 runOnUiThread(() -> {
-                    if (usuario != null && usuario.getNombre() != null) {
-                        tvNombreConductor.setText(usuario.getNombre());
-                        Log.d(TAG, "Información del conductor cargada: " + usuario.getNombre());
+                    if (snapshot.exists()) {
+                        Log.d(TAG, "Snapshot del conductor existe");
+                        try {
+                            Map<String, Object> conductorMap = (Map<String, Object>) snapshot.getValue();
+                            if (conductorMap != null) {
+                                Log.d(TAG, "Conductor map: " + conductorMap.toString());
+
+                                String nombre = (String) conductorMap.get("nombre");
+                                String modeloVehiculo = (String) conductorMap.get("modeloVehiculo");
+                                String placaVehiculo = (String) conductorMap.get("placaVehiculo");
+
+                                // CORRECCIÓN: Manejar correctamente el tipo de capacidadVehiculo
+                                Object capacidadObj = conductorMap.get("capacidadVehiculo");
+                                Integer capacidad = null;
+
+                                if (capacidadObj != null) {
+                                    if (capacidadObj instanceof Long) {
+                                        capacidad = ((Long) capacidadObj).intValue();
+                                    } else if (capacidadObj instanceof Integer) {
+                                        capacidad = (Integer) capacidadObj;
+                                    } else {
+                                        Log.w(TAG, "Tipo inesperado para capacidadVehiculo: " + capacidadObj.getClass().getSimpleName());
+                                        capacidad = CAPACIDAD_TOTAL; // Valor por defecto
+                                    }
+                                } else {
+                                    capacidad = CAPACIDAD_TOTAL; // Valor por defecto si es null
+                                }
+
+                                Log.d(TAG, "Datos extraídos - Nombre: " + nombre +
+                                        ", Modelo: " + modeloVehiculo +
+                                        ", Placa: " + placaVehiculo +
+                                        ", Capacidad: " + capacidad);
+
+                                if (nombre != null && !nombre.isEmpty()) {
+                                    conductorNombre = nombre;
+                                    tvNombreConductor.setText(conductorNombre);
+                                    Log.d(TAG, "✓ Información del conductor cargada: " + conductorNombre);
+                                } else {
+                                    conductorNombre = "------";
+                                    tvNombreConductor.setText(conductorNombre);
+                                    Log.w(TAG, "Nombre del conductor es nulo o vacío");
+                                }
+
+                                // Actualizar información del vehículo
+                                if (placaVehiculo != null && modeloVehiculo != null) {
+                                    String infoVehiculo = "Vehículo: " + placaVehiculo + " - " + modeloVehiculo;
+                                    tvVehiculoInfo.setText(infoVehiculo);
+                                    Log.d(TAG, "✓ Información del vehículo cargada: " + infoVehiculo);
+                                } else {
+                                    tvVehiculoInfo.setText("Vehículo: ------");
+                                    Log.w(TAG, "Datos del vehículo incompletos");
+                                }
+
+                                if (capacidad != null) {
+                                    tvCapacidadInfo.setText("Capacidad: " + capacidad + " asientos");
+                                    Log.d(TAG, "✓ Capacidad cargada: " + capacidad);
+                                } else {
+                                    tvCapacidadInfo.setText("Capacidad: " + CAPACIDAD_TOTAL + " asientos");
+                                    Log.w(TAG, "Capacidad no encontrada, usando valor por defecto");
+                                }
+                            } else {
+                                Log.e(TAG, "Conductor map es null");
+                                establecerValoresPorDefecto();
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error al procesar datos del conductor: " + e.getMessage());
+                            e.printStackTrace();
+                            establecerValoresPorDefecto();
+                        }
                     } else {
-                        tvNombreConductor.setText("Conductor no disponible");
-                        Log.w(TAG, "No se pudo cargar información del conductor");
+                        Log.w(TAG, "No se encontró información del conductor con ID: " + conductorId);
+                        establecerValoresPorDefecto();
                     }
                 });
             }
 
             @Override
-            public void onError(String error) {
+            public void onCancelled(DatabaseError error) {
                 runOnUiThread(() -> {
-                    Log.e(TAG, "Error al cargar conductor: " + error);
-                    tvNombreConductor.setText("Conductor no disponible");
+                    Log.e(TAG, "Error al cargar conductor: " + error.getMessage());
+                    establecerValoresPorDefecto();
                 });
             }
         });
     }
 
-    /**
-     * Configurar valores por defecto en caso de error
-     */
-    private void configurarValoresPorDefecto() {
-        tvVehiculoInfo.setText("Vehículo: ----- -----");
+    // Método auxiliar para establecer valores por defecto
+    private void establecerValoresPorDefecto() {
+        conductorNombre = "------";
+        tvNombreConductor.setText(conductorNombre);
+        tvVehiculoInfo.setText("Vehículo: ------");
         tvCapacidadInfo.setText("Capacidad: " + CAPACIDAD_TOTAL + " asientos");
-        tvNombreConductor.setText("----- -----");
     }
 
     /**
@@ -552,8 +631,10 @@ public class CrearReservas extends AppCompatActivity {
         confirmarReserva.putExtra("rutaSelecionada", rutaSeleccionada);
         confirmarReserva.putExtra("horarioId", horarioId);
         confirmarReserva.putExtra("horarioHora", horarioHora);
-        String fechaViaje= obtenerFechaDelViaje();
-        confirmarReserva.putExtra("fechaViaje", fechaViaje);
+        confirmarReserva.putExtra("conductorNombre", conductorNombre);
+        confirmarReserva.putExtra("conductorId", conductorId);
+        String fechaViaje = obtenerFechaDelViaje();
+        confirmarReserva.putExtra("fechaViaje", fechaViaje); // ¡Importante agregar esto!
         startActivity(confirmarReserva);
     }
 
@@ -574,5 +655,6 @@ public class CrearReservas extends AppCompatActivity {
         if (rutaSeleccionada != null) {
             outState.putString("rutaSeleccionada", rutaSeleccionada);
         }
+        outState.putString("conductorNombre", conductorNombre);
     }
 }
