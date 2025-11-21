@@ -14,9 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.activities.CrearReservas;
+import com.chopcode.trasnportenataga_laplata.activities.InicioUsuarios;
 import com.chopcode.trasnportenataga_laplata.adapters.HorarioAdapter;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Horario;
+import com.chopcode.trasnportenataga_laplata.models.Usuario;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,18 @@ public class HorarioFragment extends Fragment implements HorarioAdapter.OnReserv
     private List<Horario> horarios = new ArrayList<>();
     private String titulo;
     private AuthManager authManager;
+
+    // AGREGAR ESTA INTERFAZ
+    public interface OnUsuarioDataListener {
+        Usuario getUsuarioActual();
+    }
+
+    private OnUsuarioDataListener usuarioDataListener;
+
+    // AGREGAR ESTE MÉTODO
+    public void setUsuarioDataListener(OnUsuarioDataListener listener) {
+        this.usuarioDataListener = listener;
+    }
 
     public static HorarioFragment newInstance(List<Horario> horarios, String titulo) {
         HorarioFragment fragment = new HorarioFragment();
@@ -107,6 +121,23 @@ public class HorarioFragment extends Fragment implements HorarioAdapter.OnReserv
             intent.putExtra("horarioId", horario.getId());
             intent.putExtra("horarioHora", horario.getHora());
             intent.putExtra("rutaSeleccionada", titulo); // Usamos el título como ruta
+
+            // AGREGAR ESTO: Obtener y pasar datos del usuario
+            if (usuarioDataListener != null) {
+                Usuario usuario = usuarioDataListener.getUsuarioActual();
+                if (usuario != null) {
+                    intent.putExtra("usuarioId", usuario.getId());
+                    intent.putExtra("usuarioNombre", usuario.getNombre());
+                    intent.putExtra("usuarioTelefono", usuario.getTelefono());
+                    intent.putExtra("usuarioEmail", usuario.getEmail());
+                    Log.d("HorarioFragment", "Datos de usuario pasados: " + usuario);
+                } else {
+                    Log.w("HorarioFragment", "Usuario es null en el listener");
+                }
+            } else {
+                Log.w("HorarioFragment", "No hay usuarioDataListener configurado");
+            }
+
             startActivity(intent);
             Log.d("HorarioFragment", "Navegando a CrearReservas con horario: " + horario.getHora());
         } catch (Exception e) {
