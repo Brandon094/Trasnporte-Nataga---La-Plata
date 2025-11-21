@@ -24,21 +24,11 @@ public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHold
         void onReservarClick(Horario horario);
     }
 
-    public HorarioAdapter(List<Horario> horarios) {
-        this.horarios = (horarios != null) ? new ArrayList<>(horarios) : new ArrayList<>();
-        Log.d(TAG, "Adapter creado con " + this.horarios.size() + " horarios");
-    }
-
     // Nuevo constructor con listener
     public HorarioAdapter(List<Horario> horarios, OnReservarClickListener listener) {
         this.horarios = (horarios != null) ? new ArrayList<>(horarios) : new ArrayList<>();
         this.listener = listener;
         Log.d(TAG, "Adapter creado con " + this.horarios.size() + " horarios y listener");
-    }
-
-    // Método para establecer el listener después de la creación
-    public void setOnReservarClickListener(OnReservarClickListener listener) {
-        this.listener = listener;
     }
 
     @NonNull
