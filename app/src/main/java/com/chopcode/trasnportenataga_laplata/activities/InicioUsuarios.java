@@ -50,6 +50,8 @@ public class InicioUsuarios extends AppCompatActivity {
     // Datos
     private List<Horario> listaNataga = new ArrayList<>();
     private List<Horario> listaLaPlata = new ArrayList<>();
+    // Almacenar datos usuario
+    private Usuario usuarioActual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,28 +145,32 @@ public class InicioUsuarios extends AppCompatActivity {
     private void cargarDatosUsuario() {
         FirebaseUser currentUser = authManager.getCurrentUser();
         if (currentUser != null) {
-            final String userId = currentUser.getUid(); // Hacerla final
+            final String userId = currentUser.getUid();
 
             // Cargar datos completos del usuario desde Firebase
             userService.loadUserData(userId, new UserService.UserDataCallback() {
                 @Override
                 public void onUserDataLoaded(Usuario usuario) {
                     if (usuario != null && usuario.getNombre() != null) {
+                        usuarioActual = usuario; // Guardar referencia del usuario
                         tvUserName.setText(usuario.getNombre());
                         tvWelcome.setText("¡Bienvenido, " + usuario.getNombre().split(" ")[0] + "!");
                     }
-                    // Cargar contadores REALES de reservas y viajes
                     cargarContadoresAlternativo(userId);
                 }
 
                 @Override
                 public void onError(String error) {
                     Log.e("UserData", "Error cargando datos: " + error);
-                    // Intentar cargar contadores incluso si hay error en otros datos
                     cargarContadoresAlternativo(userId);
                 }
             });
         }
+    }
+
+    // Método para obtener el usuario actual (público para el adapter)
+    public Usuario getUsuarioActual() {
+        return usuarioActual;
     }
 
     private void cargarContadoresUsuario() {
