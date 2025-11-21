@@ -5,8 +5,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.chopcode.trasnportenataga_laplata.activities.InicioUsuarios;
 import com.chopcode.trasnportenataga_laplata.fragments.HorarioFragment;
 import com.chopcode.trasnportenataga_laplata.models.Horario;
+import com.chopcode.trasnportenataga_laplata.models.Usuario;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +18,13 @@ public class HorarioPagerAdapter extends FragmentStateAdapter {
     private List<Horario> listaNataga;
     private List<Horario> listaLaPlata;
     private List<HorarioFragment> fragments = new ArrayList<>();
+    private InicioUsuarios actividadPadre;
 
-    public HorarioPagerAdapter(@NonNull FragmentActivity fragmentActivity,
+    public HorarioPagerAdapter(@NonNull InicioUsuarios fragmentActivity,
                                List<Horario> listaNataga,
                                List<Horario> listaLaPlata) {
         super(fragmentActivity);
+        this.actividadPadre = fragmentActivity; // CORRECCIÓN: Asignar la actividad padre
         this.listaNataga = listaNataga != null ? new ArrayList<>(listaNataga) : new ArrayList<>();
         this.listaLaPlata = listaLaPlata != null ? new ArrayList<>(listaLaPlata) : new ArrayList<>();
     }
@@ -33,6 +37,17 @@ public class HorarioPagerAdapter extends FragmentStateAdapter {
             fragment = HorarioFragment.newInstance(listaNataga, "Natagá -> La Plata");
         } else {
             fragment = HorarioFragment.newInstance(listaLaPlata, "La Plata -> Natagá");
+        }
+
+        // CORRECCIÓN: Pasar la referencia de la actividad al fragment
+        if (actividadPadre != null) {
+            // Usar el método setUsuarioDataListener en lugar de setActividadPadre
+            fragment.setUsuarioDataListener(new HorarioFragment.OnUsuarioDataListener() {
+                @Override
+                public Usuario getUsuarioActual() {
+                    return actividadPadre.getUsuarioActual();
+                }
+            });
         }
 
         // Guardar referencia al fragment
@@ -65,6 +80,16 @@ public class HorarioPagerAdapter extends FragmentStateAdapter {
                     fragment.actualizarHorarios(new ArrayList<>(listaNataga));
                 } else if (i == 1) {
                     fragment.actualizarHorarios(new ArrayList<>(listaLaPlata));
+                }
+
+                // CORRECCIÓN: Re-configurar el listener al actualizar datos
+                if (actividadPadre != null) {
+                    fragment.setUsuarioDataListener(new HorarioFragment.OnUsuarioDataListener() {
+                        @Override
+                        public Usuario getUsuarioActual() {
+                            return actividadPadre.getUsuarioActual();
+                        }
+                    });
                 }
             }
         }
