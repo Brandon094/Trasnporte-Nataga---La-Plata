@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.adapters.ReservaAdapter;
-import com.chopcode.trasnportenataga_laplata.adapters.RutaAdapter;
+import com.chopcode.trasnportenataga_laplata.adapters.reservas.ReservaAdapter;
+import com.chopcode.trasnportenataga_laplata.adapters.rutas.RutaAdapter;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
 import com.chopcode.trasnportenataga_laplata.managers.StatisticsManager;

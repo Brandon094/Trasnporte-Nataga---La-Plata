@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.adapters;
+package com.chopcode.trasnportenataga_laplata.adapters.horarios;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.adapters;
+package com.chopcode.trasnportenataga_laplata.adapters.reservas;
 
 import android.util.Log;
 import android.view.LayoutInflater;

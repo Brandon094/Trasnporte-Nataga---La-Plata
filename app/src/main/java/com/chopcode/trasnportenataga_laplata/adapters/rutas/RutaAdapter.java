@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.adapters;
+package com.chopcode.trasnportenataga_laplata.adapters.rutas;
 
 import android.view.LayoutInflater;
 import android.view.View;

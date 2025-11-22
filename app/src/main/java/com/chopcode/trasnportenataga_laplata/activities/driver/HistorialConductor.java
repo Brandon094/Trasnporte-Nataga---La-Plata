@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.adapters.HistorialReservaAdapter;
+import com.chopcode.trasnportenataga_laplata.adapters.historial.HistorialConductorAdapter;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
 import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
@@ -38,7 +38,7 @@ public class HistorialConductor extends AppCompatActivity {
     private FloatingActionButton fabExportar;
 
     // Adapters y Data
-    private HistorialReservaAdapter reservaAdapter;
+    private HistorialConductorAdapter reservaAdapter;
     private List<Reserva> listaReservas = new ArrayList<>();
     private List<Reserva> listaFiltrada = new ArrayList<>();
 
@@ -129,7 +129,7 @@ public class HistorialConductor extends AppCompatActivity {
     }
 
     private void configurarRecyclerView() {
-        reservaAdapter = new HistorialReservaAdapter(listaFiltrada, new HistorialReservaAdapter.OnReservaClickListener() {
+        reservaAdapter = new HistorialConductorAdapter(listaFiltrada, new HistorialConductorAdapter.OnReservaClickListener() {
             @Override
             public void onReservaClick(Reserva reserva) {
                 mostrarDetallesReserva(reserva);

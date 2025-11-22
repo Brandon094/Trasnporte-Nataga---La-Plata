@@ -1,27 +1,18 @@
 package com.chopcode.trasnportenataga_laplata.services.reservations;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.chopcode.trasnportenataga_laplata.adapters.ReservaAdapter;
 import com.chopcode.trasnportenataga_laplata.models.DisponibilidadAsientos;
-import com.chopcode.trasnportenataga_laplata.models.Horario;
-import com.chopcode.trasnportenataga_laplata.models.Pasajero;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.*;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ReservaService {

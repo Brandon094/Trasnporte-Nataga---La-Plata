@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.adapters;
+package com.chopcode.trasnportenataga_laplata.adapters.horarios;
 
 import android.util.Log;
 import android.view.LayoutInflater;

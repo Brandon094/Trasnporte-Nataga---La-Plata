@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.adapters.HistorialUsuarioAdapter;
+import com.chopcode.trasnportenataga_laplata.adapters.historial.HistorialPasajeroAdapter;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
 import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
@@ -44,7 +44,7 @@ public class HistorialReservas extends AppCompatActivity {
     private AuthManager authManager;
 
     // Adapter y datos
-    private HistorialUsuarioAdapter adapter;
+    private HistorialPasajeroAdapter adapter;
     private List<Reserva> listaReservas = new ArrayList<>();
     private List<Reserva> listaFiltrada = new ArrayList<>();
 
@@ -126,7 +126,7 @@ public class HistorialReservas extends AppCompatActivity {
 
     private void setupRecyclerView() {
         Log.d(TAG, "🔧 Configurando RecyclerView...");
-        adapter = new HistorialUsuarioAdapter(listaFiltrada);
+        adapter = new HistorialPasajeroAdapter(listaFiltrada);
         recyclerHistorial.setLayoutManager(new LinearLayoutManager(this));
         recyclerHistorial.setAdapter(adapter);
         Log.d(TAG, "✅ RecyclerView configurado correctamente");

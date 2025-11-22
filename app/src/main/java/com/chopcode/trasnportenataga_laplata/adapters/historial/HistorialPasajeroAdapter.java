@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.adapters;
+package com.chopcode.trasnportenataga_laplata.adapters.historial;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +15,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class HistorialUsuarioAdapter extends RecyclerView.Adapter<HistorialUsuarioAdapter.ViewHolder> {
+public class HistorialPasajeroAdapter extends RecyclerView.Adapter<HistorialPasajeroAdapter.ViewHolder> {
 
     private List<Reserva> reservas;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy - HH:mm", new Locale("es", "ES"));
 
-    public HistorialUsuarioAdapter(List<Reserva> reservas) {
+    public HistorialPasajeroAdapter(List<Reserva> reservas) {
         this.reservas = reservas;
     }
 

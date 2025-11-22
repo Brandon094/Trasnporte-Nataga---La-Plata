@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.adapters;
+package com.chopcode.trasnportenataga_laplata.adapters.historial;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +13,7 @@ import com.chopcode.trasnportenataga_laplata.models.Reserva;
 
 import java.util.List;
 
-public class HistorialReservaAdapter extends RecyclerView.Adapter<HistorialReservaAdapter.ReservaViewHolder> {
+public class HistorialConductorAdapter extends RecyclerView.Adapter<HistorialConductorAdapter.ReservaViewHolder> {
 
     private List<Reserva> listaReservas;
     private final OnReservaClickListener listener;
@@ -23,7 +23,7 @@ public class HistorialReservaAdapter extends RecyclerView.Adapter<HistorialReser
         void onVerDetallesClick(Reserva reserva);
     }
 
-    public HistorialReservaAdapter(List<Reserva> listaReservas, OnReservaClickListener listener) {
+    public HistorialConductorAdapter(List<Reserva> listaReservas, OnReservaClickListener listener) {
         this.listaReservas = listaReservas;
         this.listener = listener;
     }
