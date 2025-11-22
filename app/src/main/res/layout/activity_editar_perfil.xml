@@ -338,6 +338,44 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- ✅ NUEVO: Valor actual de la marca -->
+                <TextView
+                    android:id="@+id/tvMarcaActual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Marca actual: cargando..."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp"
+                    android:textStyle="italic" />
+
+                <!-- ✅ NUEVO: Campo Marca del Vehículo -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputLayoutMarca"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Marca del vehículo"
+                    app:startIconDrawable="@drawable/ic_copyrigth"
+                    app:startIconTint="@color/secondary_500"
+                    app:boxStrokeColor="@color/secondary_500"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:hintTextColor="@color/secondary_500"
+                    android:layout_marginBottom="20dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etMarca"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <!-- Valor actual del modelo -->
                 <TextView
                     android:id="@+id/tvModeloActual"
@@ -375,6 +413,7 @@
                         android:textColorHint="@color/text_secondary" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
                 <!-- Valor actual del color -->
                 <TextView
                     android:id="@+id/tvColorActual"
