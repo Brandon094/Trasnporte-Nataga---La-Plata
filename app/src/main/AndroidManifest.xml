@@ -2,9 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Agregar permisos si los necesitas (opcional) -->
+    <!-- 🔹 PERMISOS PARA FCM Y CONECTIVIDAD -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- ✅ Para mantener el dispositivo despierto al recibir notificaciones -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- ✅ Android 13+ para mostrar notificaciones -->
+    <uses-permission android:name="android.permission.VIBRATE" /> <!-- ✅ Para vibración en notificaciones -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" /> <!-- ✅ Permiso específico de FCM -->
+
+    <!-- 🔹 PERMISOS PARA LA APLICACIÓN -->
+    <permission
+        android:name="com.chopcode.trasnportenataga_laplata.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" /> <!-- ✅ Permiso personalizado para FCM -->
+
+    <uses-permission android:name="com.chopcode.trasnportenataga_laplata.permission.C2D_MESSAGE" />
 
     <application
         android:allowBackup="true"
@@ -17,14 +28,75 @@
         android:theme="@style/Theme.TrasnporteNatagaLaPlata"
         tools:targetApi="31">
 
-        <!-- Ordenar actividades alfabéticamente para mejor organización -->
+        <!-- 🔹 ACTIVIDAD PRINCIPAL - Punto de entrada de la aplicación -->
+        <activity
+            android:name=".activities.InicioDeSesion"
+            android:exported="true"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- 🔹 INTENT FILTER PARA NOTIFICACIONES FCM -->
+            <intent-filter>
+                <action android:name="OPEN_NOTIFICATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- 🔹 SERVICIO DE NOTIFICACIONES FCM - Maneja mensajes en primer plano -->
+        <service
+            android:name=".services.NotificationService"
+            android:exported="false"
+            android:stopWithTask="false"
+            android:directBootAware="true"> <!-- ✅ Funciona incluso en modo de arranque directo -->
+            <intent-filter android:priority="-1">
+                <action android:name="com.google.firebase.MESSAGING_EVENT" /> <!-- ✅ Escucha mensajes de FCM -->
+            </intent-filter>
+        </service>
+
+        <!-- 🔹 SERVICIO DE INSTANCIA ID DE FCM - Maneja tokens y mensajes en segundo plano -->
+        <service
+            android:name="com.google.firebase.messaging.FirebaseMessagingService"
+            android:exported="true"
+            android:stopWithTask="false"
+            android:directBootAware="true">
+            <intent-filter android:priority="-1">
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" /> <!-- ✅ Maneja actualización de tokens -->
+            </intent-filter>
+        </service>
+
+        <!-- 🔹 RECEIVER PARA NOTIFICACIONES - Maneja clics en notificaciones -->
+        <receiver
+            android:name=".receivers.NotificationReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" /> <!-- ✅ Recibir notificaciones después del reinicio -->
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" /> <!-- ✅ Después de actualizar la app -->
+            </intent-filter>
+        </receiver>
+
+        <!-- 🔹 SERVICIO DE INICIO DE TRABAJOS - Para procesar notificaciones en background -->
+        <service
+            android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"
+            android:exported="false" />
+
+        <service
+            android:name="androidx.work.impl.background.systemjob.SystemJobService"
+            android:exported="false"
+            tools:targetApi="21" />
+
+        <!-- 🔹 ACTIVIDADES DE LA APLICACIÓN - Ordenadas alfabéticamente -->
         <activity
             android:name=".activities.ConfirmarReserva"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.HistorialReservas"
+            android:name=".activities.CrearReservas"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
@@ -46,19 +118,14 @@
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.InicioConductor"
+            android:name=".activities.HistorialReservas"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.InicioDeSesion"
-            android:exported="true"
-            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:name=".activities.InicioConductor"
+            android:exported="false"
+            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
             android:name=".activities.InicioUsuarios"
@@ -80,12 +147,18 @@
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
-        <activity
-            android:name=".activities.CrearReservas"
-            android:exported="false"
-            android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
+        <!-- 🔹 METADATOS PARA FCM -->
+        <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="true" /> <!-- ✅ Inicialización automática de FCM -->
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="true" /> <!-- ✅ Recopilación de analytics -->
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="true" /> <!-- ✅ Recopilación de crashlytics -->
 
-        <!-- Servicios de Firebase (si los usas) -->
+        <!-- 🔹 SERVICIOS DE FIREBASE (ComponentDiscovery) -->
         <service
             android:name="com.google.firebase.components.ComponentDiscoveryService"
             android:exported="false">
@@ -94,6 +167,12 @@
                 android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
                 android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data
+                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" /> <!-- ✅ Registrar FCM -->
+            <meta-data
+                android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
                 android:value="com.google.firebase.components.ComponentRegistrar" />
         </service>
 
