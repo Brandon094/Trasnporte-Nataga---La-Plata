@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.activities;
+package com.chopcode.trasnportenataga_laplata.activities.common;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,6 +11,9 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.widget.*;
 import com.chopcode.trasnportenataga_laplata.R;
+import com.chopcode.trasnportenataga_laplata.activities.driver.InicioConductor;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.CrearReservas;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuarios;
 import com.chopcode.trasnportenataga_laplata.services.IniciarService;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;

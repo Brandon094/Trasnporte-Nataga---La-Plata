@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.activities;
+package com.chopcode.trasnportenataga_laplata.activities.driver;
 
 import androidx.appcompat.app.AppCompatActivity;
 

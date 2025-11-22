@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.activities;
+package com.chopcode.trasnportenataga_laplata.activities.common;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;

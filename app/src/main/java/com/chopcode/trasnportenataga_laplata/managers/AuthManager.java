@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-import com.chopcode.trasnportenataga_laplata.activities.InicioDeSesion;
+import com.chopcode.trasnportenataga_laplata.activities.common.InicioDeSesion;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 

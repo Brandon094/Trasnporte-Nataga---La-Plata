@@ -13,8 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.activities.CrearReservas;
-import com.chopcode.trasnportenataga_laplata.activities.InicioUsuarios;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.CrearReservas;
 import com.chopcode.trasnportenataga_laplata.adapters.HorarioAdapter;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Horario;

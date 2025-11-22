@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.activities;
+package com.chopcode.trasnportenataga_laplata.activities.passenger;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
@@ -14,9 +14,6 @@ import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
 import com.chopcode.trasnportenataga_laplata.services.ReservaService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ConfirmarReserva extends AppCompatActivity {
 
