@@ -235,9 +235,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
         tvCorreoActual.setText("Correo actual: " +
                 (conductorActual.getEmail() != null ? conductorActual.getEmail() : "No definido"));
 
-        // Llenar campos editables
-        if (conductorActual.getNombre() != null) etNombre.setText(conductorActual.getNombre());
-        if (conductorActual.getTelefono() != null) etTelefono.setText(conductorActual.getTelefono());
+        // Llenar campo correo
         if (conductorActual.getEmail() != null) etCorreo.setText(conductorActual.getEmail());
 
         Log.d(TAG, "✅ UI del conductor actualizada");
@@ -258,14 +256,6 @@ public class EditarPerfilConductor extends AppCompatActivity {
             tvCapacidadActual.setText("Capacidad actual: " + vehiculoActual.getCapacidad());
             tvAnioActual.setText("Año actual: " +
                     (vehiculoActual.getAno() != null ? vehiculoActual.getAno() : "No definido"));
-
-            // Llenar campos editables
-            if (vehiculoActual.getPlaca() != null) etPlaca.setText(vehiculoActual.getPlaca());
-            if (vehiculoActual.getMarca() != null) etMarca.setText(vehiculoActual.getMarca());  // ✅ NUEVO: Llenar marca
-            if (vehiculoActual.getModelo() != null) etModelo.setText(vehiculoActual.getModelo());
-            if (vehiculoActual.getColor() != null) etColor.setText(vehiculoActual.getColor());
-            etCapacidad.setText(String.valueOf(vehiculoActual.getCapacidad()));
-            if (vehiculoActual.getAno() != null) etAnio.setText(vehiculoActual.getAno());
 
             Log.d(TAG, "✅ UI del vehículo actualizada");
         }
