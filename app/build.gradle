@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.application'
-    id 'com.google.gms.google-services'
+    id 'com.google.gms.google-services'  // ✅ Servicios de Google Firebase
 }
 
 android {
@@ -28,7 +28,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     buildFeatures {
-        viewBinding true
+        viewBinding true  // ✅ Binding de vistas para evitar findViewById
     }
     packagingOptions {
         resources {
@@ -38,25 +38,38 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'com.google.android.material:material:1.9.0' // ✅ Solo una versión
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
-    implementation 'androidx.navigation:navigation-fragment:2.5.3'
-    implementation 'androidx.navigation:navigation-ui:2.5.3'
-    implementation 'androidx.gridlayout:gridlayout:1.0.0'
-    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    // 🔹 ANDROIDX CORE - Componentes básicos de Android
+    implementation 'androidx.appcompat:appcompat:1.7.0'  // ✅ Compatibilidad con versiones anteriores
+    implementation 'com.google.android.material:material:1.9.0' // ✅ Material Design components
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.0' // ✅ Layouts flexibles
+    implementation 'androidx.navigation:navigation-fragment:2.5.3' // ✅ Navegación entre fragments
+    implementation 'androidx.navigation:navigation-ui:2.5.3' // ✅ UI de navegación
+    implementation 'androidx.gridlayout:gridlayout:1.0.0' // ✅ Layouts en grid
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0' // ✅ Soporte para versiones antiguas
+    implementation 'androidx.cardview:cardview:1.0.0' // ✅ Tarjetas Material Design
 
-    implementation platform('com.google.firebase:firebase-bom:32.7.0')
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-database'
-    implementation 'com.google.firebase:firebase-auth:22.1.1'
-    implementation 'com.google.firebase:firebase-firestore:25.1.2'
-    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    // 🔹 UI COMPONENTS - Componentes de interfaz de usuario
+    implementation 'de.hdodenhof:circleimageview:3.1.0' // ✅ ImageView circular para fotos de perfil
 
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.cardview:cardview:1.0.0' // ✅ AndroidX version
+    // 🔹 FIREBASE CORE - Plataforma principal de Firebase
+    implementation platform('com.google.firebase:firebase-bom:32.7.0') // ✅ BOM para gestionar versiones
+    implementation 'com.google.firebase:firebase-analytics' // ✅ Analytics para seguimiento de uso
+    implementation 'com.google.firebase:firebase-database' // ✅ Base de datos en tiempo real
+    implementation 'com.google.firebase:firebase-auth:22.1.1' // ✅ Autenticación de usuarios
+    implementation 'com.google.firebase:firebase-firestore:25.1.2' // ✅ Base de datos NoSQL (Firestore)
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    // 🔹 FIREBASE CLOUD MESSAGING (FCM) - Notificaciones push
+    implementation 'com.google.firebase:firebase-messaging:23.1.0' // ✅ Notificaciones push FCM
+
+    // 🔹 GOOGLE PLAY SERVICES
+    implementation 'com.google.android.gms:play-services-auth:20.7.0' // ✅ Autenticación con Google
+
+    // 🔹 UTILITIES - Utilidades adicionales
+    implementation 'com.google.code.gson:gson:2.10.1' // ✅ Serialización/Deserialización JSON
+    implementation 'androidx.work:work-runtime:2.8.1' // ✅ Trabajos en segundo plano
+
+    // 🔹 TESTING - Pruebas unitarias y de interfaz
+    testImplementation 'junit:junit:4.13.2' // ✅ Pruebas unitarias
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1' // ✅ Pruebas Android JUnit
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1' // ✅ Pruebas de interfaz
 }
