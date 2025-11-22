@@ -1,8 +1,11 @@
 package com.chopcode.trasnportenataga_laplata.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -10,8 +13,13 @@ import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.services.RegistroService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class RegistroUsuarios extends AppCompatActivity {
+
+    // ✅ TAG para logs
+    private static final String TAG = "RegistroUsuarios";
 
     private TextInputEditText editTextNombre, editTextCorreo, editTextTelefono, editTextPassword, editTextConfirmPassword;
     private Button buttonRegistrar;
@@ -19,10 +27,16 @@ public class RegistroUsuarios extends AppCompatActivity {
     private MaterialToolbar topAppBar;
     private RegistroService registroService;
 
+    // ✅ Constantes para SharedPreferences
+    private static final String PREFS_NAME = "UserPrefs";
+    private static final String KEY_USER_ID = "user_id";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro_usuarios);
+
+        Log.d(TAG, "✅ onCreate: Iniciando actividad de registro de usuarios");
 
         // Inicializar vistas del layout
         initViews();
@@ -32,22 +46,30 @@ public class RegistroUsuarios extends AppCompatActivity {
 
         // Inicializar servicio de registro
         registroService = new RegistroService();
+        Log.d(TAG, "✅ Servicio de registro inicializado");
 
         // Redirigir al usuario a la pantalla de inicio de sesión
         buttonIniciarSesion.setOnClickListener(v -> {
+            Log.d(TAG, "📱 Clic en 'Iniciar Sesión', redirigiendo a pantalla de login");
             startActivity(new Intent(RegistroUsuarios.this, InicioDeSesion.class));
             finish(); // Cierra la pantalla de registro para que no vuelva atrás
         });
 
         // Manejar el clic del botón de registro
-        buttonRegistrar.setOnClickListener(v -> registrarUsuario());
+        buttonRegistrar.setOnClickListener(v -> {
+            Log.d(TAG, "📱 Clic en botón Registrar");
+            registrarUsuario();
+        });
 
+        Log.d(TAG, "✅ Actividad de registro configurada correctamente");
     }
 
     /**
      * Inicializa todas las vistas del layout
      */
     private void initViews() {
+        Log.d(TAG, "🔧 Inicializando vistas del layout");
+
         editTextNombre = findViewById(R.id.editTextNombre);
         editTextCorreo = findViewById(R.id.editTextCorreo);
         editTextTelefono = findViewById(R.id.editTextTelefono);
@@ -56,14 +78,17 @@ public class RegistroUsuarios extends AppCompatActivity {
         buttonRegistrar = findViewById(R.id.buttonRegistrar);
         buttonIniciarSesion = findViewById(R.id.buttonIniciarSesion);
         topAppBar = findViewById(R.id.topAppBar);
+
+        Log.d(TAG, "✅ Vistas inicializadas correctamente");
     }
 
     /**
      * Configura la toolbar con navegación
      */
     private void setupToolbar() {
+        Log.d(TAG, "🔧 Configurando toolbar");
         topAppBar.setNavigationOnClickListener(v -> {
-            // Regresar a la actividad anterior
+            Log.d(TAG, "📱 Clic en navegación de toolbar, regresando a actividad anterior");
             onBackPressed();
         });
     }
@@ -78,23 +103,44 @@ public class RegistroUsuarios extends AppCompatActivity {
         String password = editTextPassword.getText().toString().trim();
         String confirmPassword = editTextConfirmPassword.getText().toString().trim();
 
+        Log.d(TAG, "👤 Iniciando proceso de registro para: " + correo);
+        Log.d(TAG, "📝 Datos capturados - Nombre: " + nombre + ", Teléfono: " + telefono);
+
         // Validaciones mejoradas
         if (!validarCampos(nombre, correo, password, confirmPassword)) {
+            Log.w(TAG, "❌ Validación de campos fallida");
             return;
         }
+
+        Log.d(TAG, "✅ Validación de campos exitosa");
 
         // Mostrar loading state en el botón
         buttonRegistrar.setEnabled(false);
         buttonRegistrar.setText("Registrando...");
+        Log.d(TAG, "⏳ Deshabilitando botón de registro - proceso en curso");
 
         // Registro del usuario
         registroService.registrarUsuario(nombre, correo, telefono, password, new RegistroService.RegistroCallback() {
             @Override
             public void onSuccess() {
+                Log.d(TAG, "🎉 Registro exitoso en Firebase Auth");
+
                 runOnUiThread(() -> {
                     buttonRegistrar.setEnabled(true);
                     buttonRegistrar.setText("Registrarse");
+                    Log.d(TAG, "✅ Botón de registro reestablecido");
+
+                    // ✅ Obtener y guardar el userId después del registro exitoso
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        Log.d(TAG, "👤 Usuario de Firebase obtenido: " + user.getUid());
+                        guardarUserIdEnPrefs(user.getUid());
+                    } else {
+                        Log.e(TAG, "❌ Usuario de Firebase es null después del registro exitoso");
+                    }
+
                     Toast.makeText(RegistroUsuarios.this, "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "🚀 Redirigiendo a pantalla de inicio de sesión");
                     startActivity(new Intent(RegistroUsuarios.this, InicioDeSesion.class));
                     finish();
                 });
@@ -102,9 +148,13 @@ public class RegistroUsuarios extends AppCompatActivity {
 
             @Override
             public void onFailure(String error) {
+                Log.e(TAG, "❌ Error en registro: " + error);
+
                 runOnUiThread(() -> {
                     buttonRegistrar.setEnabled(true);
                     buttonRegistrar.setText("Registrarse");
+                    Log.d(TAG, "✅ Botón de registro reestablecido después del error");
+
                     Toast.makeText(RegistroUsuarios.this, "Error: " + error, Toast.LENGTH_LONG).show();
                 });
             }
@@ -112,32 +162,54 @@ public class RegistroUsuarios extends AppCompatActivity {
     }
 
     /**
+     * ✅ MÉTODO: Guardar userId en SharedPreferences para FCM
+     */
+    private void guardarUserIdEnPrefs(String userId) {
+        try {
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(KEY_USER_ID, userId);
+            editor.apply();
+            Log.d(TAG, "💾 UserId guardado en SharedPreferences: " + userId);
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error guardando userId en SharedPreferences: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Valida todos los campos del formulario
      */
     private boolean validarCampos(String nombre, String correo, String password, String confirmPassword) {
+        Log.d(TAG, "🔍 Validando campos del formulario");
+
         // Validar campos obligatorios
         if (nombre.isEmpty() || correo.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            Log.w(TAG, "❌ Campos obligatorios vacíos");
             Toast.makeText(this, "Por favor, completa todos los campos obligatorios", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         // Validar formato de email
         if (!isValidEmail(correo)) {
+            Log.w(TAG, "❌ Formato de email inválido: " + correo);
             Toast.makeText(this, "Por favor, ingresa un correo electrónico válido", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         // Validar contraseñas
         if (!validarContraseñas(password, confirmPassword)) {
+            Log.w(TAG, "❌ Las contraseñas no coinciden");
             return false;
         }
 
         // Validar longitud mínima de contraseña
         if (password.length() < 6) {
+            Log.w(TAG, "❌ Contraseña demasiado corta: " + password.length() + " caracteres");
             Toast.makeText(this, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
             return false;
         }
 
+        Log.d(TAG, "✅ Todos los campos validados correctamente");
         return true;
     }
 
@@ -145,11 +217,14 @@ public class RegistroUsuarios extends AppCompatActivity {
      * Valida que las contraseñas coincidan
      */
     private boolean validarContraseñas(String password, String confirmPassword) {
-        if (!password.equals(confirmPassword)) {
+        boolean coinciden = password.equals(confirmPassword);
+        if (!coinciden) {
+            Log.w(TAG, "❌ Contraseñas no coinciden - Password: " + password.length() + " chars, Confirm: " + confirmPassword.length() + " chars");
             Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
-            return false;
+        } else {
+            Log.d(TAG, "✅ Contraseñas coinciden correctamente");
         }
-        return true;
+        return coinciden;
     }
 
     /**
@@ -157,15 +232,25 @@ public class RegistroUsuarios extends AppCompatActivity {
      */
     private boolean isValidEmail(CharSequence target) {
         if (target == null) {
+            Log.w(TAG, "❌ Email es null");
             return false;
         }
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        boolean esValido = android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        Log.d(TAG, "🔍 Validación email '" + target + "': " + (esValido ? "✅ VÁLIDO" : "❌ INVÁLIDO"));
+        return esValido;
     }
 
     @Override
     public void onBackPressed() {
+        Log.d(TAG, "📱 onBackPressed: Regresando a actividad anterior");
         super.onBackPressed();
         // Opcional: agregar animación personalizada
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "🔚 onDestroy: Actividad de registro siendo destruida");
     }
 }
