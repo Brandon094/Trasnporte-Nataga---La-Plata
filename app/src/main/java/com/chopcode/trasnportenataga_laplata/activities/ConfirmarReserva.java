@@ -10,9 +10,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
+import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
 import com.chopcode.trasnportenataga_laplata.services.ReservaService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConfirmarReserva extends AppCompatActivity {
 
@@ -24,24 +28,25 @@ public class ConfirmarReserva extends AppCompatActivity {
     private MaterialButton btnConfirmarReserva, btnCancelar;
     private MaterialToolbar topAppBar;
 
-    // Variables de datos (TODO viene del Intent)
+    // Variables de datos
     private int asientoSeleccionado;
     private String horarioId, horarioHora, rutaSeleccionada, fechaViaje;
     private String origen, destino, tiempoEstimado, metodoPago;
     private double precio;
 
-    // Datos del conductor (TODO viene del Intent)
+    // Datos del conductor
     private String conductorNombre, conductorTelefono, conductorId;
 
-    // Datos del vehículo (TODO viene del Intent)
+    // Datos del vehículo
     private String vehiculoPlaca, vehiculoModelo, vehiculoCapacidad;
 
-    // Datos del usuario (TODO viene del Intent)
+    // Datos del usuario
     private String usuarioNombre, usuarioTelefono, usuarioId;
 
     // Servicios
     private ReservaService reservaService;
     private AuthManager authManager;
+    private NotificationManager notificationManager;
 
     private static final String TAG = "ConfirmarReserva";
 
@@ -50,9 +55,10 @@ public class ConfirmarReserva extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirmar_reserva);
 
-        // ✅ Inicializar servicios (SOLO reservaService, NO userService)
+        // ✅ Inicializar servicios
         reservaService = new ReservaService();
         authManager = AuthManager.getInstance();
+        notificationManager = NotificationManager.getInstance();
 
         // Recibir TODOS los datos enviados desde CrearReservas
         recibirDatosIntent();
@@ -66,7 +72,7 @@ public class ConfirmarReserva extends AppCompatActivity {
         // Configurar listeners
         configurarListeners();
 
-        // Cargar información en la interfaz (SOLO con datos del Intent)
+        // Cargar información en la interfaz
         cargarInformacionBasica();
         cargarInformacionUsuarioYConductor();
     }
@@ -125,12 +131,13 @@ public class ConfirmarReserva extends AppCompatActivity {
         if (usuarioNombre == null) usuarioNombre = "Usuario";
         if (usuarioTelefono == null) usuarioTelefono = "No disponible";
         if (tiempoEstimado == null) tiempoEstimado = "60 min";
+        if (conductorId == null) conductorId = "conductor_default_id";
 
         metodoPago = "Efectivo"; // Por defecto
 
         Log.d(TAG, "✓ TODOS los datos recibidos via Intent:");
         Log.d(TAG, "  - Ruta: " + rutaSeleccionada + ", Asiento: " + asientoSeleccionado);
-        Log.d(TAG, "  - Conductor: " + conductorNombre + ", Tel: " + conductorTelefono);
+        Log.d(TAG, "  - Conductor: " + conductorNombre + ", ID: " + conductorId + ", Tel: " + conductorTelefono);
         Log.d(TAG, "  - Vehículo: " + vehiculoPlaca + " - " + vehiculoModelo);
         Log.d(TAG, "  - Usuario: " + usuarioNombre + ", Tel: " + usuarioTelefono);
     }
@@ -234,22 +241,22 @@ public class ConfirmarReserva extends AppCompatActivity {
     }
 
     /**
-     * Cargar información del usuario y conductor (SOLO con datos del Intent)
+     * Cargar información del usuario y conductor
      */
     private void cargarInformacionUsuarioYConductor() {
-        // ✅ Usuario (datos del Intent)
+        // Usuario (datos del Intent)
         tvUsuario.setText(usuarioNombre);
         tvTelefonoP.setText(usuarioTelefono);
 
-        // ✅ Conductor (datos del Intent)
+        // Conductor (datos del Intent)
         tvConductor.setText(conductorNombre);
         tvTelefonoC.setText(conductorTelefono);
 
-        // ✅ Vehículo (datos del Intent)
+        // Vehículo (datos del Intent)
         String infoVehiculo = "Vehículo: " + vehiculoPlaca + " - " + vehiculoModelo;
         tvPlaca.setText(infoVehiculo);
 
-        Log.d(TAG, "✓ Información cargada desde Intent - Sin consultas Firebase");
+        Log.d(TAG, "✓ Información cargada desde Intent");
     }
 
     /**
@@ -278,7 +285,7 @@ public class ConfirmarReserva extends AppCompatActivity {
     }
 
     /**
-     * Registrar la reserva en Firebase
+     * Registrar la reserva en Firebase y enviar notificación al conductor
      */
     private void registrarReserva() {
         String userId = authManager.getUserId();
@@ -290,7 +297,7 @@ public class ConfirmarReserva extends AppCompatActivity {
         String estadoReserva = "Por confirmar";
 
         Log.d(TAG, "Registrando reserva con datos del Intent:");
-        Log.d(TAG, "  - Conductor: " + conductorNombre + ", Tel: " + conductorTelefono);
+        Log.d(TAG, "  - Conductor: " + conductorNombre + ", ID: " + conductorId + ", Tel: " + conductorTelefono);
         Log.d(TAG, "  - Vehículo: " + vehiculoPlaca + " - " + vehiculoModelo);
         Log.d(TAG, "  - Usuario: " + usuarioNombre + ", Método Pago: " + metodoPago);
 
@@ -302,6 +309,9 @@ public class ConfirmarReserva extends AppCompatActivity {
                     public void onReservaExitosa() {
                         runOnUiThread(() -> {
                             Toast.makeText(ConfirmarReserva.this, "✅ Reserva confirmada exitosamente", Toast.LENGTH_LONG).show();
+
+                            // ✅ ENVIAR NOTIFICACIÓN AL CONDUCTOR
+                            enviarNotificacionAlConductor();
 
                             Intent intent = new Intent(ConfirmarReserva.this, InicioUsuarios.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -325,5 +335,31 @@ public class ConfirmarReserva extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         mostrarDialogoCancelacion();
+    }
+
+    /**
+     * ✅ NOTIFICACIÓN 1: Enviar notificación al conductor sobre la nueva reserva
+     */
+    private void enviarNotificacionAlConductor() {
+        if (conductorId == null || conductorId.equals("conductor_default_id")) {
+            Log.w(TAG, "No se puede enviar notificación: ID del conductor no válido");
+            return;
+        }
+
+        // Formatear fecha y hora
+        String fechaHoraCompleta = fechaViaje + " - " + horarioHora;
+
+        // 🔹 NOTIFICACIÓN AL CONDUCTOR
+        notificationManager.notificarNuevaReservaAlConductor(
+                conductorId,
+                usuarioNombre,           // nombre del pasajero
+                rutaSeleccionada,        // ruta
+                fechaHoraCompleta,       // fecha y hora
+                asientoSeleccionado,     // asiento
+                precio,                  // precio
+                metodoPago               // método de pago
+        );
+
+        Log.d(TAG, "📲 Notificación de NUEVA RESERVA enviada al conductor: " + conductorNombre);
     }
 }
