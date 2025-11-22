@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.models.Conductor;
 import com.chopcode.trasnportenataga_laplata.models.Vehiculo;
-import com.chopcode.trasnportenataga_laplata.services.UserService;
+import com.chopcode.trasnportenataga_laplata.services.user.UserService;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

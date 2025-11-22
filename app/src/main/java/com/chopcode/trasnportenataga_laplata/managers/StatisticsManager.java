@@ -1,7 +1,7 @@
 package com.chopcode.trasnportenataga_laplata.managers;
 
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
-import com.chopcode.trasnportenataga_laplata.services.UserService;
+import com.chopcode.trasnportenataga_laplata.services.user.UserService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

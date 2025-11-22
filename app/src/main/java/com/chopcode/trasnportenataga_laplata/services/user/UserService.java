@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.services;
+package com.chopcode.trasnportenataga_laplata.services.user;
 
 import com.chopcode.trasnportenataga_laplata.models.Horario;
 import com.chopcode.trasnportenataga_laplata.models.Ruta;

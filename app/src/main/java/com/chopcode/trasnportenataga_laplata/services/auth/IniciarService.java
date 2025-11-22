@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.services;
+package com.chopcode.trasnportenataga_laplata.services.auth;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -11,7 +11,7 @@ import android.widget.Toast;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
-import com.chopcode.trasnportenataga_laplata.services.ReservaService;
+import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 

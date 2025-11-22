@@ -12,8 +12,8 @@ import android.widget.Toast;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Vehiculo;
-import com.chopcode.trasnportenataga_laplata.services.UserService;
-import com.chopcode.trasnportenataga_laplata.services.VehiculoService;
+import com.chopcode.trasnportenataga_laplata.services.user.UserService;
+import com.chopcode.trasnportenataga_laplata.services.reservations.VehiculoService;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;

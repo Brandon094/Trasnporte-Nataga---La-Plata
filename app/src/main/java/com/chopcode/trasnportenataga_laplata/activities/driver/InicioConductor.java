@@ -19,8 +19,8 @@ import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
 import com.chopcode.trasnportenataga_laplata.managers.StatisticsManager;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
 import com.chopcode.trasnportenataga_laplata.models.Ruta;
-import com.chopcode.trasnportenataga_laplata.services.ReservaService;
-import com.chopcode.trasnportenataga_laplata.services.UserService;
+import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
+import com.chopcode.trasnportenataga_laplata.services.user.UserService;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
