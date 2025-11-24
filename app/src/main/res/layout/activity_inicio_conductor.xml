@@ -79,7 +79,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- 🔥 TARJETA DE ESTADÍSTICAS MEJORADA -->
+        <!-- 🔥 TARJETA DE ESTADÍSTICAS CON 4 TARJETAS -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardEstadisticas"
             android:layout_width="match_parent"
@@ -98,6 +98,7 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
+                <!-- Título de la sección -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -122,19 +123,93 @@
                         android:textStyle="bold"/>
                 </LinearLayout>
 
+                <!-- 🔥 FILA 1: INGRESOS (OCUPA TODA LA FILA) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="3dp"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <!-- Icono y texto descriptivo -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_monetization"
+                                android:tint="@color/warning"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Ingresos Totales"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp"
+                                android:layout_marginTop="8dp"
+                                android:textStyle="normal"/>
+                        </LinearLayout>
+
+                        <!-- Valor de ingresos -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/tvTotalIngresos"
+                                style="@style/TextAppearance.MaterialComponents.Headline4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$0.00"
+                                android:textColor="@color/warning"
+                                android:textStyle="bold"
+                                android:textAlignment="center"/>
+
+                            <TextView
+                                android:id="@+id/tvInfoIngresos"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Acumulado del día"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"
+                                android:layout_marginTop="4dp"
+                                android:textStyle="italic"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 🔥 FILA 2: ESTADÍSTICAS GENERALES (2 COLUMNAS) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginBottom="12dp">
 
-                    <!-- 🔥 TARJETA DE RESERVAS CONFIRMADAS - MÁS GRANDE -->
+                    <!-- 🔥 TARJETA DE RESERVAS CONFIRMADAS TOTALES -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="140dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginEnd="6dp"
                         app:cardBackgroundColor="@color/surface"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="3dp">
@@ -165,21 +240,31 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Confirmadas"
+                                android:text="Reservas Confirmadas"
                                 android:textAlignment="center"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="14sp"
                                 android:layout_marginTop="4dp"
                                 android:textStyle="normal"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Total del día"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="11sp"
+                                android:layout_marginTop="2dp"
+                                android:textStyle="italic"/>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- 🔥 TARJETA DE ASIENTOS DISPONIBLES - MÁS GRANDE -->
+                    <!-- 🔥 TARJETA DE ASIENTOS DISPONIBLES TOTALES -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="140dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="6dp"
                         app:cardBackgroundColor="@color/surface"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="3dp">
@@ -210,17 +295,152 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Disponibles"
+                                android:text="Asientos Disponibles"
                                 android:textAlignment="center"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="14sp"
                                 android:layout_marginTop="4dp"
                                 android:textStyle="normal"/>
+
+                            <TextView
+                                android:id="@+id/tvInfoCapacidad"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="De 14 totales"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="11sp"
+                                android:layout_marginTop="2dp"
+                                android:textStyle="italic"/>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
-                <!-- Información de capacidad total -->
+                <!-- 🔥 FILA 3: ESTADÍSTICAS POR RUTA (2 COLUMNAS) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <!-- 🔥 TARJETA DE RESERVAS POR RUTA -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="140dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        app:cardBackgroundColor="@color/info"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="3dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_checklist"
+                                android:tint="@color/white" />
+
+                            <TextView
+                                android:id="@+id/tvReservasRuta"
+                                style="@style/TextAppearance.MaterialComponents.Headline4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="0"
+                                android:textColor="@color/info"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvNombreRutaReservas"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Natagaima → La Plata"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"
+                                android:layout_marginTop="4dp"
+                                android:textStyle="normal"
+                                android:maxLines="1"
+                                android:ellipsize="end"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Reservas en esta ruta"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="11sp"
+                                android:layout_marginTop="2dp"
+                                android:textStyle="italic"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- 🔥 TARJETA DE ASIENTOS POR RUTA -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="140dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        app:cardBackgroundColor="@color/info"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="3dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_seat"
+                                android:tint="@color/white"/>
+
+                            <TextView
+                                android:id="@+id/tvAsientosRuta"
+                                style="@style/TextAppearance.MaterialComponents.Headline4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="14"
+                                android:textColor="@color/warning"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:id="@+id/tvNombreRutaAsientos"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Nataga → La Plata"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_on_primary"
+                                android:textSize="12sp"
+                                android:layout_marginTop="4dp"
+                                android:textStyle="normal"
+                                android:maxLines="1"
+                                android:ellipsize="end"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Asientos en esta ruta"
+                                android:textAlignment="center"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="11sp"
+                                android:layout_marginTop="2dp"
+                                android:textStyle="italic"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- Información adicional -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -238,10 +458,9 @@
                         android:layout_marginEnd="6dp"/>
 
                     <TextView
-                        android:id="@+id/tvInfoCapacidad"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Capacidad total: 14 asientos"
+                        android:text="Actualizado en tiempo real"
                         android:textSize="13sp"
                         android:textColor="@color/text_secondary"
                         android:textStyle="italic"/>
@@ -322,61 +541,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Sección de Ingresos -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardIngresos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/surface"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="12dp"
-            app:layout_constraintTop_toBottomOf="@id/cardReservas"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_monetization"
-                        android:layout_marginEnd="12dp"
-                        android:tint="@color/primary_color"/>
-
-                    <TextView
-                        android:id="@+id/tvIngresosDiarios"
-                        style="@style/TextAppearance.MaterialComponents.Subtitle1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/ingresosDiarios"
-                        android:textColor="@color/primary_text"
-                        android:textStyle="bold"/>
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/tvTotalIngresos"
-                    style="@style/TextAppearance.MaterialComponents.Headline4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="$0.00"
-                    android:gravity="center"
-                    android:layout_marginTop="12dp"
-                    android:textColor="@color/primary_color"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
         <!-- Sección de Próximas Rutas -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardRutas"
@@ -385,7 +549,7 @@
             app:cardBackgroundColor="@color/surface"
             app:cardElevation="4dp"
             app:cardCornerRadius="12dp"
-            app:layout_constraintTop_toBottomOf="@id/cardIngresos"
+            app:layout_constraintTop_toBottomOf="@id/cardReservas"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp">
