@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.application'
-    id 'com.google.gms.google-services'  // ✅ Servicios de Google Firebase
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -13,7 +13,6 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -28,48 +27,58 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     buildFeatures {
-        viewBinding true  // ✅ Binding de vistas para evitar findViewById
-    }
-    packagingOptions {
-        resources {
-            excludes += "META-INF/androidx.cardview_cardview.version"
-        }
+        viewBinding true
     }
 }
 
 dependencies {
-    // 🔹 ANDROIDX CORE - Componentes básicos de Android
-    implementation 'androidx.appcompat:appcompat:1.7.0'  // ✅ Compatibilidad con versiones anteriores
-    implementation 'com.google.android.material:material:1.9.0' // ✅ Material Design components
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.0' // ✅ Layouts flexibles
-    implementation 'androidx.navigation:navigation-fragment:2.5.3' // ✅ Navegación entre fragments
-    implementation 'androidx.navigation:navigation-ui:2.5.3' // ✅ UI de navegación
-    implementation 'androidx.gridlayout:gridlayout:1.0.0' // ✅ Layouts en grid
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0' // ✅ Soporte para versiones antiguas
-    implementation 'androidx.cardview:cardview:1.0.0' // ✅ Tarjetas Material Design
+    // 🔹 ANDROIDX CORE - Versiones compatibles y estables
+    implementation 'androidx.appcompat:appcompat:1.6.1' // ✅ Versión estable
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4' // ✅ Versión actualizada
+    implementation 'androidx.navigation:navigation-fragment:2.7.4' // ✅ Versión compatible
+    implementation 'androidx.navigation:navigation-ui:2.7.4'
+    implementation 'androidx.gridlayout:gridlayout:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
 
-    // 🔹 UI COMPONENTS - Componentes de interfaz de usuario
-    implementation 'de.hdodenhof:circleimageview:3.1.0' // ✅ ImageView circular para fotos de perfil
+    // 🔹 DEPENDENCIAS CRÍTICAS PARA SOLUCIONAR EL ERROR DE DATASTORE
+    implementation 'androidx.datastore:datastore-preferences:1.0.0'
+    implementation 'androidx.datastore:datastore-core:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.7.0'
 
-    // 🔹 FIREBASE CORE - Plataforma principal de Firebase
-    implementation platform('com.google.firebase:firebase-bom:32.7.0') // ✅ BOM para gestionar versiones
-    implementation 'com.google.firebase:firebase-analytics' // ✅ Analytics para seguimiento de uso
-    implementation 'com.google.firebase:firebase-database' // ✅ Base de datos en tiempo real
-    implementation 'com.google.firebase:firebase-auth:22.1.1' // ✅ Autenticación de usuarios
-    implementation 'com.google.firebase:firebase-firestore:25.1.2' // ✅ Base de datos NoSQL (Firestore)
+    // 🔹 KOTLIN REQUERIDO PARA FIREBASE (aunque uses Java)
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.10'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
 
-    // 🔹 FIREBASE CLOUD MESSAGING (FCM) - Notificaciones push
-    implementation 'com.google.firebase:firebase-messaging:23.1.0' // ✅ Notificaciones push FCM
+    // 🔹 FIREBASE - CONFIGURACIÓN COMPATIBLE
+    implementation platform('com.google.firebase:firebase-bom:32.7.0') // ✅ BOM actualizado
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-auth' // ✅ Usa la versión del BOM
+    implementation 'com.google.firebase:firebase-firestore' // ✅ Usa la versión del BOM
+    implementation 'com.google.firebase:firebase-messaging' // ✅ Usa la versión del BOM
+
+    // 🔹 FIREBASE CORE (importante para la inicialización)
+    implementation 'com.google.firebase:firebase-core:21.1.1'
 
     // 🔹 GOOGLE PLAY SERVICES
-    implementation 'com.google.android.gms:play-services-auth:20.7.0' // ✅ Autenticación con Google
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation 'com.google.android.gms:play-services-base:18.2.0' // ✅ Requerido
 
-    // 🔹 UTILITIES - Utilidades adicionales
-    implementation 'com.google.code.gson:gson:2.10.1' // ✅ Serialización/Deserialización JSON
-    implementation 'androidx.work:work-runtime:2.8.1' // ✅ Trabajos en segundo plano
+    // 🔹 UI COMPONENTS
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 
-    // 🔹 TESTING - Pruebas unitarias y de interfaz
-    testImplementation 'junit:junit:4.13.2' // ✅ Pruebas unitarias
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1' // ✅ Pruebas Android JUnit
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1' // ✅ Pruebas de interfaz
+    // 🔹 UTILITIES
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'androidx.work:work-runtime:2.8.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0' // ✅ Versión estable
+
+    // 🔹 TESTING
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
