@@ -1,53 +1,67 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Tema nocturno MD2 más oscuro -->
+    <!-- Tema nocturno MD2 mejorado con la nueva paleta -->
     <style name="Theme.TrasnporteNatagaLaPlata" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color (más claro para modo oscuro) -->
-        <item name="colorPrimary">@color/primary_200</item> <!-- #8AB4F8 - más visible en oscuro -->
-        <item name="colorPrimaryDark">@color/primary_900</item> <!-- #062F6B -->
-        <item name="colorPrimaryVariant">@color/primary_500</item> <!-- #8AB4F8 -->
-        <item name="colorOnPrimary">@color/black</item> <!-- Texto negro sobre primary claro -->
+        <!-- Primary brand color - Usando la nueva paleta -->
+        <item name="colorPrimary">@color/primary_300</item> <!-- #75B4FF - más visible en oscuro -->
+        <item name="colorPrimaryDark">@color/primary_900</item> <!-- #0038A8 -->
+        <item name="colorPrimaryVariant">@color/primary_400</item> <!-- #57A3FF -->
+        <item name="colorOnPrimary">@color/white</item> <!-- Texto blanco sobre primary -->
 
         <!-- Secondary brand color -->
-        <item name="colorSecondary">@color/secondary_200</item> <!-- #FFAB40 - más visible -->
-        <item name="colorSecondaryVariant">@color/secondary_500</item> <!-- #FFAB40 -->
+        <item name="colorSecondary">@color/secondary_300</item> <!-- #FFBF73 - más visible -->
+        <item name="colorSecondaryVariant">@color/secondary_400</item> <!-- #FFB057 -->
         <item name="colorOnSecondary">@color/black</item> <!-- Texto negro sobre secondary -->
 
-        <!-- Background colors oscuros -->
+        <!-- Background colors oscuros - Usando la nueva paleta -->
         <item name="android:colorBackground">@color/dark_background</item> <!-- #121212 -->
         <item name="colorBackgroundFloating">@color/dark_surface</item> <!-- #1E1E1E -->
-        <item name="colorOnBackground">@color/dark_on_background</item> <!-- #FFFFFF -->
+        <item name="colorOnBackground">@color/dark_text_primary</item> <!-- #FFFFFF -->
 
-        <!-- Surface colors oscuros -->
+        <!-- Surface colors oscuros - Usando la nueva paleta -->
         <item name="colorSurface">@color/dark_surface</item> <!-- #1E1E1E -->
-        <item name="colorOnSurface">@color/dark_on_surface</item> <!-- #FFFFFF -->
+        <item name="colorOnSurface">@color/dark_text_primary</item> <!-- #FFFFFF -->
+        <item name="colorSurfaceVariant">@color/dark_surface_variant</item> <!-- #252525 -->
 
-        <!-- Error color -->
-        <item name="colorError">@color/error</item> <!-- #D32F2F -->
+        <!-- Error color - Usando la nueva paleta -->
+        <item name="colorError">@color/error_300</item> <!-- #E57373 -->
         <item name="colorOnError">@color/white</item> <!-- Blanco sobre error -->
 
-        <!-- Status bar más oscuros -->
-        <item name="android:statusBarColor">@color/dark_status_bar</item> <!-- #062F6B -->
+        <!-- Status bar - Usando la nueva paleta -->
+        <item name="android:statusBarColor">@color/dark_status_bar</item> <!-- #000000 -->
         <item name="android:navigationBarColor">@color/dark_navigation_bar</item> <!-- #000000 -->
 
-        <!-- Text colors para modo oscuro -->
+        <!-- Text colors para modo oscuro - Usando la nueva paleta -->
         <item name="android:textColorPrimary">@color/dark_text_primary</item> <!-- #FFFFFF -->
-        <item name="android:textColorSecondary">@color/dark_text_secondary</item> <!-- #B3B3B3 -->
+        <item name="android:textColorSecondary">@color/dark_text_secondary</item> <!-- #E0E0E0 -->
+        <item name="android:textColorTertiary">@color/dark_text_tertiary</item> <!-- #A0A0A0 -->
+        <item name="android:textColorHint">@color/dark_text_tertiary</item> <!-- #A0A0A0 -->
 
-        <!-- Component styles -->
+        <!-- Component styles mejorados -->
         <item name="materialButtonStyle">@style/ButtonStyleDark</item>
         <item name="cardViewStyle">@style/CardViewDark</item>
+        <item name="chipStyle">@style/ChipStyleDark</item>
+        <item name="textInputStyle">@style/TextInputStyleDark</item>
+
+        <!-- Colores para estados -->
+        <item name="colorControlActivated">@color/primary_300</item>
+        <item name="colorControlHighlight">@color/dark_ripple_primary</item>
+        <item name="colorControlNormal">@color/dark_outline</item>
 
         <!-- Configuración para tema oscuro -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
+
+        <!-- Elevación y sombras mejoradas -->
+        <item name="elevationOverlayEnabled">true</item>
+        <item name="elevationOverlayColor">@color/dark_overlay</item>
     </style>
 
     <style name="Theme.TrasnporteNatagaLaPlata.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@color/dark_background</item> <!-- #121212 -->
-        <item name="android:statusBarColor">@color/dark_status_bar</item> <!-- #062F6B -->
+        <item name="android:statusBarColor">@color/dark_status_bar</item> <!-- #000000 -->
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
     </style>
@@ -59,21 +73,62 @@
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <!-- CardView estilo oscuro -->
+    <!-- CardView estilo oscuro mejorado -->
     <style name="CardViewDark" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">@color/dark_surface</item> <!-- #1E1E1E -->
-        <item name="cardElevation">4dp</item>
-        <item name="cardCornerRadius">8dp</item>
+        <item name="cardElevation">8dp</item>
+        <item name="cardCornerRadius">12dp</item>
         <item name="strokeColor">@color/dark_outline</item> <!-- #404040 -->
         <item name="strokeWidth">1dp</item>
+        <item name="rippleColor">@color/dark_ripple_color</item>
     </style>
 
-    <!-- Button estilo oscuro -->
+    <!-- Button estilo oscuro mejorado -->
     <style name="ButtonStyleDark" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@color/primary_200</item> <!-- #8AB4F8 -->
-        <item name="android:textColor">@color/black</item> <!-- Texto negro sobre fondo claro -->
-        <item name="cornerRadius">8dp</item>
-        <item name="android:paddingHorizontal">16dp</item>
-        <item name="android:paddingVertical">12dp</item>
+        <item name="backgroundTint">@color/primary_300</item> <!-- #75B4FF -->
+        <item name="android:textColor">@color/white</item> <!-- Texto blanco sobre fondo primary -->
+        <item name="cornerRadius">12dp</item>
+        <item name="android:paddingHorizontal">24dp</item>
+        <item name="android:paddingVertical">16dp</item>
+        <item name="rippleColor">@color/dark_ripple_primary</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+
+    <!-- Chip estilo oscuro -->
+    <style name="ChipStyleDark" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="chipBackgroundColor">@color/dark_chip_background</item>
+        <item name="chipStrokeColor">@color/dark_outline</item>
+        <item name="android:textColor">@color/dark_chip_text</item>
+        <item name="rippleColor">@color/dark_ripple_color</item>
+    </style>
+
+    <!-- TextInput estilo oscuro -->
+    <style name="TextInputStyleDark" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/dark_outline</item>
+        <item name="hintTextColor">@color/dark_text_tertiary</item>
+        <item name="boxStrokeErrorColor">@color/error_300</item>
+        <item name="android:textColorHint">@color/dark_text_tertiary</item>
+        <item name="android:textColor">@color/dark_text_primary</item>
+    </style>
+
+    <!-- Estilos adicionales para componentes específicos -->
+    <style name="SeatAvailableDark" parent="">
+        <item name="android:background">@color/seat_available</item>
+        <item name="android:textColor">@color/dark_text_on_success</item>
+    </style>
+
+    <style name="SeatSelectedDark" parent="">
+        <item name="android:background">@color/seat_selected</item>
+        <item name="android:textColor">@color/dark_text_on_primary</item>
+    </style>
+
+    <style name="StatusConfirmedDark" parent="">
+        <item name="android:background">@color/dark_status_confirmed_light</item>
+        <item name="android:textColor">@color/success_300</item>
+    </style>
+
+    <style name="StatusPendingDark" parent="">
+        <item name="android:background">@color/dark_status_pending_light</item>
+        <item name="android:textColor">@color/warning_300</item>
     </style>
 </resources>
