@@ -1,46 +1,60 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Tema principal MD2 - TEMA CLARO -->
+    <!-- Tema principal MD2 - TEMA CLARO MEJORADO -->
     <style name="Theme.TrasnporteNatagaLaPlata" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color -->
-        <item name="colorPrimary">@color/primary_500</item> <!-- #1A73E8 -->
-        <item name="colorPrimaryDark">@color/primary_700</item> <!-- #0D47A1 -->
-        <item name="colorPrimaryVariant">@color/primary_200</item> <!-- #8AB4F8 -->
-        <item name="colorOnPrimary">@color/white</item> <!-- Blanco sobre primary -->
+        <!-- Primary brand color - Nueva paleta -->
+        <item name="colorPrimary">@color/primary_500</item> <!-- #2B87FF -->
+        <item name="colorPrimaryDark">@color/primary_700</item> <!-- #1361D6 -->
+        <item name="colorPrimaryVariant">@color/primary_300</item> <!-- #75B4FF -->
+        <item name="colorOnPrimary">@color/text_on_primary</item> <!-- #FFFFFF -->
 
-        <!-- Secondary brand color -->
-        <item name="colorSecondary">@color/secondary_500</item> <!-- #FF6D00 -->
-        <item name="colorSecondaryVariant">@color/secondary_700</item> <!-- #E65100 -->
-        <item name="colorOnSecondary">@color/white</item> <!-- Blanco sobre secondary -->
+        <!-- Secondary brand color - Nueva paleta -->
+        <item name="colorSecondary">@color/secondary_500</item> <!-- #FF9B3B -->
+        <item name="colorSecondaryVariant">@color/secondary_700</item> <!-- #FF7619 -->
+        <item name="colorOnSecondary">@color/text_on_secondary</item> <!-- #FFFFFF -->
 
-        <!-- Background colors -->
+        <!-- Background colors - Nueva paleta -->
         <item name="android:colorBackground">@color/background</item> <!-- #FFFFFF -->
         <item name="colorBackgroundFloating">@color/surface</item> <!-- #FFFFFF -->
-        <item name="colorOnBackground">@color/text_primary</item> <!-- #000000 -->
+        <item name="colorOnBackground">@color/text_primary</item> <!-- #1A1A1A -->
 
-        <!-- Surface colors -->
+        <!-- Surface colors - Nueva paleta -->
         <item name="colorSurface">@color/surface</item> <!-- #FFFFFF -->
-        <item name="colorOnSurface">@color/text_primary</item> <!-- #000000 -->
+        <item name="colorOnSurface">@color/text_primary</item> <!-- #1A1A1A -->
+        <item name="colorSurfaceVariant">@color/surface_variant</item> <!-- #F8F9FA -->
 
-        <!-- Error color -->
-        <item name="colorError">@color/error</item> <!-- #D32F2F -->
-        <item name="colorOnError">@color/white</item> <!-- Blanco sobre error -->
+        <!-- Error color - Nueva paleta -->
+        <item name="colorError">@color/error_500</item> <!-- #F44336 -->
+        <item name="colorOnError">@color/text_on_error</item> <!-- #FFFFFF -->
 
         <!-- Status and navigation bars -->
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item> <!-- #0D47A1 -->
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item> <!-- #1361D6 -->
         <item name="android:navigationBarColor">@color/background</item> <!-- #FFFFFF -->
 
-        <!-- Text colors -->
-        <item name="android:textColorPrimary">@color/text_primary</item> <!-- #000000 -->
-        <item name="android:textColorSecondary">@color/text_secondary</item> <!-- #666666 -->
+        <!-- Text colors - Nueva paleta mejorada -->
+        <item name="android:textColorPrimary">@color/text_primary</item> <!-- #1A1A1A -->
+        <item name="android:textColorSecondary">@color/text_secondary</item> <!-- #4A4A4A -->
+        <item name="android:textColorTertiary">@color/text_tertiary</item> <!-- #767676 -->
+        <item name="android:textColorHint">@color/text_tertiary</item> <!-- #767676 -->
 
-        <!-- Component styles -->
+        <!-- Component styles mejorados -->
         <item name="materialButtonStyle">@style/ButtonStyle</item>
         <item name="cardViewStyle">@style/CardViewStyle</item>
+        <item name="chipStyle">@style/ChipStyle</item>
+        <item name="textInputStyle">@style/TextInputStyle</item>
+
+        <!-- Colores para estados -->
+        <item name="colorControlActivated">@color/primary_500</item>
+        <item name="colorControlHighlight">@color/ripple_primary</item>
+        <item name="colorControlNormal">@color/outline</item>
 
         <!-- Asegurar tema claro -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
+
+        <!-- Elevación y sombras -->
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="elevationOverlayColor">@color/overlay</item>
     </style>
 
     <!-- Tema sin ActionBar para actividades -->
@@ -48,44 +62,137 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@color/background</item> <!-- #FFFFFF -->
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item> <!-- #0D47A1 -->
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item> <!-- #1361D6 -->
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 
-    <!-- Tema para Splash Screen (compatible) -->
+    <!-- Tema para Splash Screen -->
     <style name="Theme.TrasnporteNatagaLaPlata.Splash">
-        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowBackground">@color/primary_500</item> <!-- #2B87FF -->
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <!-- Estilos de componentes -->
+    <!-- Button estilo claro mejorado -->
     <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@color/primary_500</item> <!-- #1A73E8 -->
-        <item name="android:textColor">@color/white</item> <!-- Blanco -->
-        <item name="cornerRadius">8dp</item>
-        <item name="android:paddingHorizontal">16dp</item>
-        <item name="android:paddingVertical">12dp</item>
+        <item name="backgroundTint">@color/primary_500</item> <!-- #2B87FF -->
+        <item name="android:textColor">@color/text_on_primary</item> <!-- #FFFFFF -->
+        <item name="cornerRadius">12dp</item>
+        <item name="android:paddingHorizontal">24dp</item>
+        <item name="android:paddingVertical">16dp</item>
+        <item name="rippleColor">@color/ripple_primary</item>
+        <item name="android:elevation">2dp</item>
+        <item name="android:minHeight">48dp</item>
     </style>
 
+    <!-- Button estilo secundario -->
+    <style name="ButtonStyleSecondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:textColor">@color/primary_500</item>
+        <item name="strokeColor">@color/primary_500</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:paddingHorizontal">24dp</item>
+        <item name="android:paddingVertical">16dp</item>
+        <item name="rippleColor">@color/ripple_primary</item>
+    </style>
+
+    <!-- CardView estilo claro mejorado -->
     <style name="CardViewStyle" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">@color/surface</item> <!-- #FFFFFF -->
-        <item name="cardCornerRadius">12dp</item>
-        <item name="cardElevation">4dp</item>
-        <item name="strokeColor">@color/outline</item> <!-- #BDBDBD -->
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">8dp</item>
+        <item name="strokeColor">@color/outline</item> <!-- #C8D0D9 -->
         <item name="strokeWidth">1dp</item>
+        <item name="rippleColor">@color/ripple_color</item>
     </style>
 
-    <!-- Estilo adicional para TextInputLayout -->
+    <!-- Chip estilo claro - CORREGIDO -->
+    <style name="ChipStyle" parent="Widget.MaterialComponents.Chip.Entry">
+        <item name="chipBackgroundColor">@color/chip_background</item>
+        <item name="chipStrokeColor">@color/outline</item>
+        <item name="android:textColor">@color/chip_text</item>
+        <item name="rippleColor">@color/ripple_color</item>
+        <item name="cornerRadius">12dp</item>
+    </style>
+
+    <!-- Chip seleccionado - CORREGIDO -->
+    <style name="ChipStyleSelected" parent="Widget.MaterialComponents.Chip.Entry">
+        <item name="chipBackgroundColor">@color/chip_background_selected</item>
+        <item name="android:textColor">@color/chip_text_selected</item>
+        <item name="rippleColor">@color/ripple_primary</item>
+        <item name="chipStrokeColor">@color/primary_500</item>
+        <item name="chipStrokeWidth">2dp</item>
+    </style>
+
+    <!-- TextInput estilo claro mejorado -->
     <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/primary_500</item>
-        <item name="hintTextColor">@color/text_secondary</item>
-        <item name="android:textColorHint">@color/text_secondary</item>
-        <item name="boxCornerRadiusBottomEnd">8dp</item>
-        <item name="boxCornerRadiusBottomStart">8dp</item>
-        <item name="boxCornerRadiusTopEnd">8dp</item>
-        <item name="boxCornerRadiusTopStart">8dp</item>
+        <item name="boxStrokeColor">@color/outline</item>
+        <item name="boxStrokeErrorColor">@color/error_500</item>
+        <item name="hintTextColor">@color/text_tertiary</item>
+        <item name="android:textColorHint">@color/text_tertiary</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxBackgroundColor">@color/surface</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="counterTextColor">@color/text_secondary</item>
+        <item name="counterOverflowTextColor">@color/error_500</item>
+    </style>
+
+    <!-- Estilos para estados específicos -->
+    <style name="SeatAvailable" parent="">
+        <item name="android:background">@color/seat_available</item>
+        <item name="android:textColor">@color/text_on_success</item>
+    </style>
+
+    <style name="SeatSelected" parent="">
+        <item name="android:background">@color/seat_selected</item>
+        <item name="android:textColor">@color/text_on_primary</item>
+    </style>
+
+    <style name="SeatBooked" parent="">
+        <item name="android:background">@color/seat_booked</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="StatusConfirmed" parent="">
+        <item name="android:background">@color/status_confirmed_light</item>
+        <item name="android:textColor">@color/success_600</item>
+    </style>
+
+    <style name="StatusPending" parent="">
+        <item name="android:background">@color/status_pending_light</item>
+        <item name="android:textColor">@color/warning_700</item>
+    </style>
+
+    <style name="StatusCancelled" parent="">
+        <item name="android:background">@color/status_cancelled_light</item>
+        <item name="android:textColor">@color/error_600</item>
+    </style>
+
+    <!-- AppBar style mejorado -->
+    <style name="AppBarStyle" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
+        <item name="subtitleTextColor">?attr/colorOnPrimary</item>
+        <item name="android:elevation">4dp</item>
+    </style>
+
+    <!-- Progress bar style - CORREGIDO -->
+    <style name="ProgressBarStyle" parent="android:Widget.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_bar_horizontal</item>
+        <item name="android:minHeight">8dp</item>
+        <item name="android:maxHeight">8dp</item>
+    </style>
+
+    <!-- ProgressBar circular style -->
+    <style name="ProgressBarCircularStyle" parent="android:Widget.ProgressBar">
+        <item name="android:indeterminateTint">@color/primary_500</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">48dp</item>
     </style>
 </resources>
