@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    android:background="@color/dark_background"
+    android:background="@color/background"
     tools:context=".activities.common.InicioDeSesion">
 
     <!-- Título con ícono -->
@@ -26,7 +26,8 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@mipmap/ic_launcher"
-            android:contentDescription="@string/app_logo"/>
+            android:contentDescription="@string/app_logo"
+            />
 
         <TextView
             android:id="@+id/textViewTitle"
@@ -45,9 +46,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:background="@color/dark_chip_background"
+        app:cardBackgroundColor="@color/surface"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
+        app:strokeColor="@color/outline"
+        app:strokeWidth="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerLayout">
@@ -56,7 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="24dp">
 
             <!-- Campo correo electronico -->
             <com.google.android.material.textfield.TextInputLayout
@@ -65,8 +68,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:startIconDrawable="@drawable/ic_email"
-                app:startIconTint="@color/primary_color"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                app:startIconTint="@color/primary_500"
+                app:boxStrokeColor="@color/outline"
+                app:boxStrokeErrorColor="@color/error_500"
+                app:hintTextColor="@color/text_tertiary"
+                app:boxBackgroundColor="@color/surface_1"
+                android:textColorHint="@color/text_tertiary"
+                style="@style/TextInputStyle">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextUsuario"
@@ -74,7 +82,9 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/correo"
                     android:inputType="textEmailAddress"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_tertiary"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Campo Contraseña -->
@@ -85,8 +95,15 @@
                 android:layout_marginTop="16dp"
                 app:startIconDrawable="@drawable/ic_key"
                 app:endIconDrawable="@drawable/ic_visibility_off"
-                app:startIconTint="@color/primary_color"                app:endIconMode="password_toggle"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                app:startIconTint="@color/primary_500"
+                app:endIconTint="@color/text_tertiary"
+                app:endIconMode="password_toggle"
+                app:boxStrokeColor="@color/outline"
+                app:boxStrokeErrorColor="@color/error_500"
+                app:hintTextColor="@color/text_tertiary"
+                app:boxBackgroundColor="@color/surface_1"
+                android:textColorHint="@color/text_tertiary"
+                style="@style/TextInputStyle">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextPassword"
@@ -95,20 +112,10 @@
                     android:hint="@string/contraseña"
                     android:inputType="textPassword"
                     android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_tertiary"
                     android:focusableInTouchMode="true"/>
             </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Enlace de Olvidé mi contraseña
-            <TextView
-                android:id="@+id/tvForgotPassword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginTop="8dp"
-                android:text="@string/forgot_password"
-                android:textColor="@color/primary_color"
-                android:textSize="14sp"/>
-                 -->
 
             <!-- Boton ingresar -->
             <com.google.android.material.button.MaterialButton
@@ -120,7 +127,10 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/ingresar"
                 android:textSize="16sp"
-                app:cornerRadius="8dp"/>
+                app:backgroundTint="@color/primary_500"
+                android:textColor="@color/text_on_primary"
+                app:cornerRadius="12dp"
+                app:rippleColor="@color/ripple_primary"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -138,7 +148,7 @@
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_weight="1"
-            android:background="@color/primary_500"/>
+            android:background="@color/outline"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -146,14 +156,14 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:text="@string/or"
-            android:textColor="@color/primary_500"
+            android:textColor="@color/text_tertiary"
             android:textSize="16sp"/>
 
         <View
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_weight="1"
-            android:background="@color/primary_500"/>
+            android:background="@color/outline"/>
     </LinearLayout>
 
     <!-- Botón ingresar con Google -->
@@ -164,11 +174,16 @@
         android:layout_marginTop="24dp"
         android:text="@string/ingresarGoogle"
         android:textSize="16sp"
-        app:cornerRadius="8dp"
+        app:cornerRadius="12dp"
         app:icon="@drawable/ic_google_logo"
         app:iconTint="@null"
         app:iconGravity="textStart"
         app:iconPadding="8dp"
+        app:strokeColor="@color/outline"
+        app:strokeWidth="1dp"
+        android:backgroundTint="@color/surface_1"
+        android:textColor="@color/text_primary"
+        app:rippleColor="@color/ripple_color"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         app:layout_constraintTop_toBottomOf="@+id/separatorLayout"
         app:layout_constraintStart_toStartOf="parent"
@@ -190,7 +205,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/noTieneCuenta"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="@color/text_tertiary"
             android:textSize="16sp"/>
 
         <TextView
@@ -199,7 +214,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/registrate"
-            android:textColor="@color/primary_color"
+            android:textColor="@color/primary_500"
             android:textSize="16sp"
             android:textStyle="bold"/>
     </LinearLayout>
