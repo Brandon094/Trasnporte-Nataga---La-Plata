@@ -117,6 +117,33 @@
                     android:focusableInTouchMode="true"/>
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- ✅ CORREGIDO: Texto "Olvidé contraseña" alineado a la derecha -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/olvidasteContraseña"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/forgot_password"
+                    android:textColor="@color/primary_500"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:padding="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+
+            </LinearLayout>
+
             <!-- Boton ingresar -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonIngresar"
@@ -124,7 +151,7 @@
                 app:iconGravity="textStart"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/ingresar"
                 android:textSize="16sp"
                 app:backgroundTint="@color/primary_500"
