@@ -18,6 +18,9 @@ import com.chopcode.trasnportenataga_laplata.services.auth.IniciarService;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.*;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class InicioDeSesion extends AppCompatActivity {
 
@@ -30,6 +33,7 @@ public class InicioDeSesion extends AppCompatActivity {
     // ✅ Constantes para SharedPreferences
     private static final String PREFS_NAME = "UserPrefs";
     private static final String KEY_USER_ID = "user_id";
+    private static final String KEY_USER_TYPE = "user_type";
 
     // ✅ NUEVO: Tag para logs
     private static final String TAG = "InicioDeSesion";
@@ -61,6 +65,9 @@ public class InicioDeSesion extends AppCompatActivity {
         // Manejar botón de registro
         setupRegistroButton();
 
+        // ✅ NUEVO: Verificar si ya hay un usuario logueado
+        verificarSesionExistente();
+
         Log.d(TAG, "✅ Configuración completa - Actividad lista");
     }
 
@@ -75,6 +82,8 @@ public class InicioDeSesion extends AppCompatActivity {
         buttonIngresar = findViewById(R.id.buttonIngresar);
         buttonRegistro = findViewById(R.id.buttonRegistro);
         btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn);
+        olvidasteContraseña = findViewById(R.id.olvidasteContraseña);
+
         TextInputLayout passwordInputLayout = findViewById(R.id.passwordInputLayout);
         TextInputEditText editTextPassword = findViewById(R.id.editTextPassword);
 
@@ -98,6 +107,15 @@ public class InicioDeSesion extends AppCompatActivity {
             editTextPassword.setSelection(editTextPassword.getText().length());
         });
 
+        // ✅ NUEVO: Configurar "Olvidaste contraseña"
+        if (olvidasteContraseña != null) {
+            olvidasteContraseña.setOnClickListener(v -> {
+                Log.d(TAG, "🔑 Usuario solicitó recuperar contraseña");
+                Toast.makeText(InicioDeSesion.this, "Función en desarrollo", Toast.LENGTH_SHORT).show();
+                // Aquí puedes implementar la recuperación de contraseña
+            });
+        }
+
         Log.d(TAG, "✅ Vistas referenciadas correctamente");
     }
 
@@ -107,6 +125,41 @@ public class InicioDeSesion extends AppCompatActivity {
     private void setupToolbar() {
         Log.d(TAG, "🔧 Configurando toolbar...");
         // Tu código de toolbar aquí si lo tienes
+    }
+
+    /**
+     * ✅ NUEVO: Verificar si ya existe una sesión activa
+     */
+    private void verificarSesionExistente() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String savedUserId = prefs.getString(KEY_USER_ID, null);
+        String savedUserType = prefs.getString(KEY_USER_TYPE, null);
+
+        if (savedUserId != null && savedUserType != null) {
+            Log.d(TAG, "📱 Sesión existente encontrada - UserId: " + savedUserId + ", Tipo: " + savedUserType);
+
+            // Verificar con Firebase Auth también
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null && currentUser.getUid().equals(savedUserId)) {
+                Log.d(TAG, "✅ Sesión Firebase válida, redirigiendo automáticamente...");
+                redirigirSegunTipoUsuario(savedUserType);
+            } else {
+                Log.d(TAG, "⚠️ Sesión en SharedPreferences pero no en Firebase, limpiando...");
+                limpiarSesionGuardada();
+            }
+        }
+    }
+
+    /**
+     * ✅ NUEVO: Limpiar sesión guardada
+     */
+    private void limpiarSesionGuardada() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit()
+                .remove(KEY_USER_ID)
+                .remove(KEY_USER_TYPE)
+                .apply();
+        Log.d(TAG, "🧹 Sesión guardada limpiada");
     }
 
     /**
@@ -128,6 +181,10 @@ public class InicioDeSesion extends AppCompatActivity {
                 return;
             }
 
+            // ✅ MEJORADO: Deshabilitar botón durante el login
+            buttonIngresar.setEnabled(false);
+            buttonIngresar.setText("Iniciando sesión...");
+
             Log.d(TAG, "🔄 Llamando a iniciarSesionCorreo...");
             iniciarService.iniciarSesionCorreo(correo, password, new IniciarService.LoginCallback() {
                 @Override
@@ -138,14 +195,15 @@ public class InicioDeSesion extends AppCompatActivity {
                     if (user != null) {
                         Log.d(TAG, "👤 Usuario Firebase obtenido: " + user.getUid());
 
-                        // ✅ Guardar userId en SharedPreferences
-                        guardarUserIdEnPrefs(user.getUid());
-
                         Log.d(TAG, "🔍 Detectando tipo de usuario...");
                         iniciarService.detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
                             @Override
                             public void onTipoDetectado(String tipo) {
                                 Log.d(TAG, "🎯 Tipo de usuario detectado: " + tipo);
+
+                                // ✅ CORREGIDO: Usar el nuevo método que incluye el tipo de usuario
+                                guardarUsuarioEnPrefs(user.getUid(), tipo);
+
                                 if (tipo.equals("conductor")) {
                                     Log.d(TAG, "🚗 Redirigiendo a InicioConductor");
                                     irAInicioConductor();
@@ -158,17 +216,25 @@ public class InicioDeSesion extends AppCompatActivity {
                             @Override
                             public void onError(String error) {
                                 Log.e(TAG, "❌ Error detectando tipo de usuario: " + error);
+                                // ✅ REHABILITAR BOTÓN EN CASO DE ERROR
+                                buttonIngresar.setEnabled(true);
+                                buttonIngresar.setText("Ingresar");
                                 Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_SHORT).show();
                             }
                         });
                     } else {
                         Log.e(TAG, "❌ Usuario Firebase es null después de login exitoso");
+                        buttonIngresar.setEnabled(true);
+                        buttonIngresar.setText("Ingresar");
                     }
                 }
 
                 @Override
                 public void onLoginFailure(String error) {
                     Log.e(TAG, "❌ Error en login con email: " + error);
+                    // ✅ REHABILITAR BOTÓN EN CASO DE ERROR
+                    buttonIngresar.setEnabled(true);
+                    buttonIngresar.setText("Ingresar");
                     Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_LONG).show();
                 }
             });
@@ -183,6 +249,9 @@ public class InicioDeSesion extends AppCompatActivity {
 
         btnGoogleSignIn.setOnClickListener(v -> {
             Log.d(TAG, "🔄 Iniciando login con Google...");
+            // ✅ DESHABILITAR BOTÓN DURANTE LOGIN
+            btnGoogleSignIn.setEnabled(false);
+
             iniciarService.iniciarSesionGoogle(new IniciarService.LoginCallback() {
                 @Override
                 public void onLoginSuccess() {
@@ -192,14 +261,15 @@ public class InicioDeSesion extends AppCompatActivity {
                     if (user != null) {
                         Log.d(TAG, "👤 Usuario Google obtenido: " + user.getUid());
 
-                        // ✅ Guardar userId en SharedPreferences
-                        guardarUserIdEnPrefs(user.getUid());
-
                         Log.d(TAG, "🔍 Detectando tipo de usuario Google...");
                         iniciarService.detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
                             @Override
                             public void onTipoDetectado(String tipo) {
                                 Log.d(TAG, "🎯 Tipo de usuario Google: " + tipo);
+
+                                // ✅ CORREGIDO: Usar el nuevo método que incluye el tipo de usuario
+                                guardarUsuarioEnPrefs(user.getUid(), tipo);
+
                                 if (tipo.equals("conductor")) {
                                     Log.d(TAG, "🚗 Redirigiendo a InicioConductor (Google)");
                                     irAInicioConductor();
@@ -212,6 +282,7 @@ public class InicioDeSesion extends AppCompatActivity {
                             @Override
                             public void onError(String error) {
                                 Log.e(TAG, "❌ Error detectando tipo de usuario Google: " + error);
+                                btnGoogleSignIn.setEnabled(true);
                                 Toast.makeText(InicioDeSesion.this, "Error al detectar tipo de usuario: " + error, Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -221,6 +292,7 @@ public class InicioDeSesion extends AppCompatActivity {
                 @Override
                 public void onLoginFailure(String error) {
                     Log.e(TAG, "❌ Error en login con Google: " + error);
+                    btnGoogleSignIn.setEnabled(true);
                     Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_LONG).show();
                 }
             });
@@ -261,14 +333,15 @@ public class InicioDeSesion extends AppCompatActivity {
                     if (user != null) {
                         Log.d(TAG, "👤 Usuario Google (ActivityResult): " + user.getUid());
 
-                        // ✅ Guardar userId en SharedPreferences
-                        guardarUserIdEnPrefs(user.getUid());
-
                         Log.d(TAG, "🔍 Detectando tipo de usuario (ActivityResult)...");
                         iniciarService.detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
                             @Override
                             public void onTipoDetectado(String tipo) {
                                 Log.d(TAG, "🎯 Tipo de usuario (ActivityResult): " + tipo);
+
+                                // ✅ CORREGIDO: Usar el nuevo método que incluye el tipo de usuario
+                                guardarUsuarioEnPrefs(user.getUid(), tipo);
+
                                 if (tipo.equals("conductor")) {
                                     Log.d(TAG, "🚗 Redirigiendo a InicioConductor (ActivityResult)");
                                     irAInicioConductor();
@@ -281,6 +354,7 @@ public class InicioDeSesion extends AppCompatActivity {
                             @Override
                             public void onError(String error) {
                                 Log.e(TAG, "❌ Error detectando tipo de usuario (ActivityResult): " + error);
+                                btnGoogleSignIn.setEnabled(true);
                                 Toast.makeText(InicioDeSesion.this, "Error al detectar tipo de usuario: " + error, Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -290,6 +364,7 @@ public class InicioDeSesion extends AppCompatActivity {
                 @Override
                 public void onLoginFailure(String error) {
                     Log.e(TAG, "❌ Error en Google Sign-In (ActivityResult): " + error);
+                    btnGoogleSignIn.setEnabled(true);
                     Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_LONG).show();
                 }
             });
@@ -299,32 +374,78 @@ public class InicioDeSesion extends AppCompatActivity {
     }
 
     /**
-     * ✅ MÉTODO: Guardar userId en SharedPreferences para FCM
+     * ✅ MÉTODO MEJORADO: Guardar userId y tipo de usuario en SharedPreferences
      */
-    private void guardarUserIdEnPrefs(String userId) {
+    private void guardarUsuarioEnPrefs(String userId, String tipoUsuario) {
         try {
-            Log.d(TAG, "💾 Guardando userId en SharedPreferences: " + userId);
+            Log.d(TAG, "💾 Guardando usuario en SharedPreferences - ID: " + userId + ", Tipo: " + tipoUsuario);
 
             SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString(KEY_USER_ID, userId);
-            boolean saved = editor.commit(); // Usar commit() para asegurar guardado inmediato
+            editor.putString(KEY_USER_TYPE, tipoUsuario); // Guardar el tipo de usuario
+            boolean saved = editor.commit();
 
             if (saved) {
-                Log.d(TAG, "✅ UserId guardado exitosamente en SharedPreferences: " + userId);
+                Log.d(TAG, "✅ Usuario guardado exitosamente: " + userId + " (" + tipoUsuario + ")");
 
-                // Verificar que se guardó correctamente
-                String savedUserId = prefs.getString(KEY_USER_ID, null);
-                if (savedUserId != null && savedUserId.equals(userId)) {
-                    Log.d(TAG, "✅ Verificación: UserId correctamente guardado y recuperado");
-                } else {
-                    Log.e(TAG, "❌ Verificación: UserId NO se guardó correctamente");
-                }
+                // Guardar el token FCM en el nodo correcto
+                guardarTokenFCMEnNodoCorrecto(userId, tipoUsuario);
             } else {
-                Log.e(TAG, "❌ Error: No se pudo guardar userId en SharedPreferences");
+                Log.e(TAG, "❌ Error: No se pudo guardar usuario en SharedPreferences");
             }
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error guardando userId en SharedPreferences: " + e.getMessage());
+            Log.e(TAG, "❌ Error guardando usuario en SharedPreferences: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ MÉTODO MEJORADO: Guardar token FCM en el nodo correcto según el tipo de usuario
+     */
+    private void guardarTokenFCMEnNodoCorrecto(String userId, String tipoUsuario) {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        String token = task.getResult();
+                        Log.d(TAG, "🔑 Token FCM obtenido: " + (token != null ? token.substring(0, 20) + "..." : "null"));
+
+                        // Referencia a la base de datos Firebase
+                        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+
+                        // Determinar el nodo correcto según el tipo de usuario
+                        String nodo = tipoUsuario.equals("conductor") ? "conductores" : "usuarios";
+
+                        // ✅ MEJORADO: Verificar que el token no sea null
+                        if (token != null && !token.isEmpty()) {
+                            // Guardar el token en el nodo correspondiente
+                            databaseRef.child(nodo).child(userId).child("tokenFCM")
+                                    .setValue(token)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d(TAG, "✅ Token FCM guardado en " + nodo + "/" + userId + "/tokenFCM");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e(TAG, "❌ Error guardando token FCM: " + e.getMessage());
+                                    });
+                        } else {
+                            Log.e(TAG, "❌ Token FCM es null o vacío");
+                        }
+                    } else {
+                        Log.e(TAG, "❌ Error obteniendo token FCM: " +
+                                (task.getException() != null ? task.getException().getMessage() : "Error desconocido"));
+                    }
+                });
+    }
+
+    /**
+     * ✅ NUEVO: Redirigir según tipo de usuario (para sesión existente)
+     */
+    private void redirigirSegunTipoUsuario(String tipoUsuario) {
+        if (tipoUsuario.equals("conductor")) {
+            Log.d(TAG, "🚗 Redirigiendo a InicioConductor (sesión existente)");
+            irAInicioConductor();
+        } else {
+            Log.d(TAG, "👤 Redirigiendo a InicioUsuarios (sesión existente)");
+            irAInicioUsuarios();
         }
     }
 
