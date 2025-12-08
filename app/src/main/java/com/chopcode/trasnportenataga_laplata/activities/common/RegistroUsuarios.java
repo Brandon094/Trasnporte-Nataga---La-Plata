@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.chopcode.trasnportenataga_laplata.R;
+import com.chopcode.trasnportenataga_laplata.managers.NotificationManager; // ✅ NUEVO IMPORT
 import com.chopcode.trasnportenataga_laplata.services.auth.RegistroService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -26,6 +27,9 @@ public class RegistroUsuarios extends AppCompatActivity {
     private TextView buttonIniciarSesion;
     private MaterialToolbar topAppBar;
     private RegistroService registroService;
+
+    // ✅ NUEVO: NotificationManager
+    private NotificationManager notificationManager;
 
     // ✅ Constantes para SharedPreferences
     private static final String PREFS_NAME = "UserPrefs";
@@ -46,7 +50,11 @@ public class RegistroUsuarios extends AppCompatActivity {
 
         // Inicializar servicio de registro
         registroService = new RegistroService();
-        Log.d(TAG, "✅ Servicio de registro inicializado");
+
+        // ✅ NUEVO: Inicializar NotificationManager
+        notificationManager = NotificationManager.getInstance(this);
+
+        Log.d(TAG, "✅ Servicio de registro y NotificationManager inicializados");
 
         // Redirigir al usuario a la pantalla de inicio de sesión
         buttonIniciarSesion.setOnClickListener(v -> {
@@ -135,6 +143,9 @@ public class RegistroUsuarios extends AppCompatActivity {
                     if (user != null) {
                         Log.d(TAG, "👤 Usuario de Firebase obtenido: " + user.getUid());
                         guardarUserIdEnPrefs(user.getUid());
+
+                        // ✅ NUEVO: Guardar token FCM después del registro exitoso
+                        guardarTokenFCM(user.getUid());
                     } else {
                         Log.e(TAG, "❌ Usuario de Firebase es null después del registro exitoso");
                     }
@@ -173,6 +184,24 @@ public class RegistroUsuarios extends AppCompatActivity {
             Log.d(TAG, "💾 UserId guardado en SharedPreferences: " + userId);
         } catch (Exception e) {
             Log.e(TAG, "❌ Error guardando userId en SharedPreferences: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * ✅ NUEVO MÉTODO: Guardar token FCM después del registro exitoso
+     */
+    private void guardarTokenFCM(String userId) {
+        Log.d(TAG, "🔑 Iniciando guardado de token FCM para usuario: " + userId);
+
+        if (notificationManager != null) {
+            try {
+                notificationManager.saveFCMTokenToFirestore(userId);
+                Log.d(TAG, "✅ Llamada a saveFCMTokenToFirestore ejecutada para: " + userId);
+            } catch (Exception e) {
+                Log.e(TAG, "❌ Error llamando a saveFCMTokenToFirestore: " + e.getMessage());
+            }
+        } else {
+            Log.e(TAG, "❌ NotificationManager es null - no se puede guardar token FCM");
         }
     }
 
