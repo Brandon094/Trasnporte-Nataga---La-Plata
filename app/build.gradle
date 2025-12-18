@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -19,63 +20,65 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile(
+                    'proguard-android-optimize.txt'
+            ), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     buildFeatures {
         viewBinding true
     }
 }
 
 dependencies {
-    // 🔹 ANDROIDX CORE - Versiones compatibles y estables
-    implementation 'androidx.appcompat:appcompat:1.6.1' // ✅ Versión estable
-    implementation 'com.google.android.material:material:1.9.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4' // ✅ Versión actualizada
-    implementation 'androidx.navigation:navigation-fragment:2.7.4' // ✅ Versión compatible
-    implementation 'androidx.navigation:navigation-ui:2.7.4'
-    implementation 'androidx.gridlayout:gridlayout:1.0.0'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.cardview:cardview:1.0.0'
 
-    // 🔹 DEPENDENCIAS CRÍTICAS PARA SOLUCIONAR EL ERROR DE DATASTORE
-    implementation 'androidx.datastore:datastore-preferences:1.0.0'
-    implementation 'androidx.datastore:datastore-core:1.0.0'
+    // 🔹 ANDROIDX CORE
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.navigation:navigation-fragment:2.7.4'
+    implementation 'androidx.navigation:navigation-ui:2.7.4'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.gridlayout:gridlayout:1.0.0'
+
+    // 🔹 DATASTORE (VERSIÓN CORRECTA)
+    implementation "androidx.datastore:datastore-preferences:1.2.0"
+
+    // 🔹 LIFECYCLE
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-livedata:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-runtime:2.7.0'
 
-    // 🔹 KOTLIN REQUERIDO PARA FIREBASE (aunque uses Java)
+    // 🔹 KOTLIN (requerido por Firebase)
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.10'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
 
-    // 🔹 FIREBASE - CONFIGURACIÓN COMPATIBLE
-    implementation platform('com.google.firebase:firebase-bom:32.7.0') // ✅ BOM actualizado
+    // 🔥 FIREBASE (BOM)
+    implementation platform('com.google.firebase:firebase-bom:34.6.0')
     implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-database'
-    implementation 'com.google.firebase:firebase-auth' // ✅ Usa la versión del BOM
-    implementation 'com.google.firebase:firebase-firestore' // ✅ Usa la versión del BOM
-    implementation 'com.google.firebase:firebase-messaging' // ✅ Usa la versión del BOM
-
-    // 🔹 FIREBASE CORE (importante para la inicialización)
-    implementation 'com.google.firebase:firebase-core:21.1.1'
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-crashlytics'
 
     // 🔹 GOOGLE PLAY SERVICES
     implementation 'com.google.android.gms:play-services-auth:20.7.0'
-    implementation 'com.google.android.gms:play-services-base:18.2.0' // ✅ Requerido
 
-    // 🔹 UI COMPONENTS
+    // 🔹 UI
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
     // 🔹 UTILITIES
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'androidx.work:work-runtime:2.8.1'
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0' // ✅ Versión estable
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 
     // 🔹 TESTING
     testImplementation 'junit:junit:4.13.2'
