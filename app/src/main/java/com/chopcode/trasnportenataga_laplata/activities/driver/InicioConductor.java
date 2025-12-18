@@ -21,9 +21,9 @@ import com.chopcode.trasnportenataga_laplata.models.Reserva;
 import com.chopcode.trasnportenataga_laplata.models.Ruta;
 import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
 import com.chopcode.trasnportenataga_laplata.services.user.UserService;
-
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.database.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +31,9 @@ import java.util.List;
 public class InicioConductor extends AppCompatActivity {
     // Views
     private RecyclerView rvReservas, rvProximasRutas;
-    private TextView tvTotalIngresos, tvReservasActivas, tvProximaRuta, tvConductor, tvPlacaVehiculo;
+    private TextView tvConductor, tvPlacaVehiculo;
     private TextView tvEmptyReservas, tvEmptyRutas, tvReservasConfirmadas, tvAsientosDisponibles, tvInfoCapacidad;
+    private TextView tvTotalIngresos, tvInfoIngresos;
     private MaterialButton btnPerfilConductor, btnCerrarSesion;
 
     // Adapters
@@ -57,6 +58,10 @@ public class InicioConductor extends AppCompatActivity {
     private StatisticsManager statisticsManager;
     private NotificationManager notificationManager;
 
+    // ✅ NUEVO: Listeners para tiempo real
+    private DatabaseReference reservasRef;
+    private ValueEventListener reservasListener;
+
     // ✅ NUEVO: Tag para logs
     private static final String TAG = "InicioConductor";
 
@@ -74,7 +79,7 @@ public class InicioConductor extends AppCompatActivity {
             userService = new UserService();
             reservaService = new ReservaService();
             statisticsManager = new StatisticsManager();
-            notificationManager = NotificationManager.getInstance();
+            notificationManager = NotificationManager.getInstance(this);
             Log.d(TAG, "✅ Servicios inicializados");
 
             if (!authManager.validateLogin(this)) {
@@ -104,13 +109,13 @@ public class InicioConductor extends AppCompatActivity {
         tvConductor = findViewById(R.id.tvConductor);
         tvPlacaVehiculo = findViewById(R.id.tvPlacaVehiculo);
         tvTotalIngresos = findViewById(R.id.tvTotalIngresos);
-        tvReservasActivas = findViewById(R.id.tvReservasActivas);
-        tvProximaRuta = findViewById(R.id.tvProximaRuta);
         tvEmptyReservas = findViewById(R.id.tvEmptyReservas);
         tvEmptyRutas = findViewById(R.id.tvEmptyRutas);
         tvReservasConfirmadas = findViewById(R.id.tvReservasConfirmadas);
         tvAsientosDisponibles = findViewById(R.id.tvAsientosDisponibles);
         tvInfoCapacidad = findViewById(R.id.tvInfoCapacidad);
+        tvInfoIngresos = findViewById(R.id.tvInfoIngresos);
+
         btnPerfilConductor = findViewById(R.id.btnPerfilConductor);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         rvReservas = findViewById(R.id.recyclerReservas);
@@ -118,6 +123,103 @@ public class InicioConductor extends AppCompatActivity {
 
         Log.d(TAG, "✅ Todas las vistas inicializadas");
         updateStatisticsUI();
+    }
+
+    // ✅ MÉTODO CORREGIDO: Configurar listener en tiempo real
+    private void setupRealTimeListener(String conductorNombre) {
+        Log.d(TAG, "🔔 Configurando listener en tiempo real para: " + conductorNombre);
+
+        try {
+            // Remover listener anterior si existe
+            if (reservasRef != null && reservasListener != null) {
+                reservasRef.removeEventListener(reservasListener);
+                Log.d(TAG, "🗑️ Listener anterior removido");
+            }
+
+            // Configurar nueva referencia y listener
+            reservasRef = FirebaseDatabase.getInstance().getReference("reservas");
+
+            reservasListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d(TAG, "🔄 Datos cambiados en Firebase - Actualizando en tiempo real");
+
+                    int nuevasConfirmadas = 0;
+                    final List<Reserva> reservasTiempoReal = new ArrayList<>(); // ✅ Hacer final
+
+                    // Procesar todas las reservas
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        try {
+                            Reserva reserva = snapshot.getValue(Reserva.class);
+                            if (reserva != null) {
+                                // Filtrar por conductor y estado
+                                if (conductorNombre.equals(reserva.getConductor())) {
+                                    reservasTiempoReal.add(reserva);
+
+                                    // Contar reservas confirmadas
+                                    if ("Confirmada".equals(reserva.getEstadoReserva())) {
+                                        nuevasConfirmadas++;
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "❌ Error procesando reserva: " + e.getMessage());
+                        }
+                    }
+
+                    Log.d(TAG, "📊 Estadísticas en tiempo real:");
+                    Log.d(TAG, "   - Reservas totales: " + reservasTiempoReal.size());
+                    Log.d(TAG, "   - Reservas confirmadas: " + nuevasConfirmadas);
+
+                    // ✅ CREAR COPIA FINAL DE LAS VARIABLES PARA USAR EN EL RUNNABLE
+                    final int finalNuevasConfirmadas = nuevasConfirmadas;
+                    final int finalReservasConfirmadasHoy = reservasConfirmadasHoy;
+
+                    // Actualizar UI en el hilo principal
+                    runOnUiThread(() -> {
+                        // Actualizar contador de reservas confirmadas
+                        if (finalReservasConfirmadasHoy != finalNuevasConfirmadas) {
+                            Log.d(TAG, "🔄 Actualizando contador de confirmadas: " + finalReservasConfirmadasHoy + " → " + finalNuevasConfirmadas);
+                            reservasConfirmadasHoy = finalNuevasConfirmadas;
+                            tvReservasConfirmadas.setText(String.valueOf(reservasConfirmadasHoy));
+
+                            // Animación sutil para indicar cambio
+                            tvReservasConfirmadas.animate()
+                                    .scaleX(1.2f)
+                                    .scaleY(1.2f)
+                                    .setDuration(200)
+                                    .withEndAction(() -> tvReservasConfirmadas.animate()
+                                            .scaleX(1.0f)
+                                            .scaleY(1.0f)
+                                            .setDuration(200)
+                                            .start())
+                                    .start();
+                        }
+
+                        // Actualizar lista de reservas si hay cambios
+                        if (!reservasTiempoReal.equals(listaReservas)) {
+                            Log.d(TAG, "🔄 Actualizando lista de reservas en tiempo real");
+                            listaReservas.clear();
+                            listaReservas.addAll(reservasTiempoReal);
+                            reservaAdapter.actualizarReservas(new ArrayList<>(listaReservas));
+                            updateReservationsUI();
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e(TAG, "❌ Error en listener tiempo real: " + databaseError.getMessage());
+                }
+            };
+
+            // Agregar listener
+            reservasRef.addValueEventListener(reservasListener);
+            Log.d(TAG, "✅ Listener en tiempo real configurado exitosamente");
+
+        } catch (Exception e) {
+            Log.e(TAG, "💥 Error crítico configurando listener tiempo real: " + e.getMessage());
+        }
     }
 
     private void setupRecyclerView() {
@@ -188,6 +290,9 @@ public class InicioConductor extends AppCompatActivity {
                     tvConductor.setText(nombre != null ? nombre : "N/A");
                     tvPlacaVehiculo.setText(getString(R.string.placaVehiculo, placa != null ? placa : "N/A"));
                     horariosAsignados = horarios;
+
+                    // ✅ ACTUALIZADO: Configurar listener en tiempo real después de cargar datos
+                    setupRealTimeListener(nombre);
 
                     calculateStatistics(nombre);
                     loadReservations(nombre);
@@ -291,16 +396,35 @@ public class InicioConductor extends AppCompatActivity {
 
         tvReservasConfirmadas.setText(String.valueOf(reservasConfirmadasHoy));
         tvAsientosDisponibles.setText(String.valueOf(asientosDisponibles));
-        tvInfoCapacidad.setText("Capacidad total: " + CAPACIDAD_TOTAL + " asientos");
-        tvTotalIngresos.setText(getString(R.string.totalIngresos, totalIngresos));
+        tvTotalIngresos.setText(formatCurrency(totalIngresos));
+
+        // ✅ ACTUALIZADO: Información más específica
+        if (tvInfoCapacidad != null) {
+            tvInfoCapacidad.setText("De " + CAPACIDAD_TOTAL + " totales");
+        }
+        if (tvInfoIngresos != null) {
+            tvInfoIngresos.setText("Acumulado del día");
+        }
 
         Log.d(TAG, "✅ UI de estadísticas actualizada");
+    }
+
+    // ✅ MÉTODO MEJORADO: Formatear moneda con K para miles
+    private String formatCurrency(double amount) {
+        if (amount == 0) {
+            return "$0";
+        } else if (amount < 1000) {
+            return String.format("$%.0f", amount);
+        } else if (amount < 1000000) {
+            return String.format("$%.1fK", amount / 1000);
+        } else {
+            return String.format("$%.1fM", amount / 1000000);
+        }
     }
 
     private void updateReservationsUI() {
         Log.d(TAG, "🔄 Actualizando UI de reservas - Total: " + listaReservas.size());
 
-        tvReservasActivas.setText(getString(R.string.reservasPendientes, listaReservas.size()));
         tvEmptyReservas.setVisibility(listaReservas.isEmpty() ? View.VISIBLE : View.GONE);
         rvReservas.setVisibility(listaReservas.isEmpty() ? View.GONE : View.VISIBLE);
 
@@ -313,12 +437,7 @@ public class InicioConductor extends AppCompatActivity {
         if (!listaRutas.isEmpty()) {
             Ruta proximaRuta = listaRutas.get(0);
             String horario = proximaRuta.getHora() != null ? proximaRuta.getHora().getHora() : "--:--";
-            tvProximaRuta.setText("Próxima ruta: " + proximaRuta.getOrigen() + " → " +
-                    proximaRuta.getDestino() + " a las " + horario);
             Log.d(TAG, "✅ Ruta próxima: " + proximaRuta.getOrigen() + " → " + proximaRuta.getDestino());
-        } else {
-            tvProximaRuta.setText("Próxima: No hay rutas programadas");
-            Log.d(TAG, "ℹ️ No hay rutas programadas");
         }
 
         tvEmptyRutas.setVisibility(listaRutas.isEmpty() ? View.VISIBLE : View.GONE);
@@ -399,9 +518,6 @@ public class InicioConductor extends AppCompatActivity {
                 });
     }
 
-    /**
-     * ✅ VERSIÓN MEJORADA: Enviar notificación al pasajero cuando el conductor confirma la reserva
-     */
     private void enviarNotificacionConfirmacionAlPasajero(Reserva reserva) {
         Log.d(TAG, "🎯 INICIANDO ENVÍO DE NOTIFICACIÓN DE CONFIRMACIÓN");
 
@@ -433,7 +549,7 @@ public class InicioConductor extends AppCompatActivity {
             if (pasajeroId != null && !pasajeroId.isEmpty()) {
                 Log.d(TAG, "📤 Llamando a NotificationManager...");
 
-                // 🔹 ENVIAR NOTIFICACIÓN DE CONFIRMACIÓN AL PASAJERO
+                // 🔹 ENVIAR NOTIFICACIÓN DE CONFIRMACIÓN AL PASAJERO CON CALLBACK
                 notificationManager.notificarReservaConfirmadaAlPasajero(
                         pasajeroId,
                         nombreConductor,
@@ -441,13 +557,21 @@ public class InicioConductor extends AppCompatActivity {
                         fechaHora,
                         asiento,
                         placaVehiculo,
-                        modeloVehiculo
+                        modeloVehiculo,
+                        new NotificationManager.NotificationCallback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.d(TAG, "✅ Notificación de CONFIRMACIÓN enviada exitosamente al pasajero");
+                            }
+
+                            @Override
+                            public void onError(String error) {
+                                Log.e(TAG, "❌ Error enviando notificación de confirmación: " + error);
+                            }
+                        }
                 );
 
                 Log.d(TAG, "✅ Notificación de CONFIRMACIÓN enviada a NotificationManager");
-                Log.d(TAG, "   - Destino: " + pasajeroNombre + " (ID: " + pasajeroId + ")");
-                Log.d(TAG, "   - Ruta: " + ruta);
-                Log.d(TAG, "   - Asiento: A" + asiento);
 
             } else {
                 Log.w(TAG, "❌ No se pudo enviar notificación: ID del pasajero no disponible");
@@ -461,9 +585,6 @@ public class InicioConductor extends AppCompatActivity {
         }
     }
 
-    /**
-     * ✅ OPCIONAL: Enviar notificación al pasajero cuando el conductor cancela la reserva
-     */
     private void enviarNotificacionCancelacionAlPasajero(Reserva reserva) {
         Log.d(TAG, "🎯 INICIANDO ENVÍO DE NOTIFICACIÓN DE CANCELACIÓN");
 
@@ -473,7 +594,6 @@ public class InicioConductor extends AppCompatActivity {
                 nombreConductor = "El conductor";
             }
 
-            // ✅ USAR getUsuarioId() en lugar de getUserId()
             String pasajeroId = reserva.getUsuarioId();
             String ruta = reserva.getOrigen() + " → " + reserva.getDestino();
             String motivo = "Por decisión del conductor";
@@ -483,11 +603,23 @@ public class InicioConductor extends AppCompatActivity {
             Log.d(TAG, "   - Ruta: " + ruta);
 
             if (pasajeroId != null && !pasajeroId.isEmpty()) {
+                // 🔹 ENVIAR NOTIFICACIÓN DE CANCELACIÓN CON CALLBACK
                 notificationManager.notificarReservaCanceladaAlPasajero(
                         pasajeroId,
                         nombreConductor,
                         ruta,
-                        motivo
+                        motivo,
+                        new NotificationManager.NotificationCallback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.d(TAG, "✅ Notificación de CANCELACIÓN enviada exitosamente al pasajero");
+                            }
+
+                            @Override
+                            public void onError(String error) {
+                                Log.e(TAG, "❌ Error enviando notificación de cancelación: " + error);
+                            }
+                        }
                 );
 
                 Log.d(TAG, "✅ Notificación de CANCELACIÓN enviada al pasajero");
@@ -591,7 +723,9 @@ public class InicioConductor extends AppCompatActivity {
         showEmptyRoutes();
         tvConductor.setText("N/A");
         tvPlacaVehiculo.setText("Placa: N/A");
-        tvTotalIngresos.setText("Ingresos: $0");
+
+        // ✅ ACTUALIZADO: Los ingresos ahora se muestran en las estadísticas
+        totalIngresos = 0.0;
         reservasConfirmadasHoy = 0;
         asientosDisponibles = CAPACIDAD_TOTAL;
         updateStatisticsUI();
@@ -604,7 +738,6 @@ public class InicioConductor extends AppCompatActivity {
 
         tvEmptyReservas.setVisibility(View.VISIBLE);
         rvReservas.setVisibility(View.GONE);
-        tvReservasActivas.setText(getString(R.string.reservasPendientes, 0));
     }
 
     private void showEmptyRoutes() {
@@ -612,7 +745,6 @@ public class InicioConductor extends AppCompatActivity {
 
         tvEmptyRutas.setVisibility(View.VISIBLE);
         rvProximasRutas.setVisibility(View.GONE);
-        tvProximaRuta.setText("Próxima: No hay rutas asignadas");
     }
 
     @Override
@@ -643,5 +775,11 @@ public class InicioConductor extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "📱 onDestroy - Actividad destruida");
+
+        // ✅ NUEVO: Limpiar listeners cuando la actividad se destruya
+        if (reservasRef != null && reservasListener != null) {
+            reservasRef.removeEventListener(reservasListener);
+            Log.d(TAG, "🗑️ Listener de Firebase removido");
+        }
     }
 }
