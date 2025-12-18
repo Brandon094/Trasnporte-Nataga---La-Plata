@@ -1,13 +1,16 @@
 package com.chopcode.trasnportenataga_laplata.activities.passenger;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
@@ -45,6 +48,9 @@ public class ConfirmarReserva extends AppCompatActivity {
     private AuthManager authManager;
     private NotificationManager notificationManager;
 
+    // Handler para timeouts
+    private Handler timeoutHandler;
+
     private static final String TAG = "ConfirmarReserva";
 
     @Override
@@ -52,10 +58,11 @@ public class ConfirmarReserva extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirmar_reserva);
 
-        // ✅ Inicializar servicios
+        // ✅ Inicializar servicios CON CONTEXTO
         reservaService = new ReservaService();
         authManager = AuthManager.getInstance();
-        notificationManager = NotificationManager.getInstance();
+        notificationManager = NotificationManager.getInstance(this); // ✅ Pasar contexto
+        timeoutHandler = new Handler();
 
         // Recibir TODOS los datos enviados desde CrearReservas
         recibirDatosIntent();
@@ -72,6 +79,15 @@ public class ConfirmarReserva extends AppCompatActivity {
         // Cargar información en la interfaz
         cargarInformacionBasica();
         cargarInformacionUsuarioYConductor();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // ✅ Limpiar todos los callbacks del handler para evitar memory leaks
+        if (timeoutHandler != null) {
+            timeoutHandler.removeCallbacksAndMessages(null);
+        }
     }
 
     /**
@@ -282,7 +298,7 @@ public class ConfirmarReserva extends AppCompatActivity {
     }
 
     /**
-     * Registrar la reserva en Firebase y enviar notificación al conductor
+     * ✅ MÉTODO MEJORADO: Registrar la reserva con mejor manejo de errores
      */
     private void registrarReserva() {
         String userId = authManager.getUserId();
@@ -295,8 +311,32 @@ public class ConfirmarReserva extends AppCompatActivity {
 
         Log.d(TAG, "Registrando reserva con datos del Intent:");
         Log.d(TAG, "  - Conductor: " + conductorNombre + ", ID: " + conductorId + ", Tel: " + conductorTelefono);
-        Log.d(TAG, "  - Vehículo: " + vehiculoPlaca + " - " + vehiculoModelo);
-        Log.d(TAG, "  - Usuario: " + usuarioNombre + ", Método Pago: " + metodoPago);
+
+        // Deshabilitar botón para evitar múltiples clics
+        btnConfirmarReserva.setEnabled(false);
+        btnConfirmarReserva.setText("Procesando...");
+
+        // ✅ TIMEOUT para evitar que se quede bloqueado
+        Runnable timeoutRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing()) {
+                    Log.w(TAG, "⏰ TIMEOUT - La operación está tomando demasiado tiempo");
+                    runOnUiThread(() -> {
+                        if (!isFinishing()) {
+                            btnConfirmarReserva.setEnabled(true);
+                            btnConfirmarReserva.setText("Confirmar Reserva");
+                            Toast.makeText(ConfirmarReserva.this,
+                                    "La operación está tardando más de lo esperado. Verifica tu conexión.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        };
+
+        // Establecer timeout de 15 segundos
+        timeoutHandler.postDelayed(timeoutRunnable, 15000);
 
         reservaService.actualizarDisponibilidadAsientos(
                 this, horarioId, asientoSeleccionado, origen, destino, tiempoEstimado,
@@ -304,26 +344,141 @@ public class ConfirmarReserva extends AppCompatActivity {
                 new ReservaService.ReservaCallback() {
                     @Override
                     public void onReservaExitosa() {
+                        // ✅ Cancelar el timeout
+                        timeoutHandler.removeCallbacks(timeoutRunnable);
+
                         runOnUiThread(() -> {
-                            Toast.makeText(ConfirmarReserva.this, "✅ Reserva confirmada exitosamente", Toast.LENGTH_LONG).show();
+                            if (!isFinishing()) {
+                                Toast.makeText(ConfirmarReserva.this, "✅ Reserva creada exitosamente", Toast.LENGTH_LONG).show();
 
-                            // ✅ ENVIAR NOTIFICACIÓN AL CONDUCTOR
-                            enviarNotificacionAlConductor();
-
-                            Intent intent = new Intent(ConfirmarReserva.this, InicioUsuarios.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
+                                // ✅ ENVIAR NOTIFICACIÓN AL CONDUCTOR CON MANEJO DE ERRORES MEJORADO
+                                enviarNotificacionAlConductor();
+                            }
                         });
                     }
 
                     @Override
                     public void onError(String error) {
+                        // ✅ Cancelar el timeout
+                        timeoutHandler.removeCallbacks(timeoutRunnable);
+
                         runOnUiThread(() -> {
-                            Toast.makeText(ConfirmarReserva.this, "❌ Error al confirmar reserva: " + error, Toast.LENGTH_LONG).show();
+                            if (!isFinishing()) {
+                                btnConfirmarReserva.setEnabled(true);
+                                btnConfirmarReserva.setText("Confirmar Reserva");
+                                Toast.makeText(ConfirmarReserva.this, "❌ Error al confirmar reserva: " + error, Toast.LENGTH_LONG).show();
+                            }
                         });
                     }
                 });
+    }
+
+    /**
+     * ✅ NOTIFICACIÓN MEJORADA: Con timeout y mejor manejo de errores
+     */
+    private void enviarNotificacionAlConductor() {
+        if (conductorId == null || conductorId.equals("conductor_default_id")) {
+            Log.w(TAG, "No se puede enviar notificación: ID del conductor no válido");
+            // ✅ NAVEGAR DE TODAS FORMAS AUNQUE FALLE LA NOTIFICACIÓN
+            navegarAInicioUsuarios();
+            return;
+        }
+
+        String fechaHoraCompleta = fechaViaje + " - " + horarioHora;
+
+        // Mostrar progreso
+        btnConfirmarReserva.setText("Enviando notificación...");
+
+        // ✅ TIMEOUT para notificación
+        Runnable notificationTimeout = new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing()) {
+                    Log.w(TAG, "⏰ TIMEOUT NOTIFICACIÓN - Envío de notificación tardando demasiado");
+                    runOnUiThread(() -> {
+                        if (!isFinishing()) {
+                            mostrarErrorNotificacion("El envío de notificación está tardando demasiado. La reserva fue creada exitosamente.");
+                        }
+                    });
+                }
+            }
+        };
+        timeoutHandler.postDelayed(notificationTimeout, 10000);
+
+        // ✅ NOTIFICACIÓN CON MANEJO DE ÉXITO/ERROR MEJORADO
+        notificationManager.notificarNuevaReservaAlConductor(
+                conductorId,
+                usuarioNombre,
+                rutaSeleccionada,
+                fechaHoraCompleta,
+                asientoSeleccionado,
+                precio,
+                metodoPago,
+                new NotificationManager.NotificationCallback() {
+                    @Override
+                    public void onSuccess() {
+                        // ✅ Cancelar timeout de notificación
+                        timeoutHandler.removeCallbacks(notificationTimeout);
+
+                        runOnUiThread(() -> {
+                            if (!isFinishing()) {
+                                Log.d(TAG, "✅ Notificación enviada exitosamente al conductor");
+                                Toast.makeText(ConfirmarReserva.this, "✅ Reserva confirmada y notificación enviada", Toast.LENGTH_LONG).show();
+                                navegarAInicioUsuarios();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        // ✅ Cancelar timeout de notificación
+                        timeoutHandler.removeCallbacks(notificationTimeout);
+
+                        runOnUiThread(() -> {
+                            if (!isFinishing()) {
+                                Log.e(TAG, "❌ Error enviando notificación: " + error);
+                                mostrarErrorNotificacion("Error enviando notificación al conductor: " + error);
+                            }
+                        });
+                    }
+                });
+    }
+
+    /**
+     * ✅ MÉTODO NUEVO: Navegar a inicio de usuarios
+     */
+    private void navegarAInicioUsuarios() {
+        Log.d(TAG, "🏠 Navegando a InicioUsuarios");
+        try {
+            Intent intent = new Intent(ConfirmarReserva.this, InicioUsuarios.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error navegando a InicioUsuarios: " + e.getMessage());
+            // Si hay error, al menos finalizar esta actividad
+            finish();
+        }
+    }
+
+    /**
+     * ✅ MOSTRAR ERROR DE NOTIFICACIÓN MEJORADO
+     */
+    private void mostrarErrorNotificacion(String mensaje) {
+        try {
+            new android.app.AlertDialog.Builder(this)
+                    .setTitle("Información de Notificación")
+                    .setMessage(mensaje + "\n\nLa reserva se creó exitosamente, pero hubo un problema con la notificación al conductor.")
+                    .setPositiveButton("Continuar", (dialog, which) -> {
+                        navegarAInicioUsuarios();
+                    })
+                    .setCancelable(false) // ✅ Evitar que el usuario cierre el diálogo sin acción
+                    .show();
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error mostrando diálogo: " + e.getMessage());
+            // Si falla el diálogo, navegar directamente
+            navegarAInicioUsuarios();
+        }
     }
 
     /**
@@ -332,31 +487,5 @@ public class ConfirmarReserva extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         mostrarDialogoCancelacion();
-    }
-
-    /**
-     * ✅ NOTIFICACIÓN 1: Enviar notificación al conductor sobre la nueva reserva
-     */
-    private void enviarNotificacionAlConductor() {
-        if (conductorId == null || conductorId.equals("conductor_default_id")) {
-            Log.w(TAG, "No se puede enviar notificación: ID del conductor no válido");
-            return;
-        }
-
-        // Formatear fecha y hora
-        String fechaHoraCompleta = fechaViaje + " - " + horarioHora;
-
-        // 🔹 NOTIFICACIÓN AL CONDUCTOR
-        notificationManager.notificarNuevaReservaAlConductor(
-                conductorId,
-                usuarioNombre,           // nombre del pasajero
-                rutaSeleccionada,        // ruta
-                fechaHoraCompleta,       // fecha y hora
-                asientoSeleccionado,     // asiento
-                precio,                  // precio
-                metodoPago               // método de pago
-        );
-
-        Log.d(TAG, "📲 Notificación de NUEVA RESERVA enviada al conductor: " + conductorNombre);
     }
 }
