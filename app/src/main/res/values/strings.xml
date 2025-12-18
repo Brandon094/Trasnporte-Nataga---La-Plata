@@ -15,7 +15,7 @@
     <string name="inicioSesion">Iniciar sesión</string>
     <string name="forgot_password">¿Olvidaste tu contraseña?</string>
     <string name="ingresar">Ingresar</string>
-    <string name="ingresarGoogle">Iniciar sesión con Google</string>
+    <string name="ingresarGoogle">Inicia con Google</string>
     <string name="noTieneCuenta">¿No tienes cuenta?</string>
     <string name="registrate">Regístrate</string>
     <string name="cerrarSesion">Cerrar sesión</string>
@@ -71,7 +71,7 @@
     <string name="destino">Destino: %s</string>
     <string name="metodoPago">Método de pago: %s</string>
     <string name="estadoReserva">Estado: %s</string>
-    <string name="reservasPendientes">Reservas por confirmar: %d</string>
+    <string name="reservasPendientes">Reservas por confirmar</string>
     <string name="historial">Historial de reservas</string>
     <string name="no_hay_reservas">No hay reservas por confirmar</string>
     <string name="no_hay_rutas">No hay rutas programadas</string>
