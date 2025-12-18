@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.activities.driver.InicioConductor;
