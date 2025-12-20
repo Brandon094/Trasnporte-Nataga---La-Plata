@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.chopcode.trasnportenataga_laplata">
 
     <!-- 🔹 PERMISOS PARA FCM Y CONECTIVIDAD -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -10,7 +11,17 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
+    <!-- 🔹 PERMISOS DE SEGURIDAD PARA FCM (AGREGADO) -->
+    <!-- Define un permiso único para tu app que solo ella puede usar -->
+    <permission
+        android:name="com.chopcode.trasnportenataga_laplata.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <!-- Tu app debe declarar que usa ese permiso -->
+    <uses-permission android:name="com.chopcode.trasnportenataga_laplata.permission.C2D_MESSAGE" />
+
     <application
+        android:name=".config.MyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -20,6 +31,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TrasnporteNatagaLaPlata"
         tools:targetApi="31">
+
+        <!-- 🔹 CONFIGURACIÓN ESPECIAL PARA XIAOMI (AGREGADO) -->
+        <!-- Canal de notificaciones por defecto (Android 8.0+) -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="high_priority_channel" />
+
+        <!-- Para optimizar notificaciones en dispositivos Xiaomi -->
+        <meta-data
+            android:name="com.xiaomi.mipush.sdk_register"
+            android:value="true" />
 
         <!-- 🔹 ACTIVIDAD PRINCIPAL - Punto de entrada de la aplicación -->
         <activity
@@ -35,7 +57,8 @@
         <!-- 🔹 SERVICIO DE NOTIFICACIONES FCM - Maneja mensajes en primer plano -->
         <service
             android:name=".services.notifications.NotificationService"
-            android:exported="false">
+            android:exported="false"
+            android:permission="com.google.android.c2dm.permission.SEND"> <!-- AGREGADO -->
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
