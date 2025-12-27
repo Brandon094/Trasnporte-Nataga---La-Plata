@@ -195,7 +195,7 @@ public class RegistroUsuarios extends AppCompatActivity {
 
         if (notificationManager != null) {
             try {
-                notificationManager.saveFCMTokenToFirestore(userId);
+                notificationManager.saveFCMTokenToRealtimeDatabase(userId, "usuarios");
                 Log.d(TAG, "✅ Llamada a saveFCMTokenToFirestore ejecutada para: " + userId);
             } catch (Exception e) {
                 Log.e(TAG, "❌ Error llamando a saveFCMTokenToFirestore: " + e.getMessage());
