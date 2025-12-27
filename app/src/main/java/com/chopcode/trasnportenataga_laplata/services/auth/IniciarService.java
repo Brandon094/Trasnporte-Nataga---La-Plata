@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.util.Log;
-import com.google.firebase.database.*;
 
 import com.chopcode.trasnportenataga_laplata.R;
+import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.gms.auth.api.identity.SignInClient;
@@ -16,9 +16,12 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import androidx.annotation.NonNull;
-import com.chopcode.trasnportenataga_laplata.config.MyApp;
 
 public class IniciarService {
     private static final String TAG = "IniciarService";
@@ -35,12 +38,13 @@ public class IniciarService {
         void onLoginSuccess(String tipoUsuario);
         void onLoginFailure(String error);
     }
+
     public interface TipoUsuarioCallback {
         void onTipoDetectado(String tipo); // tipo = "pasajero" o "conductor"
         void onError(String error);
     }
 
-    /** Constructor que recibe la actividad para poder usar startIntentSenderForResult, etc.*/
+    /** Constructor */
     public IniciarService(Activity activity) {
         Log.d(TAG, "🚀 Constructor - Inicializando servicio de autenticación");
         this.activity = activity;
@@ -58,66 +62,191 @@ public class IniciarService {
         Log.d(TAG, "✅ Servicio de autenticación inicializado correctamente");
     }
 
-    /** Metodo que se encarga de manejar la logica
-     * para identificar el tipo de usuario validando
-     * en que nodo se encuentra registrado*/
+    /**
+     * ✅ CORREGIDO: Método mejorado para detectar tipo de usuario
+     * Verifica si es conductor REAL (con datos completos) o solo tiene token
+     */
     public void detectarTipoUsuario(FirebaseUser user, @NonNull TipoUsuarioCallback callback) {
         String uid = user.getUid();
         Log.d(TAG, "🔍 Detectando tipo de usuario para UID: " + uid);
-        Log.d(TAG, "   - Email: " + user.getEmail());
-        Log.d(TAG, "   - Nombre: " + user.getDisplayName());
 
         DatabaseReference dbRef = MyApp.getDatabaseReference("");
 
-        // 🔍 Primero busca en el nodo "conductores"
-        Log.d(TAG, "🔎 Buscando en nodo 'conductores'...");
+        // 🔍 Buscar en AMBOS nodos simultáneamente
+        Log.d(TAG, "🔍 Buscando usuario en toda la base de datos...");
+
+        // Buscar en conductores
         dbRef.child("conductores").child(uid)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshotConductor) {
-                        if (snapshotConductor.exists()) {
-                            // ✅ Si el UID está en "conductores", es conductor
-                            Log.d(TAG, "✅ Usuario encontrado en 'conductores' - Tipo: CONDUCTOR");
-                            callback.onTipoDetectado("conductor");
-                        } else {
-                            Log.d(TAG, "🔍 Usuario no encontrado en 'conductores' - Buscando en 'usuarios'...");
-                            // 🔍 Si no está en "conductores", buscar en "usuarios"
-                            dbRef.child("usuarios").child(uid)
-                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshotUsuario) {
-                                            if (snapshotUsuario.exists()) {
-                                                // ✅ Está en "usuarios", es pasajero
-                                                Log.d(TAG, "✅ Usuario encontrado en 'usuarios' - Tipo: PASAJERO");
-                                                callback.onTipoDetectado("pasajero");
-                                            } else {
-                                                // ❌ No se encontró en ninguno
-                                                Log.w(TAG, "⚠️ Usuario no encontrado en 'usuarios' ni 'conductores'");
-                                                Log.w(TAG, "   - UID: " + uid);
-                                                Log.w(TAG, "   - Email: " + user.getEmail());
-                                                callback.onError("No se encontró el usuario en usuarios ni conductores.");
-                                            }
-                                        }
+                        // Buscar en usuarios también
+                        dbRef.child("usuarios").child(uid)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshotUsuario) {
+                                        // ✅ ANALIZAR AMBOS RESULTADOS
+                                        analizarResultados(uid, snapshotConductor, snapshotUsuario, callback);
+                                    }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-                                            Log.e(TAG, "❌ Error en consulta a 'usuarios': " + error.getMessage());
-                                            Log.e(TAG, "   - Código: " + error.getCode());
-                                            Log.e(TAG, "   - Detalles: " + error.getDetails());
-                                            callback.onError("Error al verificar en usuarios: " + error.getMessage());
-                                        }
-                                    });
-                        }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        Log.e(TAG, "❌ Error consultando usuarios: " + error.getMessage());
+                                        callback.onError("Error verificando usuarios: " + error.getMessage());
+                                    }
+                                });
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e(TAG, "❌ Error en consulta a 'conductores': " + error.getMessage());
-                        Log.e(TAG, "   - Código: " + error.getCode());
-                        Log.e(TAG, "   - Detalles: " + error.getDetails());
-                        callback.onError("Error al verificar en conductores: " + error.getMessage());
+                        Log.e(TAG, "❌ Error consultando conductores: " + error.getMessage());
+                        callback.onError("Error verificando conductores: " + error.getMessage());
                     }
                 });
+    }
+
+    /**
+     * ✅ NUEVO MÉTODO: Analizar resultados de ambas consultas
+     */
+    private void analizarResultados(String uid, DataSnapshot snapshotConductor,
+                                    DataSnapshot snapshotUsuario, TipoUsuarioCallback callback) {
+
+        Log.d(TAG, "📊 ANALIZANDO RESULTADOS para: " + uid);
+        Log.d(TAG, "   - En conductores: " + (snapshotConductor.exists() ? "SÍ" : "NO"));
+        Log.d(TAG, "   - En usuarios: " + (snapshotUsuario.exists() ? "SÍ" : "NO"));
+
+        // ✅ CASO 1: Está en USUARIOS y tiene datos completos
+        if (snapshotUsuario.exists() && esUsuarioCompleto(snapshotUsuario)) {
+            Log.d(TAG, "✅ Usuario encontrado en 'usuarios' con datos COMPLETOS - Tipo: PASAJERO");
+            callback.onTipoDetectado("pasajero");
+            return;
+        }
+
+        // ✅ CASO 2: Está en CONDUCTORES y tiene datos completos
+        if (snapshotConductor.exists() && esConductorCompleto(snapshotConductor)) {
+            Log.d(TAG, "✅ Usuario encontrado en 'conductores' con datos COMPLETOS - Tipo: CONDUCTOR");
+            callback.onTipoDetectado("conductor");
+            return;
+        }
+
+        // ✅ CASO 3: Está en AMBOS nodos (posible duplicidad)
+        if (snapshotConductor.exists() && snapshotUsuario.exists()) {
+            Log.w(TAG, "⚠️ Usuario encontrado en AMBOS nodos - Analizando...");
+
+            boolean conductorCompleto = esConductorCompleto(snapshotConductor);
+            boolean usuarioCompleto = esUsuarioCompleto(snapshotUsuario);
+
+            if (conductorCompleto && !usuarioCompleto) {
+                Log.d(TAG, "   → Conductor con datos completos - Tipo: CONDUCTOR");
+                callback.onTipoDetectado("conductor");
+            } else if (usuarioCompleto && !conductorCompleto) {
+                Log.d(TAG, "   → Usuario con datos completos - Tipo: PASAJERO");
+                callback.onTipoDetectado("pasajero");
+            } else if (conductorCompleto && usuarioCompleto) {
+                // ❌ ERROR: Usuario completo en ambos nodos
+                Log.e(TAG, "❌ ERROR: Usuario completo en AMBOS nodos - Priorizando conductor");
+                callback.onTipoDetectado("conductor");
+            } else {
+                // Ninguno tiene datos completos - Usar usuarios como default
+                Log.w(TAG, "   → Ninguno tiene datos completos - Default: PASAJERO");
+                callback.onTipoDetectado("pasajero");
+            }
+            return;
+        }
+
+        // ✅ CASO 4: Solo en conductores pero datos incompletos (solo token)
+        if (snapshotConductor.exists() && !esConductorCompleto(snapshotConductor)) {
+            Log.w(TAG, "⚠️ Entrada en 'conductores' pero datos INCOMPLETOS - Tipo: PASAJERO");
+            Log.w(TAG, "   - Probablemente solo tokenFCM - Tratando como pasajero");
+            callback.onTipoDetectado("pasajero");
+            return;
+        }
+
+        // ✅ CASO 5: Solo en usuarios pero datos incompletos
+        if (snapshotUsuario.exists() && !esUsuarioCompleto(snapshotUsuario)) {
+            Log.w(TAG, "⚠️ Entrada en 'usuarios' pero datos INCOMPLETOS - Tipo: PASAJERO");
+            callback.onTipoDetectado("pasajero");
+            return;
+        }
+
+        // ✅ CASO 6: No está en ningún lado
+        Log.w(TAG, "⚠️ Usuario no encontrado en ninguna colección con datos válidos");
+        callback.onError("Usuario no encontrado en usuarios ni conductores.");
+    }
+
+    /**
+     * ✅ NUEVO MÉTODO: Verificar si es conductor COMPLETO
+     * Un conductor debe tener al menos: nombre, placaVehiculo, modeloVehiculo
+     */
+    private boolean esConductorCompleto(DataSnapshot snapshot) {
+        try {
+            // Campos MÍNIMOS requeridos para ser conductor REAL
+            boolean tieneNombre = snapshot.hasChild("nombre");
+            boolean tienePlaca = snapshot.hasChild("placaVehiculo") || snapshot.hasChild("vehiculoId");
+            boolean tieneModelo = snapshot.hasChild("modeloVehiculo");
+            boolean tieneCapacidad = snapshot.hasChild("capacidadVehiculo");
+
+            // Verificar que el nombre no sea "No disponible" o similar
+            String nombre = snapshot.child("nombre").getValue(String.class);
+            boolean nombreValido = nombre != null &&
+                    !nombre.isEmpty() &&
+                    !nombre.contains("Conductor") && // No "Conductor ABC123"
+                    !nombre.equals("No disponible");
+
+            Log.d(TAG, "🔍 Verificando conductor completo:");
+            Log.d(TAG, "   - Tiene nombre: " + tieneNombre + " (" + nombre + ")");
+            Log.d(TAG, "   - Tiene placa: " + tienePlaca);
+            Log.d(TAG, "   - Tiene modelo: " + tieneModelo);
+            Log.d(TAG, "   - Tiene capacidad: " + tieneCapacidad);
+            Log.d(TAG, "   - Nombre válido: " + nombreValido);
+
+            // Debe tener al menos nombre válido Y placa para ser conductor real
+            boolean esConductorReal = tieneNombre && nombreValido && tienePlaca;
+
+            if (esConductorReal) {
+                Log.d(TAG, "   ✅ ES CONDUCTOR REAL");
+            } else {
+                Log.d(TAG, "   ❌ NO ES CONDUCTOR REAL (falta información)");
+            }
+
+            return esConductorReal;
+
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error verificando conductor completo: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * ✅ NUEVO MÉTODO: Verificar si es usuario COMPLETO
+     */
+    private boolean esUsuarioCompleto(DataSnapshot snapshot) {
+        try {
+            // Campos mínimos para usuario
+            boolean tieneNombre = snapshot.hasChild("nombre");
+            boolean tieneEmail = snapshot.hasChild("email");
+            boolean tieneTelefono = snapshot.hasChild("telefono");
+
+            Log.d(TAG, "🔍 Verificando usuario completo:");
+            Log.d(TAG, "   - Tiene nombre: " + tieneNombre);
+            Log.d(TAG, "   - Tiene email: " + tieneEmail);
+            Log.d(TAG, "   - Tiene teléfono: " + tieneTelefono);
+
+            // Para ser usuario válido necesita al menos nombre
+            boolean esUsuarioValido = tieneNombre;
+
+            if (esUsuarioValido) {
+                Log.d(TAG, "   ✅ ES USUARIO COMPLETO");
+            } else {
+                Log.d(TAG, "   ❌ NO ES USUARIO COMPLETO");
+            }
+
+            return esUsuarioValido;
+
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error verificando usuario completo: " + e.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -125,7 +254,6 @@ public class IniciarService {
      */
     public void iniciarSesionCorreo(String correo, String password, @NonNull LoginCallback callback) {
         Log.d(TAG, "🔐 Iniciando sesión con email: " + correo);
-        Log.d(TAG, "   - Longitud contraseña: " + password.length());
 
         auth.signInWithEmailAndPassword(correo, password)
                 .addOnCompleteListener(activity, task -> {
@@ -139,14 +267,13 @@ public class IniciarService {
                                 @Override
                                 public void onTipoDetectado(String tipo) {
                                     Log.d(TAG, "🎯 Tipo de usuario detectado: " + tipo);
-                                    callback.onLoginSuccess(tipo); // Éxito, el callback manejará la
-                                    // redirección
+                                    callback.onLoginSuccess(tipo);
                                 }
 
                                 @Override
                                 public void onError(String error) {
                                     Log.e(TAG, "❌ Error detectando tipo de usuario: " + error);
-                                    callback.onLoginFailure("Usuario no encontrado en conductores ni usuarios: " + error);
+                                    callback.onLoginFailure("Usuario no encontrado: " + error);
                                 }
                             });
                         } else {
@@ -211,15 +338,12 @@ public class IniciarService {
                                 FirebaseUser user = auth.getCurrentUser();
                                 if (user != null) {
                                     Log.d(TAG, "👤 Usuario Google autenticado: " + user.getUid());
-                                    Log.d(TAG, "   - Email: " + user.getEmail());
-                                    Log.d(TAG, "   - Nombre: " + user.getDisplayName());
 
                                     // 🔎 Detectar si es conductor o pasajero
                                     detectarTipoUsuario(user, new TipoUsuarioCallback() {
                                         @Override
                                         public void onTipoDetectado(String tipo) {
                                             Log.d(TAG, "✅ Usuario Google ya registrado como: " + tipo);
-                                            // Ya está registrado como pasajero o conductor, continuar
                                             callback.onLoginSuccess(tipo);
                                         }
 
@@ -227,7 +351,6 @@ public class IniciarService {
                                         public void onError(String error) {
                                             Log.w(TAG, "⚠️ Usuario Google no encontrado en BD - registrando como pasajero");
                                             Log.w(TAG, "   - Error: " + error);
-                                            Log.w(TAG, "   - UID: " + user.getUid());
 
                                             // No existe en ningún nodo, lo registramos como pasajero por defecto
                                             registroService.guardarUsuarioSiNoExiste(user, new RegistroService.RegistroCallback() {
@@ -261,8 +384,6 @@ public class IniciarService {
             }
         } catch (ApiException e) {
             Log.e(TAG, "❌ ApiException en Google Sign-In: " + e.getMessage(), e);
-            Log.e(TAG, "   - Status Code: " + e.getStatusCode());
-            Log.e(TAG, "   - Status Message: " + e.getStatusMessage());
             callback.onLoginFailure(e.getMessage());
         } catch (Exception e) {
             Log.e(TAG, "❌ Error inesperado en Google Sign-In: " + e.getMessage(), e);
