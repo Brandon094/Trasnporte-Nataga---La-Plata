@@ -18,9 +18,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import androidx.annotation.NonNull;
+import com.chopcode.trasnportenataga_laplata.config.MyApp;
 
 public class IniciarService {
-    // ✅ NUEVO: Tag para logs
     private static final String TAG = "IniciarService";
 
     private FirebaseAuth auth;
@@ -32,7 +32,7 @@ public class IniciarService {
 
     // Interfaz para callbacks de inicio de sesión
     public interface LoginCallback {
-        void onLoginSuccess();
+        void onLoginSuccess(String tipoUsuario);
         void onLoginFailure(String error);
     }
     public interface TipoUsuarioCallback {
@@ -44,7 +44,7 @@ public class IniciarService {
     public IniciarService(Activity activity) {
         Log.d(TAG, "🚀 Constructor - Inicializando servicio de autenticación");
         this.activity = activity;
-        auth = FirebaseAuth.getInstance();
+        auth = MyApp.getInstance().getFirebaseAuth();
         registroService = new RegistroService();
         oneTapClient = Identity.getSignInClient(activity);
         signInRequest = BeginSignInRequest.builder()
@@ -67,7 +67,7 @@ public class IniciarService {
         Log.d(TAG, "   - Email: " + user.getEmail());
         Log.d(TAG, "   - Nombre: " + user.getDisplayName());
 
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference dbRef = MyApp.getDatabaseReference("");
 
         // 🔍 Primero busca en el nodo "conductores"
         Log.d(TAG, "🔎 Buscando en nodo 'conductores'...");
@@ -139,7 +139,8 @@ public class IniciarService {
                                 @Override
                                 public void onTipoDetectado(String tipo) {
                                     Log.d(TAG, "🎯 Tipo de usuario detectado: " + tipo);
-                                    callback.onLoginSuccess(); // Éxito, el callback manejará la redirección
+                                    callback.onLoginSuccess(tipo); // Éxito, el callback manejará la
+                                    // redirección
                                 }
 
                                 @Override
@@ -219,7 +220,7 @@ public class IniciarService {
                                         public void onTipoDetectado(String tipo) {
                                             Log.d(TAG, "✅ Usuario Google ya registrado como: " + tipo);
                                             // Ya está registrado como pasajero o conductor, continuar
-                                            callback.onLoginSuccess();
+                                            callback.onLoginSuccess(tipo);
                                         }
 
                                         @Override
@@ -233,7 +234,7 @@ public class IniciarService {
                                                 @Override
                                                 public void onSuccess() {
                                                     Log.d(TAG, "✅ Usuario Google registrado exitosamente como pasajero");
-                                                    callback.onLoginSuccess();
+                                                    callback.onLoginSuccess("pasajero");
                                                 }
 
                                                 @Override
