@@ -1,28 +1,43 @@
 package com.chopcode.trasnportenataga_laplata.activities.common;
 
+import static com.chopcode.trasnportenataga_laplata.managers.PermissionManager.requestNotificationPermission;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.activities.driver.InicioConductor;
 import com.chopcode.trasnportenataga_laplata.activities.passenger.CrearReservas;
 import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuarios;
+import com.chopcode.trasnportenataga_laplata.config.MyApp;
+import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
+import com.chopcode.trasnportenataga_laplata.managers.PermissionManager;
 import com.chopcode.trasnportenataga_laplata.services.auth.IniciarService;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.*;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class InicioDeSesion extends AppCompatActivity {
 
@@ -36,6 +51,7 @@ public class InicioDeSesion extends AppCompatActivity {
     private static final String PREFS_NAME = "UserPrefs";
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_USER_TYPE = "user_type";
+    private DatabaseReference rtdb;
 
     // ✅ NUEVO: Tag para logs
     private static final String TAG = "InicioDeSesion";
@@ -47,6 +63,12 @@ public class InicioDeSesion extends AppCompatActivity {
 
         Log.d(TAG, "🚀 onCreate - Iniciando actividad de login");
 
+        // Solicitar permiso de notificaciones
+        requestNotificationPermission(this);
+
+        // Inicializar Firebase - SOLO Realtime Database
+        rtdb = MyApp.getDatabaseReference(""); // Referencia raiz a la base de datos
+
         // Inicializar IniciarService, pasando la actividad actual
         iniciarService = new IniciarService(this);
         Log.d(TAG, "✅ IniciarService inicializado");
@@ -54,9 +76,6 @@ public class InicioDeSesion extends AppCompatActivity {
         // Referenciar elementos de UI
         initViews();
         Log.d(TAG, "✅ Vistas inicializadas");
-
-        // Configurar la toolbar
-        setupToolbar();
 
         // Manejar inicio de sesión con correo y contraseña
         setupEmailLogin();
@@ -67,7 +86,7 @@ public class InicioDeSesion extends AppCompatActivity {
         // Manejar botón de registro
         setupRegistroButton();
 
-        // ✅ NUEVO: Verificar si ya hay un usuario logueado
+        // Verificar si ya hay un usuario logueado
         verificarSesionExistente();
 
         Log.d(TAG, "✅ Configuración completa - Actividad lista");
@@ -122,15 +141,7 @@ public class InicioDeSesion extends AppCompatActivity {
     }
 
     /**
-     * Configura la toolbar con navegación
-     */
-    private void setupToolbar() {
-        Log.d(TAG, "🔧 Configurando toolbar...");
-        // Tu código de toolbar aquí si lo tienes
-    }
-
-    /**
-     * ✅ NUEVO: Verificar si ya existe una sesión activa
+     * Verificar si ya existe una sesión activa
      */
     private void verificarSesionExistente() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -141,9 +152,19 @@ public class InicioDeSesion extends AppCompatActivity {
             Log.d(TAG, "📱 Sesión existente encontrada - UserId: " + savedUserId + ", Tipo: " + savedUserType);
 
             // Verificar con Firebase Auth también
-            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            FirebaseUser currentUser = MyApp.getCurrentUser();
             if (currentUser != null && currentUser.getUid().equals(savedUserId)) {
                 Log.d(TAG, "✅ Sesión Firebase válida, redirigiendo automáticamente...");
+
+                // ✅ VERIFICAR PERMISOS ANTES DE REDIRIGIR
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    boolean tienePermiso = PermissionManager.isNotificationPermissionGranted(this);
+                    if (!tienePermiso) {
+                        Log.d(TAG, "🔔 Usuario no tiene permiso de notificaciones, solicitando...");
+                        requestNotificationPermission(this);
+                    }
+                }
+
                 redirigirSegunTipoUsuario(savedUserType);
             } else {
                 Log.d(TAG, "⚠️ Sesión en SharedPreferences pero no en Firebase, limpiando...");
@@ -190,40 +211,23 @@ public class InicioDeSesion extends AppCompatActivity {
             Log.d(TAG, "🔄 Llamando a iniciarSesionCorreo...");
             iniciarService.iniciarSesionCorreo(correo, password, new IniciarService.LoginCallback() {
                 @Override
-                public void onLoginSuccess() {
-                    Log.d(TAG, "✅ Login exitoso con email");
+                public void onLoginSuccess(String tipoUsuario) { // ✅ tipoUsuario YA VIENE DEL SERVICIO
+                    Log.d(TAG, "✅ Login exitoso con email. Tipo recibido: " + tipoUsuario);
 
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null) {
                         Log.d(TAG, "👤 Usuario Firebase obtenido: " + user.getUid());
 
-                        Log.d(TAG, "🔍 Detectando tipo de usuario...");
-                        iniciarService.detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
-                            @Override
-                            public void onTipoDetectado(String tipo) {
-                                Log.d(TAG, "🎯 Tipo de usuario detectado: " + tipo);
+                        // ✅ CORREGIDO: Usar el tipoUsuario que YA VIENE del servicio
+                        guardarUsuarioEnPrefs(user.getUid(), tipoUsuario);
 
-                                // ✅ CORREGIDO: Usar el nuevo método que incluye el tipo de usuario
-                                guardarUsuarioEnPrefs(user.getUid(), tipo);
-
-                                if (tipo.equals("conductor")) {
-                                    Log.d(TAG, "🚗 Redirigiendo a InicioConductor");
-                                    irAInicioConductor();
-                                } else {
-                                    Log.d(TAG, "👤 Redirigiendo a InicioUsuarios");
-                                    irAInicioUsuarios();
-                                }
-                            }
-
-                            @Override
-                            public void onError(String error) {
-                                Log.e(TAG, "❌ Error detectando tipo de usuario: " + error);
-                                // ✅ REHABILITAR BOTÓN EN CASO DE ERROR
-                                buttonIngresar.setEnabled(true);
-                                buttonIngresar.setText("Ingresar");
-                                Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        if (tipoUsuario.equals("conductor")) {
+                            Log.d(TAG, "🚗 Redirigiendo a InicioConductor");
+                            irAInicioConductor();
+                        } else {
+                            Log.d(TAG, "👤 Redirigiendo a InicioUsuarios");
+                            irAInicioUsuarios();
+                        }
                     } else {
                         Log.e(TAG, "❌ Usuario Firebase es null después de login exitoso");
                         buttonIngresar.setEnabled(true);
@@ -256,38 +260,21 @@ public class InicioDeSesion extends AppCompatActivity {
 
             iniciarService.iniciarSesionGoogle(new IniciarService.LoginCallback() {
                 @Override
-                public void onLoginSuccess() {
-                    Log.d(TAG, "✅ Login con Google exitoso");
+                public void onLoginSuccess(String tipoUsuario) { // ✅ tipoUsuario YA VIENE DEL SERVICIO
+                    Log.d(TAG, "✅ Login con Google exitoso. Tipo recibido: " + tipoUsuario);
 
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    FirebaseUser user = MyApp.getCurrentUser();
                     if (user != null) {
-                        Log.d(TAG, "👤 Usuario Google obtenido: " + user.getUid());
+                        // ✅ CORREGIDO: Usar el tipoUsuario que YA VIENE del servicio
+                        guardarUsuarioEnPrefs(user.getUid(), tipoUsuario);
 
-                        Log.d(TAG, "🔍 Detectando tipo de usuario Google...");
-                        iniciarService.detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
-                            @Override
-                            public void onTipoDetectado(String tipo) {
-                                Log.d(TAG, "🎯 Tipo de usuario Google: " + tipo);
-
-                                // ✅ CORREGIDO: Usar el nuevo método que incluye el tipo de usuario
-                                guardarUsuarioEnPrefs(user.getUid(), tipo);
-
-                                if (tipo.equals("conductor")) {
-                                    Log.d(TAG, "🚗 Redirigiendo a InicioConductor (Google)");
-                                    irAInicioConductor();
-                                } else {
-                                    Log.d(TAG, "👤 Redirigiendo a InicioUsuarios (Google)");
-                                    irAInicioUsuarios();
-                                }
-                            }
-
-                            @Override
-                            public void onError(String error) {
-                                Log.e(TAG, "❌ Error detectando tipo de usuario Google: " + error);
-                                btnGoogleSignIn.setEnabled(true);
-                                Toast.makeText(InicioDeSesion.this, "Error al detectar tipo de usuario: " + error, Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        if (tipoUsuario.equals("conductor")) {
+                            Log.d(TAG, "🚗 Redirigiendo a InicioConductor (Google)");
+                            irAInicioConductor();
+                        } else {
+                            Log.d(TAG, "👤 Redirigiendo a InicioUsuarios (Google)");
+                            irAInicioUsuarios();
+                        }
                     }
                 }
 
@@ -318,7 +305,9 @@ public class InicioDeSesion extends AppCompatActivity {
         }
     }
 
-    // Recibir el resultado del One Tap Sign-In de Google
+    /**
+     *  Recibir el resultado del One Tap Sign-In de Google
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -328,38 +317,21 @@ public class InicioDeSesion extends AppCompatActivity {
             Log.d(TAG, "🔍 Procesando resultado de Google Sign-In...");
             iniciarService.manejarResultadoGoogle(data, new IniciarService.LoginCallback() {
                 @Override
-                public void onLoginSuccess() {
-                    Log.d(TAG, "✅ Google Sign-In exitoso desde onActivityResult");
+                public void onLoginSuccess(String tipoUsuario) { // ✅ tipoUsuario YA VIENE DEL SERVICIO
+                    Log.d(TAG, "✅ Google Sign-In exitoso desde onActivityResult. Tipo recibido: " + tipoUsuario);
 
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    FirebaseUser user = MyApp.getCurrentUser();
                     if (user != null) {
-                        Log.d(TAG, "👤 Usuario Google (ActivityResult): " + user.getUid());
+                        // ✅ CORREGIDO: Usar el tipoUsuario que YA VIENE del servicio
+                        guardarUsuarioEnPrefs(user.getUid(), tipoUsuario);
 
-                        Log.d(TAG, "🔍 Detectando tipo de usuario (ActivityResult)...");
-                        iniciarService.detectarTipoUsuario(user, new IniciarService.TipoUsuarioCallback() {
-                            @Override
-                            public void onTipoDetectado(String tipo) {
-                                Log.d(TAG, "🎯 Tipo de usuario (ActivityResult): " + tipo);
-
-                                // ✅ CORREGIDO: Usar el nuevo método que incluye el tipo de usuario
-                                guardarUsuarioEnPrefs(user.getUid(), tipo);
-
-                                if (tipo.equals("conductor")) {
-                                    Log.d(TAG, "🚗 Redirigiendo a InicioConductor (ActivityResult)");
-                                    irAInicioConductor();
-                                } else {
-                                    Log.d(TAG, "👤 Redirigiendo a InicioUsuarios (ActivityResult)");
-                                    irAInicioUsuarios();
-                                }
-                            }
-
-                            @Override
-                            public void onError(String error) {
-                                Log.e(TAG, "❌ Error detectando tipo de usuario (ActivityResult): " + error);
-                                btnGoogleSignIn.setEnabled(true);
-                                Toast.makeText(InicioDeSesion.this, "Error al detectar tipo de usuario: " + error, Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        if (tipoUsuario.equals("conductor")) {
+                            Log.d(TAG, "🚗 Redirigiendo a InicioConductor (ActivityResult)");
+                            irAInicioConductor();
+                        } else {
+                            Log.d(TAG, "👤 Redirigiendo a InicioUsuarios (ActivityResult)");
+                            irAInicioUsuarios();
+                        }
                     }
                 }
 
@@ -391,8 +363,8 @@ public class InicioDeSesion extends AppCompatActivity {
             if (saved) {
                 Log.d(TAG, "✅ Usuario guardado exitosamente: " + userId + " (" + tipoUsuario + ")");
 
-                // Guardar el token FCM en el nodo correcto
-                guardarTokenFCMEnNodoCorrecto(userId, tipoUsuario);
+                // Guardar el token FCM en el nodo correcto usando NotificationManager
+                guardarTokenFCMEnRealtimeDatabase(userId, tipoUsuario);
             } else {
                 Log.e(TAG, "❌ Error: No se pudo guardar usuario en SharedPreferences");
             }
@@ -402,40 +374,170 @@ public class InicioDeSesion extends AppCompatActivity {
     }
 
     /**
-     * ✅ MÉTODO MEJORADO: Guardar token FCM en el nodo correcto según el tipo de usuario
+     * ✅ CORREGIDO: Guardar token FCM en Realtime Database usando NotificationManager
      */
-    private void guardarTokenFCMEnNodoCorrecto(String userId, String tipoUsuario) {
-        FirebaseMessaging.getInstance().getToken()
+    private void guardarTokenFCMEnRealtimeDatabase(String userId, String tipoUsuario) {
+        Log.d(TAG, "🔑 guardarTokenFCMEnRealtimeDatabase - Usuario: " + userId + ", Tipo: " + tipoUsuario);
+
+        MyApp.getInstance().getFirebaseMessaging().getToken()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
                         String token = task.getResult();
-                        Log.d(TAG, "🔑 Token FCM obtenido: " + (token != null ? token.substring(0, 20) + "..." : "null"));
+                        Log.d(TAG, "✅ Token FCM obtenido: " + (token != null ? token.substring(0, 20) + "..." : "null"));
 
-                        // Referencia a la base de datos Firebase
-                        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+                        // ✅ AGREGADO: Guardar token localmente como backup
+                        guardarTokenLocalmente(token);
 
-                        // Determinar el nodo correcto según el tipo de usuario
-                        String nodo = tipoUsuario.equals("conductor") ? "conductores" : "usuarios";
+                        // ✅ USAR NOTIFICATION MANAGER PARA GUARDAR EN REALTIME DATABASE
+                        NotificationManager notificationManager = NotificationManager.getInstance(this);
+                        notificationManager.saveFCMTokenToRealtimeDatabase(userId, tipoUsuario);
 
-                        // ✅ MEJORADO: Verificar que el token no sea null
-                        if (token != null && !token.isEmpty()) {
-                            // Guardar el token en el nodo correspondiente
-                            databaseRef.child(nodo).child(userId).child("tokenFCM")
-                                    .setValue(token)
-                                    .addOnSuccessListener(aVoid -> {
-                                        Log.d(TAG, "✅ Token FCM guardado en " + nodo + "/" + userId + "/tokenFCM");
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Log.e(TAG, "❌ Error guardando token FCM: " + e.getMessage());
-                                    });
-                        } else {
-                            Log.e(TAG, "❌ Token FCM es null o vacío");
-                        }
+                        // ✅ TAMBIÉN GUARDAR DIRECTAMENTE POR COMPATIBILIDAD
+                        guardarTokenDirectamenteEnRTDB(userId, tipoUsuario, token);
+
                     } else {
-                        Log.e(TAG, "❌ Error obteniendo token FCM: " +
-                                (task.getException() != null ? task.getException().getMessage() : "Error desconocido"));
+                        String errorMsg = task.getException() != null ? task.getException().getMessage() : "Error desconocido";
+                        Log.e(TAG, "❌ Error obteniendo token FCM: " + errorMsg);
+                        if (task.getException() != null) {
+                            MyApp.logError(task.getException());
+                        }
                     }
                 });
+    }
+
+    /**
+     * ✅ CORREGIDO: Guardar token directamente en RTDB solo en el nodo correcto
+     */
+    private void guardarTokenDirectamenteEnRTDB(String userId, String tipoUsuario, String token) {
+        try {
+            if (userId == null || userId.isEmpty() || token == null || token.isEmpty()) {
+                Log.e(TAG, "❌ Datos inválidos para guardar token - UserId: " + userId + ", Token: " + (token != null ? token.substring(0, 10) + "..." : "null"));
+                return;
+            }
+
+            Log.d(TAG, "💾 Guardando token FCM para usuario: " + userId + ", Tipo: " + tipoUsuario);
+
+            // ✅ Determinar el nodo CORRECTO según el tipo de usuario
+            String nodoCorrecto;
+            if (tipoUsuario.equals("conductor")) {
+                nodoCorrecto = "conductores";
+                Log.d(TAG, "👨‍✈️ Usuario es CONDUCTOR - Guardando en nodo 'conductores'");
+            } else if (tipoUsuario.equals("pasajero") || tipoUsuario.equals("usuario")) {
+                nodoCorrecto = "usuarios";
+                Log.d(TAG, "👤 Usuario es PASAJERO - Guardando en nodo 'usuarios'");
+            } else {
+                Log.e(TAG, "❌ Tipo de usuario desconocido: " + tipoUsuario);
+                Log.e(TAG, "⚠️ Por defecto, guardando en 'usuarios'");
+                nodoCorrecto = "usuarios";
+            }
+
+            // ✅ PASO 1: Guardar SOLO en el nodo correcto
+            rtdb.child(nodoCorrecto).child(userId).child("tokenFCM")
+                    .setValue(token)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "✅ Token FCM guardado en '" + nodoCorrecto + "/" + userId + "/tokenFCM'");
+
+                        // ✅ PASO 2: Verificar si el usuario existe en el otro nodo y eliminar token si es necesario
+                        String otroNodo = nodoCorrecto.equals("conductores") ? "usuarios" : "conductores";
+
+                        rtdb.child(otroNodo).child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    // ❌ El usuario existe en el nodo incorrecto - Eliminar su token de allí
+                                    Log.w(TAG, "⚠️ Usuario " + userId + " también existe en '" + otroNodo + "' - Limpiando token incorrecto");
+
+                                    // Verificar si tiene token en el nodo incorrecto
+                                    if (dataSnapshot.child("tokenFCM").exists()) {
+                                        rtdb.child(otroNodo).child(userId).child("tokenFCM").removeValue()
+                                                .addOnSuccessListener(aVoid2 -> {
+                                                    Log.d(TAG, "✅ Token eliminado del nodo incorrecto '" + otroNodo + "'");
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Log.e(TAG, "❌ Error eliminando token del nodo incorrecto: " + e.getMessage());
+                                                });
+                                    }
+                                } else {
+                                    Log.d(TAG, "✅ Usuario NO existe en el nodo incorrecto '" + otroNodo + "' (esto es correcto)");
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.e(TAG, "❌ Error verificando nodo incorrecto: " + databaseError.getMessage());
+                            }
+                        });
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "❌ Error guardando token en RTDB: " + e.getMessage());
+                        MyApp.logError(e);
+                    });
+
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error crítico en guardarTokenDirectamenteEnRTDB: " + e.getMessage());
+            MyApp.logError(e);
+        }
+    }
+
+    /**
+     * ✅ NUEVO: Guardar token localmente como backup
+     */
+    private void guardarTokenLocalmente(String token) {
+        try {
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            prefs.edit().putString("fcm_token_local", token).apply();
+            Log.d(TAG, "💾 Token guardado localmente como backup");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error guardando token localmente: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ MANEJAR RESULTADO DE SOLICITUD DE PERMISOS
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PermissionManager.NOTIFICATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                Log.d(TAG, "✅ Permiso de notificaciones CONCEDIDO por el usuario");
+                Toast.makeText(this, "Notificaciones habilitadas", Toast.LENGTH_SHORT).show();
+
+                // ✅ Opcional: Registrar token FCM inmediatamente
+                registrarTokenFCMDespuesDePermiso();
+
+            } else {
+                Log.w(TAG, "❌ Permiso de notificaciones DENEGADO por el usuario");
+
+                // Mostrar mensaje informativo
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    Toast.makeText(this,
+                            "Las notificaciones están desactivadas. Puedes activarlas en Configuración > Aplicaciones",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+    /**
+     * ✅ Registrar token FCM después de que se concede el permiso
+     */
+    private void registrarTokenFCMDespuesDePermiso() {
+        FirebaseUser currentUser = MyApp.getCurrentUser();
+        if (currentUser != null) {
+            // Verificar el tipo de usuario actual
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            String userType = prefs.getString(KEY_USER_TYPE, null);
+
+            if (userType != null) {
+                guardarTokenFCMEnRealtimeDatabase(currentUser.getUid(), userType);
+            }
+        }
     }
 
     /**
