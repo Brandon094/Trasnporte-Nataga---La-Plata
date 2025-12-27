@@ -15,6 +15,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true  // ✅ CORRECTO
     }
 
     buildTypes {
@@ -23,6 +24,11 @@ android {
             proguardFiles getDefaultProguardFile(
                     'proguard-android-optimize.txt'
             ), 'proguard-rules.pro'
+            debuggable true  // ✅ Para poder depurar versiones release si es necesario
+        }
+        debug {
+            debuggable true  // ✅ CORREGIDO: Solo una "g"
+            testCoverageEnabled false
         }
     }
 
@@ -34,10 +40,17 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }
 
 dependencies {
-
     // 🔹 ANDROIDX CORE
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
@@ -46,8 +59,9 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.7.4'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
+    implementation 'androidx.multidex:multidex:2.0.1'  // ✅ Para apps grandes
 
-    // 🔹 DATASTORE (VERSIÓN CORRECTA)
+    // 🔹 DATASTORE
     implementation "androidx.datastore:datastore-preferences:1.2.0"
 
     // 🔹 LIFECYCLE
@@ -55,13 +69,20 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-runtime:2.7.0'
 
-    // 🔹 KOTLIN (requerido por Firebase)
+    // ✅ EXTENSIONES KOTLIN PARA LIFECYCLE
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
+
+    // 🔹 KOTLIN
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.10'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
 
-    // 🔥 FIREBASE (BOM)
-    implementation platform('com.google.firebase:firebase-bom:34.6.0')
+    // ✅ COROUTINES PARA FIREBASE
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3'
+
+    // 🔥 FIREBASE (BOM - Bill Of Materials)
+    implementation platform('com.google.firebase:firebase-bom:33.1.0')  // ✅ Versión estable
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-firestore'
@@ -70,7 +91,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
 
     // 🔹 GOOGLE PLAY SERVICES
-    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation 'com.google.android.gms:play-services-base:18.3.0'  // ✅ Base requerida
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'  // ✅ Para Google Sign-In
 
     // 🔹 UI
     implementation 'de.hdodenhof:circleimageview:3.1.0'
@@ -84,4 +106,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    // ✅ TESTING PARA FIREBASE (opcional, puedes removerlo si no lo usas)
+    androidTestImplementation 'com.google.firebase:firebase-auth-testing:1.0.0'
 }
