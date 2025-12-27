@@ -405,78 +405,194 @@ public class InicioDeSesion extends AppCompatActivity {
                 });
     }
 
-    /**
-     * ✅ CORREGIDO: Guardar token directamente en RTDB solo en el nodo correcto
-     */
     private void guardarTokenDirectamenteEnRTDB(String userId, String tipoUsuario, String token) {
         try {
             if (userId == null || userId.isEmpty() || token == null || token.isEmpty()) {
-                Log.e(TAG, "❌ Datos inválidos para guardar token - UserId: " + userId + ", Token: " + (token != null ? token.substring(0, 10) + "..." : "null"));
+                Log.e(TAG, "❌ Datos inválidos para guardar token");
                 return;
             }
 
             Log.d(TAG, "💾 Guardando token FCM para usuario: " + userId + ", Tipo: " + tipoUsuario);
 
-            // ✅ Determinar el nodo CORRECTO según el tipo de usuario
-            String nodoCorrecto;
-            if (tipoUsuario.equals("conductor")) {
-                nodoCorrecto = "conductores";
-                Log.d(TAG, "👨‍✈️ Usuario es CONDUCTOR - Guardando en nodo 'conductores'");
-            } else if (tipoUsuario.equals("pasajero") || tipoUsuario.equals("usuario")) {
-                nodoCorrecto = "usuarios";
-                Log.d(TAG, "👤 Usuario es PASAJERO - Guardando en nodo 'usuarios'");
-            } else {
-                Log.e(TAG, "❌ Tipo de usuario desconocido: " + tipoUsuario);
-                Log.e(TAG, "⚠️ Por defecto, guardando en 'usuarios'");
-                nodoCorrecto = "usuarios";
-            }
-
-            // ✅ PASO 1: Guardar SOLO en el nodo correcto
-            rtdb.child(nodoCorrecto).child(userId).child("tokenFCM")
-                    .setValue(token)
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d(TAG, "✅ Token FCM guardado en '" + nodoCorrecto + "/" + userId + "/tokenFCM'");
-
-                        // ✅ PASO 2: Verificar si el usuario existe en el otro nodo y eliminar token si es necesario
-                        String otroNodo = nodoCorrecto.equals("conductores") ? "usuarios" : "conductores";
-
-                        rtdb.child(otroNodo).child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.exists()) {
-                                    // ❌ El usuario existe en el nodo incorrecto - Eliminar su token de allí
-                                    Log.w(TAG, "⚠️ Usuario " + userId + " también existe en '" + otroNodo + "' - Limpiando token incorrecto");
-
-                                    // Verificar si tiene token en el nodo incorrecto
-                                    if (dataSnapshot.child("tokenFCM").exists()) {
-                                        rtdb.child(otroNodo).child(userId).child("tokenFCM").removeValue()
-                                                .addOnSuccessListener(aVoid2 -> {
-                                                    Log.d(TAG, "✅ Token eliminado del nodo incorrecto '" + otroNodo + "'");
-                                                })
-                                                .addOnFailureListener(e -> {
-                                                    Log.e(TAG, "❌ Error eliminando token del nodo incorrecto: " + e.getMessage());
-                                                });
-                                    }
-                                } else {
-                                    Log.d(TAG, "✅ Usuario NO existe en el nodo incorrecto '" + otroNodo + "' (esto es correcto)");
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                Log.e(TAG, "❌ Error verificando nodo incorrecto: " + databaseError.getMessage());
-                            }
-                        });
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e(TAG, "❌ Error guardando token en RTDB: " + e.getMessage());
-                        MyApp.logError(e);
-                    });
+            // ✅ NUEVA LÓGICA: Determinar nodo basado en datos REALES, no solo en tipoUsuario
+            determinarNodoCorrecto(userId, tipoUsuario, token);
 
         } catch (Exception e) {
             Log.e(TAG, "❌ Error crítico en guardarTokenDirectamenteEnRTDB: " + e.getMessage());
             MyApp.logError(e);
         }
+    }
+
+    /**
+     * ✅ NUEVO MÉTODO: Determinar el nodo correcto basado en datos reales
+     */
+    private void determinarNodoCorrecto(String userId, String tipoUsuario, String token) {
+        // Verificar en qué nodo existe REALMENTE el usuario
+        rtdb.child("conductores").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot conductorSnapshot) {
+                rtdb.child("usuarios").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot usuarioSnapshot) {
+                        boolean esConductorReal = esConductorRealEnRTDB(conductorSnapshot);
+                        boolean esUsuarioReal = esUsuarioRealEnRTDB(usuarioSnapshot);
+
+                        Log.d(TAG, "🔍 Determinando nodo correcto:");
+                        Log.d(TAG, "   - Es conductor real: " + esConductorReal);
+                        Log.d(TAG, "   - Es usuario real: " + esUsuarioReal);
+                        Log.d(TAG, "   - TipoUsuario recibido: " + tipoUsuario);
+
+                        String nodoFinal;
+
+                        if (esConductorReal) {
+                            // ✅ Es conductor REAL - guardar en conductores
+                            nodoFinal = "conductores";
+                            Log.d(TAG, "👨‍✈️ Usuario es CONDUCTOR REAL - Guardando en 'conductores'");
+                        } else if (esUsuarioReal) {
+                            // ✅ Es usuario REAL - guardar en usuarios
+                            nodoFinal = "usuarios";
+                            Log.d(TAG, "👤 Usuario es USUARIO REAL - Guardando en 'usuarios'");
+                        } else {
+                            // ❌ No existe en ningún lado - usar el tipoUsuario recibido
+                            nodoFinal = "conductor".equals(tipoUsuario) ? "conductores" : "usuarios";
+                            Log.w(TAG, "⚠️ Usuario no existe en RTDB - Usando tipoUsuario recibido: " + nodoFinal);
+                        }
+
+                        // Guardar token en el nodo final
+                        guardarTokenEnNodo(userId, nodoFinal, token);
+
+                        // Limpiar token del nodo incorrecto
+                        String otroNodo = "conductores".equals(nodoFinal) ? "usuarios" : "conductores";
+                        limpiarTokenDelNodoIncorrecto(userId, otroNodo);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        Log.e(TAG, "❌ Error verificando usuarios: " + error.getMessage());
+                        // Fallback al tipoUsuario recibido
+                        String nodoFinal = "conductor".equals(tipoUsuario) ? "conductores" : "usuarios";
+                        guardarTokenEnNodo(userId, nodoFinal, token);
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.e(TAG, "❌ Error verificando conductores: " + error.getMessage());
+                // Fallback al tipoUsuario recibido
+                String nodoFinal = "conductor".equals(tipoUsuario) ? "conductores" : "usuarios";
+                guardarTokenEnNodo(userId, nodoFinal, token);
+            }
+        });
+    }
+
+    /**
+     * ✅ Verificar si es conductor REAL en RTDB
+     */
+    private boolean esConductorRealEnRTDB(DataSnapshot snapshot) {
+        if (!snapshot.exists()) return false;
+
+        boolean tieneNombre = snapshot.hasChild("nombre");
+        boolean tienePlaca = snapshot.hasChild("placaVehiculo") || snapshot.hasChild("vehiculoId");
+
+        if (tieneNombre) {
+            String nombre = snapshot.child("nombre").getValue(String.class);
+            // Verificar que el nombre no sea genérico
+            boolean nombreValido = nombre != null &&
+                    !nombre.contains("Conductor") &&
+                    !nombre.equals("No disponible");
+            return nombreValido && tienePlaca;
+        }
+
+        return false;
+    }
+
+    /**
+     * ✅ Verificar si es usuario REAL en RTDB
+     */
+    private boolean esUsuarioRealEnRTDB(DataSnapshot snapshot) {
+        if (!snapshot.exists()) return false;
+
+        return snapshot.hasChild("nombre") || snapshot.hasChild("email");
+    }
+
+    /**
+     * ✅ Guardar token en nodo específico
+     */
+    private void guardarTokenEnNodo(String userId, String nodo, String token) {
+        rtdb.child(nodo).child(userId).child("tokenFCM")
+                .setValue(token)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "✅ Token FCM guardado en '" + nodo + "/" + userId + "/tokenFCM'");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "❌ Error guardando token en " + nodo + ": " + e.getMessage());
+                });
+    }
+
+    /**
+     * ✅ Limpiar token del nodo incorrecto
+     */
+    private void limpiarTokenDelNodoIncorrecto(String userId, String nodoIncorrecto) {
+        rtdb.child(nodoIncorrecto).child(userId).child("tokenFCM").removeValue()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "✅ Token eliminado del nodo incorrecto '" + nodoIncorrecto + "'");
+                })
+                .addOnFailureListener(e -> {
+                    // Esto es normal si no existía
+                    Log.d(TAG, "ℹ️ No había token en '" + nodoIncorrecto + "'");
+                });
+    }
+
+    /**
+     * ✅ NUEVO: Limpiar entrada en nodo incorrecto
+     */
+    private void limpiarEntradaEnNodoIncorrecto(String userId, String nodoCorrecto) {
+        String otroNodo = nodoCorrecto.equals("conductores") ? "usuarios" : "conductores";
+
+        // Verificar si existe una entrada en el nodo incorrecto
+        rtdb.child(otroNodo).child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // ❌ Existe en el nodo incorrecto
+                    Log.w(TAG, "⚠️ Usuario " + userId + " también existe en '" + otroNodo + "'");
+
+                    // Verificar si es una entrada VÁLIDA o solo un tokenFCM
+                    boolean esEntradaValida = dataSnapshot.hasChildren();
+                    boolean soloTieneToken = dataSnapshot.getChildrenCount() == 1 &&
+                            dataSnapshot.child("tokenFCM").exists();
+
+                    if (soloTieneToken) {
+                        // Es solo un tokenFCM vacío - ELIMINAR COMPLETAMENTE
+                        Log.w(TAG, "🔍 Es una entrada vacía con solo tokenFCM - Eliminando completamente");
+                        rtdb.child(otroNodo).child(userId).removeValue()
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d(TAG, "✅ Entrada vacía eliminada de '" + otroNodo + "'");
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "❌ Error eliminando entrada vacía: " + e.getMessage());
+                                });
+                    } else if (esEntradaValida) {
+                        // Es una entrada válida (conductor o usuario) - Solo eliminar tokenFCM
+                        Log.w(TAG, "⚠️ Es una entrada válida en el nodo incorrecto - Eliminando solo token");
+                        if (dataSnapshot.child("tokenFCM").exists()) {
+                            rtdb.child(otroNodo).child(userId).child("tokenFCM").removeValue()
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d(TAG, "✅ Token eliminado del nodo incorrecto");
+                                    });
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "✅ Usuario no existe en el nodo incorrecto '" + otroNodo + "'");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "❌ Error verificando nodo incorrecto: " + databaseError.getMessage());
+            }
+        });
     }
 
     /**
