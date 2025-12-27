@@ -18,16 +18,28 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.chopcode.trasnportenataga_laplata.R;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationService extends FirebaseMessagingService {
 
     private static final String TAG = "NotificationService";
-    private static final String CHANNEL_ID = "transport_channel";
-    private static final String CHANNEL_NAME = "Transporte Notifications";
+    private static final String CHANNEL_ID = "high_priority_channel";
+    private static final String CHANNEL_NAME = "Notificaciones Importantes";
     private static final String PREFS_NAME = "UserPrefs";
     private static final String KEY_USER_ID = "user_id";
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "🔄 Inicializando NotificationService");
+        // Crear el canal inmediatamente
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            android.app.NotificationManager notificationManager =
+                    (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            createNotificationChannel(notificationManager);
+        }
+    }
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         Log.d(TAG, "📨 MENSAJE RECIBIDO DE: " + remoteMessage.getFrom());
@@ -140,7 +152,7 @@ public class NotificationService extends FirebaseMessagingService {
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
             // ✅ CORREGIDO: Usar ícono por defecto de Android si no tienes ic_notification
-            int smallIcon = getResources().getIdentifier("ic_notification", "drawable", getPackageName());
+            int smallIcon = R.drawable.ic_launcher_foreground;
             if (smallIcon == 0) {
                 smallIcon = android.R.drawable.ic_dialog_info; // Ícono por defecto
             }
@@ -153,7 +165,8 @@ public class NotificationService extends FirebaseMessagingService {
                             .setAutoCancel(true)
                             .setSound(defaultSoundUri)
                             .setContentIntent(pendingIntent)
-                            .setPriority(NotificationCompat.PRIORITY_HIGH);
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .setVibrate(new long[]{0, 500, 200, 500});
 
             android.app.NotificationManager notificationManager =
                     (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -188,23 +201,17 @@ public class NotificationService extends FirebaseMessagingService {
     }
 
     private void sendRegistrationToServer(String token) {
-        Log.d(TAG, "💾 Guardando token en servidor: " + token);
+        Log.d(TAG, "🔑 Token FCM generado en servicio: " + token);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // ✅ CORREGIDO: Obtener el ID real del usuario
+        // Solo loguear el token - El guardado real se hará desde InicioDeSesion
         String userId = obtenerUserIdActual();
 
-        if (userId != null && !userId.equals("current_user_id")) {
-            db.collection("users")
-                    .document(userId)
-                    .update("fcmToken", token)
-                    .addOnSuccessListener(aVoid ->
-                            Log.d(TAG, "✅ Token guardado exitosamente para usuario: " + userId))
-                    .addOnFailureListener(e ->
-                            Log.e(TAG, "❌ Error guardando token: " + e.getMessage()));
+        if (userId != null && !userId.isEmpty() && !userId.equals("current_user_id")) {
+            Log.d(TAG, "👤 Token generado para userId: " + userId);
+            Log.d(TAG, "💡 Nota: El token se guardará cuando el usuario inicie sesión en InicioDeSesion");
         } else {
-            Log.w(TAG, "⚠️ No se pudo guardar token: userId no disponible");
+            Log.w(TAG, "⚠️ Token generado pero userId no disponible aún. Se guardará al iniciar sesión.");
+            Log.d(TAG, "🔑 Token para guardar más tarde: " + token.substring(0, 30) + "...");
         }
     }
 
