@@ -377,7 +377,7 @@ public class ConfirmarReserva extends AppCompatActivity {
      * ✅ NOTIFICACIÓN MEJORADA: Con timeout y mejor manejo de errores
      */
     private void enviarNotificacionAlConductor() {
-        if (conductorId == null || conductorId.equals("conductor_default_id")) {
+        if (conductorId == null || conductorId.isEmpty()) {
             Log.w(TAG, "No se puede enviar notificación: ID del conductor no válido");
             // ✅ NAVEGAR DE TODAS FORMAS AUNQUE FALLE LA NOTIFICACIÓN
             navegarAInicioUsuarios();
