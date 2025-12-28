@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.adapters.horarios.HorarioPagerAdapter;
+import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Horario;
 import com.chopcode.trasnportenataga_laplata.models.Usuario;
@@ -26,11 +27,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InicioUsuarios extends AppCompatActivity {
 
@@ -60,6 +62,9 @@ public class InicioUsuarios extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "🚀 onCreate - Iniciando actividad principal de usuario");
+
+        // ✅ Registrar evento analítico de inicio de pantalla
+        registrarEventoAnalitico("pantalla_inicio_usuario_inicio", null, null);
 
         setContentView(R.layout.activity_inicio_usuarios);
         Log.d(TAG, "✅ Layout inflado correctamente");
@@ -117,6 +122,10 @@ public class InicioUsuarios extends AppCompatActivity {
         topAppBar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_perfil && validarLogIn()) {
                 Log.d(TAG, "👤 Navegando a PerfilUsuario desde toolbar");
+
+                // ✅ Registrar evento analítico de navegación
+                registrarEventoAnalitico("navegar_perfil_usuario_toolbar", null, null);
+
                 Intent intent = new Intent(InicioUsuarios.this, PerfilUsuario.class);
                 startActivity(intent);
                 return true;
@@ -157,6 +166,10 @@ public class InicioUsuarios extends AppCompatActivity {
         // Botón Editar Perfil
         btnEditarPerfil.setOnClickListener(view -> {
             Log.d(TAG, "🎯 Click en botón Editar Perfil");
+
+            // ✅ Registrar evento analítico de botón
+            registrarEventoAnalitico("click_editar_perfil", null, null);
+
             if (validarLogIn()) {
                 Log.d(TAG, "👤 Navegando a EditarPerfil");
                 Intent intent = new Intent(InicioUsuarios.this, EditarPerfil.class);
@@ -169,6 +182,10 @@ public class InicioUsuarios extends AppCompatActivity {
         // Botón Actualizar
         btnRefresh.setOnClickListener(view -> {
             Log.d(TAG, "🔄 Click en botón Actualizar");
+
+            // ✅ Registrar evento analítico de actualización
+            registrarEventoAnalitico("click_actualizar", null, null);
+
             cargarHorarios();
             cargarContadoresUsuario(); // Recargar contadores al actualizar
             Toast.makeText(this, "Actualizando información...", Toast.LENGTH_SHORT).show();
@@ -181,10 +198,14 @@ public class InicioUsuarios extends AppCompatActivity {
     private void cargarDatosUsuario() {
         Log.d(TAG, "🔍 Cargando datos del usuario...");
 
-        FirebaseUser currentUser = authManager.getCurrentUser();
+        // ✅ Usar MyApp para obtener el usuario actual
+        FirebaseUser currentUser = MyApp.getCurrentUser();
         if (currentUser != null) {
             final String userId = currentUser.getUid();
-            Log.d(TAG, "👤 UserId encontrado: " + userId);
+            Log.d(TAG, "👤 UserId encontrado usando MyApp: " + userId);
+
+            // ✅ Registrar evento de carga de datos
+            registrarEventoAnalitico("carga_datos_usuario", null, null);
 
             // Cargar datos completos del usuario desde Firebase
             userService.loadUserData(userId, new UserService.UserDataCallback() {
@@ -200,8 +221,12 @@ public class InicioUsuarios extends AppCompatActivity {
                         Log.d(TAG, "👋 Usuario cargado: " + usuario.getNombre());
                         Log.d(TAG, "   - Email: " + usuario.getEmail());
                         Log.d(TAG, "   - Teléfono: " + usuario.getTelefono());
+
+                        // ✅ Registrar evento de usuario cargado
+                        registrarUsuarioCargadoAnalitico(usuario);
                     } else {
                         Log.w(TAG, "⚠️ Datos de usuario incompletos o nulos");
+                        MyApp.logError(new Exception("Datos de usuario incompletos para userId: " + userId));
                     }
 
                     Log.d(TAG, "📊 Cargando contadores de reservas...");
@@ -211,6 +236,10 @@ public class InicioUsuarios extends AppCompatActivity {
                 @Override
                 public void onError(String error) {
                     Log.e(TAG, "❌ Error cargando datos de usuario: " + error);
+
+                    // ✅ Usar MyApp para logging de errores
+                    MyApp.logError(new Exception("Error cargando datos usuario: " + error));
+
                     cargarContadoresAlternativo(userId);
                 }
             });
@@ -233,28 +262,32 @@ public class InicioUsuarios extends AppCompatActivity {
     private void cargarContadoresUsuario() {
         Log.d(TAG, "🔄 Recargando contadores de usuario...");
 
-        FirebaseUser currentUser = authManager.getCurrentUser();
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-            Log.d(TAG, "👤 Recargando contadores para userId: " + userId);
+        // ✅ Usar MyApp para obtener el ID del usuario
+        String userId = MyApp.getCurrentUserId();
+        if (userId != null) {
+            Log.d(TAG, "👤 Recargando contadores para userId usando MyApp: " + userId);
             cargarContadoresAlternativo(userId);
         } else {
             Log.w(TAG, "⚠️ No se pueden recargar contadores - usuario no autenticado");
         }
     }
 
-    // Método alternativo para cargar contadores de reservas y viajes - CORREGIDO
+    // Método alternativo para cargar contadores de reservas y viajes
     private void cargarContadoresAlternativo(final String userId) {
         Log.d(TAG, "📊 Cargando contadores alternativos para: " + userId);
 
-        DatabaseReference reservasRef = FirebaseDatabase.getInstance().getReference("reservas");
-        Log.d(TAG, "🔗 Conectando a Firebase Database...");
+        // ✅ Usar MyApp para obtener referencia a la base de datos
+        DatabaseReference reservasRef = MyApp.getDatabaseReference("reservas");
+        Log.d(TAG, "🔗 Conectando a Firebase Database usando MyApp...");
 
         reservasRef.orderByChild("usuarioId").equalTo(userId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Log.d(TAG, "✅ Datos de reservas recibidos - Snapshots: " + snapshot.getChildrenCount());
+
+                        // ✅ Registrar evento de datos cargados
+                        registrarEventoAnalitico("reservas_cargadas", (int) snapshot.getChildrenCount(), null);
 
                         // Usar variables locales en lugar de modificar las del método externo
                         final int reservasCount = contarReservasActivas(snapshot);
@@ -263,6 +296,9 @@ public class InicioUsuarios extends AppCompatActivity {
                         Log.d(TAG, "📈 Contadores calculados:");
                         Log.d(TAG, "   - Reservas activas: " + reservasCount);
                         Log.d(TAG, "   - Viajes completados: " + viajesCount);
+
+                        // ✅ Registrar estadísticas de usuario
+                        registrarEstadisticasUsuario(reservasCount, viajesCount);
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -278,6 +314,9 @@ public class InicioUsuarios extends AppCompatActivity {
                         Log.e(TAG, "❌ Error en Firebase Database: " + error.getMessage());
                         Log.e(TAG, "   - Código: " + error.getCode());
                         Log.e(TAG, "   - Detalles: " + error.getDetails());
+
+                        // ✅ Usar MyApp para logging de errores
+                        MyApp.logError(new Exception("DatabaseError contadores: " + error.getMessage()));
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -359,6 +398,9 @@ public class InicioUsuarios extends AppCompatActivity {
                 Log.d(TAG, "   - Natagá → La Plata: " + nataga.size() + " horarios");
                 Log.d(TAG, "   - La Plata → Natagá: " + laPlata.size() + " horarios");
 
+                // ✅ Registrar evento de horarios cargados
+                registrarEventoHorariosCargados(nataga.size(), laPlata.size());
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -376,6 +418,7 @@ public class InicioUsuarios extends AppCompatActivity {
                             Log.d(TAG, "✅ Adaptador del ViewPager actualizado");
                         } else {
                             Log.e(TAG, "❌ pagerAdapter es null - no se puede actualizar");
+                            MyApp.logError(new Exception("pagerAdapter es null en InicioUsuarios"));
                         }
 
                         Toast.makeText(InicioUsuarios.this,
@@ -390,6 +433,10 @@ public class InicioUsuarios extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 Log.e(TAG, "❌ Error cargando horarios: " + error);
+
+                // ✅ Usar MyApp para logging de errores
+                MyApp.logError(new Exception("Error cargando horarios: " + error));
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -405,6 +452,10 @@ public class InicioUsuarios extends AppCompatActivity {
         Log.d(TAG, "🔐 Validando login...");
         if (!authManager.isUserLoggedIn()) {
             Log.w(TAG, "⚠️ Usuario no logeado - redirigiendo a login");
+
+            // ✅ Registrar evento de validación fallida
+            registrarEventoAnalitico("validacion_login_fallida", null, null);
+
             Toast.makeText(this, "Debes iniciar sesión", Toast.LENGTH_SHORT).show();
             authManager.redirectToLogin(this);
             return false;
@@ -417,6 +468,9 @@ public class InicioUsuarios extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "📱 onResume - Actividad en primer plano");
+
+        // ✅ Registrar evento analítico de resumen
+        registrarEventoAnalitico("pantalla_inicio_usuario_resume", null, null);
 
         // Actualizar datos cuando la actividad se reanude
         if (authManager.isUserLoggedIn()) {
@@ -450,5 +504,86 @@ public class InicioUsuarios extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "📱 onDestroy - Actividad destruida");
+    }
+
+    /**
+     * ✅ MÉTODO AUXILIAR: Registrar eventos analíticos usando MyApp
+     */
+    private void registrarEventoAnalitico(String evento, Integer count, Integer count2) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("user_id", MyApp.getCurrentUserId());
+
+            if (count != null) {
+                params.put("count", count);
+            }
+            if (count2 != null) {
+                params.put("count2", count2);
+            }
+
+            params.put("timestamp", System.currentTimeMillis());
+            params.put("pantalla", "InicioUsuarios");
+
+            MyApp.logEvent(evento, params);
+            Log.d(TAG, "📊 Evento analítico registrado: " + evento);
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando evento analítico: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ MÉTODO AUXILIAR: Registrar usuario cargado usando MyApp
+     */
+    private void registrarUsuarioCargadoAnalitico(Usuario usuario) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("user_id", MyApp.getCurrentUserId());
+            params.put("user_nombre", usuario.getNombre());
+            params.put("user_email", usuario.getEmail());
+            params.put("user_telefono", usuario.getTelefono() != null ? usuario.getTelefono() : "N/A");
+            params.put("timestamp", System.currentTimeMillis());
+
+            MyApp.logEvent("usuario_cargado_inicio", params);
+            Log.d(TAG, "📊 Usuario cargado registrado en analytics");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando usuario cargado: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ MÉTODO AUXILIAR: Registrar estadísticas de usuario usando MyApp
+     */
+    private void registrarEstadisticasUsuario(int reservasActivas, int viajesCompletados) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("user_id", MyApp.getCurrentUserId());
+            params.put("reservas_activas", reservasActivas);
+            params.put("viajes_completados", viajesCompletados);
+            params.put("timestamp", System.currentTimeMillis());
+
+            MyApp.logEvent("estadisticas_usuario", params);
+            Log.d(TAG, "📊 Estadísticas de usuario registradas");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando estadísticas usuario: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ MÉTODO AUXILIAR: Registrar horarios cargados usando MyApp
+     */
+    private void registrarEventoHorariosCargados(int horariosNataga, int horariosLaPlata) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("user_id", MyApp.getCurrentUserId());
+            params.put("horarios_nataga", horariosNataga);
+            params.put("horarios_laplata", horariosLaPlata);
+            params.put("total_horarios", horariosNataga + horariosLaPlata);
+            params.put("timestamp", System.currentTimeMillis());
+
+            MyApp.logEvent("horarios_cargados", params);
+            Log.d(TAG, "📊 Horarios cargados registrados en analytics");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando horarios cargados: " + e.getMessage());
+        }
     }
 }
