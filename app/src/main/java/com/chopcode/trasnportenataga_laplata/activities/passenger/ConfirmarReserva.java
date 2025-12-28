@@ -12,11 +12,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
+import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
 import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConfirmarReserva extends AppCompatActivity {
 
@@ -56,9 +60,13 @@ public class ConfirmarReserva extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // ✅ Registrar evento analítico de inicio de pantalla
+        registrarEventoAnalitico("pantalla_confirmar_reserva_inicio", null, null);
+
         setContentView(R.layout.activity_confirmar_reserva);
 
-        // ✅ Inicializar servicios CON CONTEXTO
+        // ✅ Inicializar servicios CON CONTEXTO usando MyApp para el ID de usuario
         reservaService = new ReservaService();
         authManager = AuthManager.getInstance();
         notificationManager = NotificationManager.getInstance(this); // ✅ Pasar contexto
@@ -88,6 +96,18 @@ public class ConfirmarReserva extends AppCompatActivity {
         if (timeoutHandler != null) {
             timeoutHandler.removeCallbacksAndMessages(null);
         }
+
+        // ✅ Registrar evento de destrucción
+        registrarEventoAnalitico("pantalla_confirmar_reserva_destroy", null, null);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "📱 onResume - Actividad en primer plano");
+
+        // ✅ Registrar evento analítico de resumen
+        registrarEventoAnalitico("pantalla_confirmar_reserva_resume", null, null);
     }
 
     /**
@@ -95,6 +115,9 @@ public class ConfirmarReserva extends AppCompatActivity {
      */
     private void recibirDatosIntent() {
         Intent intent = getIntent();
+
+        // ✅ Registrar evento de recepción de datos
+        registrarEventoAnalitico("datos_recibidos_confirmar_reserva", null, null);
 
         // Datos principales del viaje
         asientoSeleccionado = intent.getIntExtra("asientoSeleccionado", -1);
@@ -148,6 +171,9 @@ public class ConfirmarReserva extends AppCompatActivity {
 
         metodoPago = "Efectivo"; // Por defecto
 
+        // ✅ Registrar detalles de los datos recibidos
+        registrarDatosRecibidosAnalitico();
+
         Log.d(TAG, "✓ TODOS los datos recibidos via Intent:");
         Log.d(TAG, "  - Ruta: " + rutaSeleccionada + ", Asiento: " + asientoSeleccionado);
         Log.d(TAG, "  - Conductor: " + conductorNombre + ", ID: " + conductorId + ", Tel: " + conductorTelefono);
@@ -197,6 +223,8 @@ public class ConfirmarReserva extends AppCompatActivity {
         }
 
         topAppBar.setNavigationOnClickListener(v -> {
+            // ✅ Registrar evento de navegación en toolbar
+            registrarEventoAnalitico("click_toolbar_navigation", null, null);
             onBackPressed();
         });
     }
@@ -212,11 +240,18 @@ public class ConfirmarReserva extends AppCompatActivity {
             } else if (checkedId == R.id.radioTransferencia) {
                 metodoPago = "Transferencia";
             }
+
+            // ✅ Registrar evento de cambio de método de pago
+            registrarEventoAnalitico("metodo_pago_seleccionado", null, metodoPago.equals("Efectivo") ? 1 : 2);
+
             Log.d(TAG, "Método de pago seleccionado: " + metodoPago);
         });
 
         // Botón Confirmar Reserva
         btnConfirmarReserva.setOnClickListener(v -> {
+            // ✅ Registrar evento de click en confirmar
+            registrarEventoAnalitico("click_confirmar_reserva", asientoSeleccionado, null);
+
             if (validarFormulario()) {
                 registrarReserva();
             }
@@ -224,6 +259,9 @@ public class ConfirmarReserva extends AppCompatActivity {
 
         // Botón Cancelar
         btnCancelar.setOnClickListener(v -> {
+            // ✅ Registrar evento de click en cancelar
+            registrarEventoAnalitico("click_cancelar_reserva", asientoSeleccionado, null);
+
             mostrarDialogoCancelacion();
         });
     }
@@ -251,6 +289,9 @@ public class ConfirmarReserva extends AppCompatActivity {
 
         // Seleccionar método de pago por defecto (Efectivo)
         radioEfectivo.setChecked(true);
+
+        // ✅ Registrar evento de información cargada
+        registrarEventoAnalitico("informacion_basica_cargada", asientoSeleccionado, null);
     }
 
     /**
@@ -269,6 +310,9 @@ public class ConfirmarReserva extends AppCompatActivity {
         String infoVehiculo = "Vehículo: " + vehiculoPlaca + " - " + vehiculoModelo;
         tvPlaca.setText(infoVehiculo);
 
+        // ✅ Registrar evento de información de usuario y conductor cargada
+        registrarInfoUsuarioConductorAnalitico();
+
         Log.d(TAG, "✓ Información cargada desde Intent");
     }
 
@@ -278,8 +322,16 @@ public class ConfirmarReserva extends AppCompatActivity {
     private boolean validarFormulario() {
         if (metodoPago == null || metodoPago.isEmpty()) {
             Toast.makeText(this, "Por favor selecciona un método de pago", Toast.LENGTH_SHORT).show();
+
+            // ✅ Registrar evento de validación fallida
+            registrarEventoAnalitico("validacion_fallida_sin_metodo_pago", null, null);
+
             return false;
         }
+
+        // ✅ Registrar evento de validación exitosa
+        registrarEventoAnalitico("validacion_exitosa_confirmar", asientoSeleccionado, null);
+
         return true;
     }
 
@@ -287,23 +339,39 @@ public class ConfirmarReserva extends AppCompatActivity {
      * Mostrar diálogo de cancelación
      */
     private void mostrarDialogoCancelacion() {
+        // ✅ Registrar evento de diálogo mostrado
+        registrarEventoAnalitico("dialogo_cancelacion_mostrado", asientoSeleccionado, null);
+
         new android.app.AlertDialog.Builder(this)
                 .setTitle("Cancelar reserva")
                 .setMessage("¿Estás seguro de que quieres cancelar la reserva?")
                 .setPositiveButton("Sí", (dialog, which) -> {
+                    // ✅ Registrar evento de confirmación de cancelación
+                    registrarEventoAnalitico("cancelacion_reserva_confirmada", asientoSeleccionado, null);
+
                     finish();
                 })
-                .setNegativeButton("No", null)
+                .setNegativeButton("No", (dialog, which) -> {
+                    // ✅ Registrar evento de rechazo de cancelación
+                    registrarEventoAnalitico("cancelacion_reserva_rechazada", asientoSeleccionado, null);
+
+                    dialog.dismiss();
+                })
                 .show();
     }
 
     /**
-     * ✅ MÉTODO MEJORADO: Registrar la reserva con mejor manejo de errores
+     * ✅ MÉTODO MEJORADO: Registrar la reserva con mejor manejo de errores usando MyApp
      */
     private void registrarReserva() {
-        String userId = authManager.getUserId();
+        // ✅ Usar MyApp para obtener el ID del usuario
+        String userId = MyApp.getCurrentUserId();
         if (userId == null) {
             Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
+
+            // ✅ Registrar evento de error
+            registrarEventoAnalitico("error_usuario_no_autenticado", null, null);
+
             return;
         }
 
@@ -311,6 +379,9 @@ public class ConfirmarReserva extends AppCompatActivity {
 
         Log.d(TAG, "Registrando reserva con datos del Intent:");
         Log.d(TAG, "  - Conductor: " + conductorNombre + ", ID: " + conductorId + ", Tel: " + conductorTelefono);
+
+        // ✅ Registrar evento de inicio de registro
+        registrarEventoAnalitico("registro_reserva_inicio", asientoSeleccionado, null);
 
         // Deshabilitar botón para evitar múltiples clics
         btnConfirmarReserva.setEnabled(false);
@@ -322,6 +393,10 @@ public class ConfirmarReserva extends AppCompatActivity {
             public void run() {
                 if (!isFinishing()) {
                     Log.w(TAG, "⏰ TIMEOUT - La operación está tomando demasiado tiempo");
+
+                    // ✅ Registrar evento de timeout
+                    registrarEventoAnalitico("timeout_registro_reserva", asientoSeleccionado, null);
+
                     runOnUiThread(() -> {
                         if (!isFinishing()) {
                             btnConfirmarReserva.setEnabled(true);
@@ -351,6 +426,10 @@ public class ConfirmarReserva extends AppCompatActivity {
                             if (!isFinishing()) {
                                 Toast.makeText(ConfirmarReserva.this, "✅ Reserva creada exitosamente", Toast.LENGTH_LONG).show();
 
+                                // ✅ Registrar evento de reserva exitosa
+                                registrarEventoAnalitico("reserva_registrada_exitosa", asientoSeleccionado, null);
+                                registrarReservaExitosaAnalitico();
+
                                 // ✅ ENVIAR NOTIFICACIÓN AL CONDUCTOR CON MANEJO DE ERRORES MEJORADO
                                 enviarNotificacionAlConductor();
                             }
@@ -366,6 +445,13 @@ public class ConfirmarReserva extends AppCompatActivity {
                             if (!isFinishing()) {
                                 btnConfirmarReserva.setEnabled(true);
                                 btnConfirmarReserva.setText("Confirmar Reserva");
+
+                                // ✅ Usar MyApp para logging de errores
+                                MyApp.logError(new Exception("Error registrando reserva: " + error));
+
+                                // ✅ Registrar evento de error
+                                registrarEventoAnalitico("error_registro_reserva", asientoSeleccionado, null);
+
                                 Toast.makeText(ConfirmarReserva.this, "❌ Error al confirmar reserva: " + error, Toast.LENGTH_LONG).show();
                             }
                         });
@@ -374,11 +460,15 @@ public class ConfirmarReserva extends AppCompatActivity {
     }
 
     /**
-     * ✅ NOTIFICACIÓN MEJORADA: Con timeout y mejor manejo de errores
+     * ✅ NOTIFICACIÓN MEJORADA: Con timeout y mejor manejo de errores usando MyApp
      */
     private void enviarNotificacionAlConductor() {
         if (conductorId == null || conductorId.isEmpty()) {
             Log.w(TAG, "No se puede enviar notificación: ID del conductor no válido");
+
+            // ✅ Registrar evento de error
+            registrarEventoAnalitico("error_conductor_id_invalido", asientoSeleccionado, null);
+
             // ✅ NAVEGAR DE TODAS FORMAS AUNQUE FALLE LA NOTIFICACIÓN
             navegarAInicioUsuarios();
             return;
@@ -389,12 +479,19 @@ public class ConfirmarReserva extends AppCompatActivity {
         // Mostrar progreso
         btnConfirmarReserva.setText("Enviando notificación...");
 
+        // ✅ Registrar evento de inicio de notificación
+        registrarEventoAnalitico("notificacion_conductor_inicio", asientoSeleccionado, null);
+
         // ✅ TIMEOUT para notificación
         Runnable notificationTimeout = new Runnable() {
             @Override
             public void run() {
                 if (!isFinishing()) {
                     Log.w(TAG, "⏰ TIMEOUT NOTIFICACIÓN - Envío de notificación tardando demasiado");
+
+                    // ✅ Registrar evento de timeout
+                    registrarEventoAnalitico("timeout_notificacion_conductor", asientoSeleccionado, null);
+
                     runOnUiThread(() -> {
                         if (!isFinishing()) {
                             mostrarErrorNotificacion("El envío de notificación está tardando demasiado. La reserva fue creada exitosamente.");
@@ -423,6 +520,10 @@ public class ConfirmarReserva extends AppCompatActivity {
                         runOnUiThread(() -> {
                             if (!isFinishing()) {
                                 Log.d(TAG, "✅ Notificación enviada exitosamente al conductor");
+
+                                // ✅ Registrar evento de notificación exitosa
+                                registrarEventoAnalitico("notificacion_conductor_exitosa", asientoSeleccionado, null);
+
                                 Toast.makeText(ConfirmarReserva.this, "✅ Reserva confirmada y notificación enviada", Toast.LENGTH_LONG).show();
                                 navegarAInicioUsuarios();
                             }
@@ -437,6 +538,13 @@ public class ConfirmarReserva extends AppCompatActivity {
                         runOnUiThread(() -> {
                             if (!isFinishing()) {
                                 Log.e(TAG, "❌ Error enviando notificación: " + error);
+
+                                // ✅ Usar MyApp para logging de errores
+                                MyApp.logError(new Exception("Error enviando notificación conductor: " + error));
+
+                                // ✅ Registrar evento de error en notificación
+                                registrarEventoAnalitico("error_notificacion_conductor", asientoSeleccionado, null);
+
                                 mostrarErrorNotificacion("Error enviando notificación al conductor: " + error);
                             }
                         });
@@ -449,6 +557,10 @@ public class ConfirmarReserva extends AppCompatActivity {
      */
     private void navegarAInicioUsuarios() {
         Log.d(TAG, "🏠 Navegando a InicioUsuarios");
+
+        // ✅ Registrar evento de navegación
+        registrarEventoAnalitico("navegacion_inicio_usuarios", asientoSeleccionado, null);
+
         try {
             Intent intent = new Intent(ConfirmarReserva.this, InicioUsuarios.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -456,6 +568,13 @@ public class ConfirmarReserva extends AppCompatActivity {
             finish();
         } catch (Exception e) {
             Log.e(TAG, "❌ Error navegando a InicioUsuarios: " + e.getMessage());
+
+            // ✅ Usar MyApp para logging de errores
+            MyApp.logError(e);
+
+            // ✅ Registrar evento de error en navegación
+            registrarEventoAnalitico("error_navegacion_inicio", asientoSeleccionado, null);
+
             // Si hay error, al menos finalizar esta actividad
             finish();
         }
@@ -466,16 +585,29 @@ public class ConfirmarReserva extends AppCompatActivity {
      */
     private void mostrarErrorNotificacion(String mensaje) {
         try {
+            // ✅ Registrar evento de diálogo de error
+            registrarEventoAnalitico("dialogo_error_notificacion", asientoSeleccionado, null);
+
             new android.app.AlertDialog.Builder(this)
                     .setTitle("Información de Notificación")
                     .setMessage(mensaje + "\n\nLa reserva se creó exitosamente, pero hubo un problema con la notificación al conductor.")
                     .setPositiveButton("Continuar", (dialog, which) -> {
+                        // ✅ Registrar evento de confirmación de diálogo
+                        registrarEventoAnalitico("confirmacion_dialogo_error", asientoSeleccionado, null);
+
                         navegarAInicioUsuarios();
                     })
                     .setCancelable(false) // ✅ Evitar que el usuario cierre el diálogo sin acción
                     .show();
         } catch (Exception e) {
             Log.e(TAG, "❌ Error mostrando diálogo: " + e.getMessage());
+
+            // ✅ Usar MyApp para logging de errores
+            MyApp.logError(e);
+
+            // ✅ Registrar evento de error en diálogo
+            registrarEventoAnalitico("error_mostrando_dialogo", asientoSeleccionado, null);
+
             // Si falla el diálogo, navegar directamente
             navegarAInicioUsuarios();
         }
@@ -486,6 +618,105 @@ public class ConfirmarReserva extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
+        // ✅ Registrar evento de botón físico back
+        registrarEventoAnalitico("boton_back_fisico", asientoSeleccionado, null);
+
         mostrarDialogoCancelacion();
+    }
+
+    /**
+     * ✅ MÉTODO AUXILIAR: Registrar eventos analíticos usando MyApp
+     */
+    private void registrarEventoAnalitico(String evento, Integer asiento, Integer tipo) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("user_id", MyApp.getCurrentUserId());
+            params.put("pantalla", "ConfirmarReserva");
+
+            if (asiento != null) {
+                params.put("asiento", asiento);
+            }
+            if (tipo != null) {
+                params.put("tipo", tipo);
+            }
+
+            params.put("ruta", rutaSeleccionada != null ? rutaSeleccionada : "N/A");
+            params.put("conductor", conductorNombre != null ? conductorNombre : "N/A");
+            params.put("metodo_pago", metodoPago != null ? metodoPago : "N/A");
+            params.put("precio", precio);
+            params.put("timestamp", System.currentTimeMillis());
+
+            MyApp.logEvent(evento, params);
+            Log.d(TAG, "📊 Evento analítico registrado: " + evento);
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando evento analítico: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ MÉTODO AUXILIAR: Registrar detalles de datos recibidos usando MyApp
+     */
+    private void registrarDatosRecibidosAnalitico() {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("user_id", MyApp.getCurrentUserId());
+            params.put("asiento", asientoSeleccionado);
+            params.put("ruta", rutaSeleccionada != null ? rutaSeleccionada : "N/A");
+            params.put("conductor", conductorNombre != null ? conductorNombre : "N/A");
+            params.put("conductor_id", conductorId != null ? conductorId : "N/A");
+            params.put("vehiculo_placa", vehiculoPlaca != null ? vehiculoPlaca : "N/A");
+            params.put("precio", precio);
+            params.put("metodo_pago", metodoPago);
+            params.put("timestamp", System.currentTimeMillis());
+            params.put("pantalla", "ConfirmarReserva");
+
+            MyApp.logEvent("datos_recibidos_detalle_confirmar", params);
+            Log.d(TAG, "📊 Detalles de datos recibidos registrados en analytics");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando detalles de datos: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ MÉTODO AUXILIAR: Registrar información de usuario y conductor usando MyApp
+     */
+    private void registrarInfoUsuarioConductorAnalitico() {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("user_id", MyApp.getCurrentUserId());
+            params.put("usuario_nombre", usuarioNombre != null ? usuarioNombre : "N/A");
+            params.put("conductor_nombre", conductorNombre != null ? conductorNombre : "N/A");
+            params.put("conductor_telefono", conductorTelefono != null ? conductorTelefono : "N/A");
+            params.put("vehiculo_placa", vehiculoPlaca != null ? vehiculoPlaca : "N/A");
+            params.put("timestamp", System.currentTimeMillis());
+            params.put("pantalla", "ConfirmarReserva");
+
+            MyApp.logEvent("info_usuario_conductor_cargada", params);
+            Log.d(TAG, "📊 Información de usuario y conductor registrada en analytics");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando info usuario/conductor: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ MÉTODO AUXILIAR: Registrar reserva exitosa usando MyApp
+     */
+    private void registrarReservaExitosaAnalitico() {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("user_id", MyApp.getCurrentUserId());
+            params.put("asiento", asientoSeleccionado);
+            params.put("ruta", rutaSeleccionada != null ? rutaSeleccionada : "N/A");
+            params.put("conductor", conductorNombre != null ? conductorNombre : "N/A");
+            params.put("metodo_pago", metodoPago);
+            params.put("precio", precio);
+            params.put("timestamp", System.currentTimeMillis());
+            params.put("pantalla", "ConfirmarReserva");
+
+            MyApp.logEvent("reserva_completa_detalle", params);
+            Log.d(TAG, "📊 Detalles de reserva completa registrados en analytics");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando detalles de reserva: " + e.getMessage());
+        }
     }
 }
