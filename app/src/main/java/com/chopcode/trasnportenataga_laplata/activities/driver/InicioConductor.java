@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.adapters.reservas.ReservaAdapter;
 import com.chopcode.trasnportenataga_laplata.adapters.rutas.RutaAdapter;
+import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
 import com.chopcode.trasnportenataga_laplata.managers.StatisticsManager;
@@ -58,11 +59,11 @@ public class InicioConductor extends AppCompatActivity {
     private StatisticsManager statisticsManager;
     private NotificationManager notificationManager;
 
-    // ✅ NUEVO: Listeners para tiempo real
+    // Listeners para tiempo real
     private DatabaseReference reservasRef;
     private ValueEventListener reservasListener;
 
-    // ✅ NUEVO: Tag para logs
+    // Tag para logs
     private static final String TAG = "InicioConductor";
 
     @Override
@@ -74,7 +75,7 @@ public class InicioConductor extends AppCompatActivity {
             setContentView(R.layout.activity_inicio_conductor);
             Log.d(TAG, "✅ Layout inflado correctamente");
 
-            // Inicializar services
+            // Inicializar servicios usando MyApp para Firebase
             authManager = AuthManager.getInstance();
             userService = new UserService();
             reservaService = new ReservaService();
@@ -98,6 +99,7 @@ public class InicioConductor extends AppCompatActivity {
 
         } catch (Exception e) {
             Log.e(TAG, "❌ Error crítico en onCreate: " + e.getMessage(), e);
+            MyApp.logError(e); // ✅ Usar MyApp para logging de errores
             Toast.makeText(this, "Error al iniciar: " + e.getMessage(), Toast.LENGTH_LONG).show();
             finish();
         }
@@ -125,7 +127,7 @@ public class InicioConductor extends AppCompatActivity {
         updateStatisticsUI();
     }
 
-    // ✅ MÉTODO CORREGIDO: Configurar listener en tiempo real
+    // Configurar listener en tiempo real usando MyApp
     private void setupRealTimeListener(String conductorNombre) {
         Log.d(TAG, "🔔 Configurando listener en tiempo real para: " + conductorNombre);
 
@@ -136,8 +138,8 @@ public class InicioConductor extends AppCompatActivity {
                 Log.d(TAG, "🗑️ Listener anterior removido");
             }
 
-            // Configurar nueva referencia y listener
-            reservasRef = FirebaseDatabase.getInstance().getReference("reservas");
+            // ✅ Usar MyApp para obtener referencia a la base de datos
+            reservasRef = MyApp.getDatabaseReference("reservas");
 
             reservasListener = new ValueEventListener() {
                 @Override
@@ -145,7 +147,7 @@ public class InicioConductor extends AppCompatActivity {
                     Log.d(TAG, "🔄 Datos cambiados en Firebase - Actualizando en tiempo real");
 
                     int nuevasConfirmadas = 0;
-                    final List<Reserva> reservasTiempoReal = new ArrayList<>(); // ✅ Hacer final
+                    final List<Reserva> reservasTiempoReal = new ArrayList<>();
 
                     // Procesar todas las reservas
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -164,6 +166,7 @@ public class InicioConductor extends AppCompatActivity {
                             }
                         } catch (Exception e) {
                             Log.e(TAG, "❌ Error procesando reserva: " + e.getMessage());
+                            MyApp.logError(e); // ✅ Usar MyApp para logging
                         }
                     }
 
@@ -171,15 +174,20 @@ public class InicioConductor extends AppCompatActivity {
                     Log.d(TAG, "   - Reservas totales: " + reservasTiempoReal.size());
                     Log.d(TAG, "   - Reservas confirmadas: " + nuevasConfirmadas);
 
-                    // ✅ CREAR COPIA FINAL DE LAS VARIABLES PARA USAR EN EL RUNNABLE
+                    // Crear copia final de las variables para usar en el Runnable
                     final int finalNuevasConfirmadas = nuevasConfirmadas;
                     final int finalReservasConfirmadasHoy = reservasConfirmadasHoy;
+
+                    // ✅ Registrar evento analítico usando MyApp
+                    registrarEventoAnalitico("reservas_tiempo_real",
+                            reservasTiempoReal.size(), nuevasConfirmadas);
 
                     // Actualizar UI en el hilo principal
                     runOnUiThread(() -> {
                         // Actualizar contador de reservas confirmadas
                         if (finalReservasConfirmadasHoy != finalNuevasConfirmadas) {
-                            Log.d(TAG, "🔄 Actualizando contador de confirmadas: " + finalReservasConfirmadasHoy + " → " + finalNuevasConfirmadas);
+                            Log.d(TAG, "🔄 Actualizando contador de confirmadas: " +
+                                    finalReservasConfirmadasHoy + " → " + finalNuevasConfirmadas);
                             reservasConfirmadasHoy = finalNuevasConfirmadas;
                             tvReservasConfirmadas.setText(String.valueOf(reservasConfirmadasHoy));
 
@@ -210,6 +218,7 @@ public class InicioConductor extends AppCompatActivity {
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     Log.e(TAG, "❌ Error en listener tiempo real: " + databaseError.getMessage());
+                    MyApp.logError(new Exception("DatabaseError: " + databaseError.getMessage())); // ✅ Logging
                 }
             };
 
@@ -219,6 +228,7 @@ public class InicioConductor extends AppCompatActivity {
 
         } catch (Exception e) {
             Log.e(TAG, "💥 Error crítico configurando listener tiempo real: " + e.getMessage());
+            MyApp.logError(e); // ✅ Usar MyApp para logging
         }
     }
 
@@ -254,12 +264,20 @@ public class InicioConductor extends AppCompatActivity {
 
         btnCerrarSesion.setOnClickListener(view -> {
             Log.d(TAG, "🚪 Cerrando sesión de conductor...");
+
+            // ✅ Registrar evento de cierre de sesión usando MyApp
+            registrarEventoAnalitico("conductor_cerro_sesion", null, null);
+
             authManager.signOut(this);
             Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show();
         });
 
         btnPerfilConductor.setOnClickListener(view -> {
             Log.d(TAG, "👤 Navegando a perfil de conductor");
+
+            // ✅ Registrar evento de navegación usando MyApp
+            registrarEventoAnalitico("navegar_perfil_conductor", null, null);
+
             goToDriverProfile();
         });
 
@@ -269,7 +287,8 @@ public class InicioConductor extends AppCompatActivity {
     private void loadDriverData() {
         Log.d(TAG, "🔧 Cargando datos del conductor...");
 
-        String userId = authManager.getUserId();
+        // ✅ Usar MyApp para obtener el ID del usuario actual
+        String userId = MyApp.getCurrentUserId();
         if (userId == null) {
             Log.w(TAG, "⚠️ UserId es null - mostrando datos por defecto");
             showDefaultData();
@@ -291,7 +310,7 @@ public class InicioConductor extends AppCompatActivity {
                     tvPlacaVehiculo.setText(getString(R.string.placaVehiculo, placa != null ? placa : "N/A"));
                     horariosAsignados = horarios;
 
-                    // ✅ ACTUALIZADO: Configurar listener en tiempo real después de cargar datos
+                    // Configurar listener en tiempo real después de cargar datos
                     setupRealTimeListener(nombre);
 
                     calculateStatistics(nombre);
@@ -303,6 +322,7 @@ public class InicioConductor extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 Log.e(TAG, "❌ Error cargando datos conductor: " + error);
+                MyApp.logError(new Exception("Error cargando datos conductor: " + error)); // ✅ Logging
                 showDefaultData();
             }
         });
@@ -319,6 +339,9 @@ public class InicioConductor extends AppCompatActivity {
                 Log.d(TAG, "   - Asientos disponibles: " + asientosDisp);
                 Log.d(TAG, "   - Ingresos: $" + ingresos);
 
+                // ✅ Registrar evento estadístico usando MyApp
+                registrarEstadisticasAnaliticas(reservasConfirmadas, asientosDisp, ingresos);
+
                 runOnUiThread(() -> {
                     reservasConfirmadasHoy = reservasConfirmadas;
                     asientosDisponibles = asientosDisp;
@@ -330,6 +353,7 @@ public class InicioConductor extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 Log.e(TAG, "❌ Error calculando estadísticas: " + error);
+                MyApp.logError(new Exception("Error calculando estadísticas: " + error)); // ✅ Logging
             }
         });
     }
@@ -342,6 +366,9 @@ public class InicioConductor extends AppCompatActivity {
                     @Override
                     public void onDriverReservationsLoaded(List<Reserva> reservas) {
                         Log.d(TAG, "✅ Reservas cargadas: " + reservas.size() + " reservas encontradas");
+
+                        // ✅ Registrar evento analítico
+                        registrarEventoAnalitico("reservas_cargadas", reservas.size(), null);
 
                         runOnUiThread(() -> {
                             listaReservas.clear();
@@ -362,6 +389,7 @@ public class InicioConductor extends AppCompatActivity {
                     @Override
                     public void onError(String error) {
                         Log.e(TAG, "❌ Error cargando reservas: " + error);
+                        MyApp.logError(new Exception("Error cargando reservas: " + error)); // ✅ Logging
                         showEmptyReservations();
                     }
                 });
@@ -375,6 +403,9 @@ public class InicioConductor extends AppCompatActivity {
             public void onRoutesLoaded(List<Ruta> rutas) {
                 Log.d(TAG, "✅ Rutas cargadas: " + rutas.size() + " rutas encontradas");
 
+                // ✅ Registrar evento analítico
+                registrarEventoAnalitico("rutas_cargadas", rutas.size(), null);
+
                 runOnUiThread(() -> {
                     listaRutas.clear();
                     listaRutas.addAll(rutas);
@@ -386,6 +417,7 @@ public class InicioConductor extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 Log.e(TAG, "❌ Error cargando rutas: " + error);
+                MyApp.logError(new Exception("Error cargando rutas: " + error)); // ✅ Logging
                 showEmptyRoutes();
             }
         });
@@ -398,7 +430,6 @@ public class InicioConductor extends AppCompatActivity {
         tvAsientosDisponibles.setText(String.valueOf(asientosDisponibles));
         tvTotalIngresos.setText(formatCurrency(totalIngresos));
 
-        // ✅ ACTUALIZADO: Información más específica
         if (tvInfoCapacidad != null) {
             tvInfoCapacidad.setText("De " + CAPACIDAD_TOTAL + " totales");
         }
@@ -409,7 +440,6 @@ public class InicioConductor extends AppCompatActivity {
         Log.d(TAG, "✅ UI de estadísticas actualizada");
     }
 
-    // ✅ MÉTODO MEJORADO: Formatear moneda con K para miles
     private String formatCurrency(double amount) {
         if (amount == 0) {
             return "$0";
@@ -457,6 +487,10 @@ public class InicioConductor extends AppCompatActivity {
                         "¿Cancelar reserva de " + reserva.getNombre() + "?")
                 .setPositiveButton(isConfirmation ? "Confirmar" : "Cancelar", (dialog, which) -> {
                     Log.d(TAG, "✅ Usuario confirmó " + (isConfirmation ? "confirmación" : "cancelación"));
+
+                    // ✅ Registrar evento de acción
+                    registrarAccionReserva(reserva, isConfirmation ? "confirmar" : "cancelar");
+
                     if (isConfirmation) {
                         confirmReservation(reserva);
                     } else {
@@ -512,6 +546,7 @@ public class InicioConductor extends AppCompatActivity {
                     @Override
                     public void onError(String error) {
                         Log.e(TAG, "❌ Error actualizando estado de reserva: " + error);
+                        MyApp.logError(new Exception("Error actualizando reserva: " + error)); // ✅ Logging
                         Toast.makeText(InicioConductor.this,
                                 "Error al actualizar: " + error, Toast.LENGTH_SHORT).show();
                     }
@@ -522,17 +557,14 @@ public class InicioConductor extends AppCompatActivity {
         Log.d(TAG, "🎯 INICIANDO ENVÍO DE NOTIFICACIÓN DE CONFIRMACIÓN");
 
         try {
-            // Obtener datos del conductor actual
             String nombreConductor = tvConductor.getText().toString();
             if (nombreConductor.equals("N/A") || nombreConductor.isEmpty()) {
                 nombreConductor = reserva.getConductor() != null ? reserva.getConductor() : "Tu conductor";
             }
 
-            // Obtener datos del vehículo
             String placaVehiculo = obtenerPlacaVehiculo();
             String modeloVehiculo = obtenerModeloVehiculo();
 
-            // ✅ USAR LOS CAMPOS CORRECTOS DE TU MODELO RESERVA
             String pasajeroId = reserva.getUsuarioId();
             String pasajeroNombre = reserva.getNombre();
             String ruta = reserva.getOrigen() + " → " + reserva.getDestino();
@@ -549,7 +581,6 @@ public class InicioConductor extends AppCompatActivity {
             if (pasajeroId != null && !pasajeroId.isEmpty()) {
                 Log.d(TAG, "📤 Llamando a NotificationManager...");
 
-                // 🔹 ENVIAR NOTIFICACIÓN DE CONFIRMACIÓN AL PASAJERO CON CALLBACK
                 notificationManager.notificarReservaConfirmadaAlPasajero(
                         pasajeroId,
                         nombreConductor,
@@ -567,6 +598,7 @@ public class InicioConductor extends AppCompatActivity {
                             @Override
                             public void onError(String error) {
                                 Log.e(TAG, "❌ Error enviando notificación de confirmación: " + error);
+                                MyApp.logError(new Exception("Error notificación confirmación: " + error)); // ✅ Logging
                             }
                         }
                 );
@@ -580,8 +612,7 @@ public class InicioConductor extends AppCompatActivity {
 
         } catch (Exception e) {
             Log.e(TAG, "💥 ERROR CRÍTICO enviando notificación al pasajero: " + e.getMessage());
-            Log.e(TAG, "   - Reserva ID: " + reserva.getIdReserva());
-            e.printStackTrace();
+            MyApp.logError(e); // ✅ Logging con MyApp
         }
     }
 
@@ -603,7 +634,6 @@ public class InicioConductor extends AppCompatActivity {
             Log.d(TAG, "   - Ruta: " + ruta);
 
             if (pasajeroId != null && !pasajeroId.isEmpty()) {
-                // 🔹 ENVIAR NOTIFICACIÓN DE CANCELACIÓN CON CALLBACK
                 notificationManager.notificarReservaCanceladaAlPasajero(
                         pasajeroId,
                         nombreConductor,
@@ -618,6 +648,7 @@ public class InicioConductor extends AppCompatActivity {
                             @Override
                             public void onError(String error) {
                                 Log.e(TAG, "❌ Error enviando notificación de cancelación: " + error);
+                                MyApp.logError(new Exception("Error notificación cancelación: " + error)); // ✅ Logging
                             }
                         }
                 );
@@ -629,12 +660,10 @@ public class InicioConductor extends AppCompatActivity {
 
         } catch (Exception e) {
             Log.e(TAG, "💥 ERROR enviando notificación de cancelación: " + e.getMessage());
+            MyApp.logError(e); // ✅ Logging con MyApp
         }
     }
 
-    /**
-     * ✅ Métodos auxiliares para obtener datos del vehículo
-     */
     private String obtenerPlacaVehiculo() {
         String placa = tvPlacaVehiculo.getText().toString();
         if (placa.contains(":")) {
@@ -644,24 +673,16 @@ public class InicioConductor extends AppCompatActivity {
     }
 
     private String obtenerModeloVehiculo() {
-        // Si no tienes modelo, puedes usar un valor por defecto o obtenerlo de tu base de datos
         return "Vehículo de transporte";
     }
 
-    /**
-     * ✅ NUEVO MÉTODO AUXILIAR: Formatear fecha y hora de la reserva
-     */
     private String obtenerFechaHoraReserva(Reserva reserva) {
         try {
-            // Si tienes fechaReserva como timestamp
             if (reserva.getFechaReserva() > 0) {
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy - HH:mm", java.util.Locale.getDefault());
                 return sdf.format(new java.util.Date(reserva.getFechaReserva()));
             }
-
-            // Si no hay fecha específica, usar información básica
             return "Próximo viaje";
-
         } catch (Exception e) {
             return "Próximo viaje";
         }
@@ -673,7 +694,8 @@ public class InicioConductor extends AppCompatActivity {
         Log.d(TAG, "   - Ingresos actuales: $" + totalIngresos);
         Log.d(TAG, "   - Nuevos ingresos: $" + (totalIngresos + reserva.getPrecio()));
 
-        String userId = authManager.getUserId();
+        // ✅ Usar MyApp para obtener el ID del usuario
+        String userId = MyApp.getCurrentUserId();
         if (userId != null) {
             statisticsManager.updateIncomeInFirebase(userId, totalIngresos + reserva.getPrecio(),
                     new UserService.IncomeUpdateCallback() {
@@ -687,6 +709,7 @@ public class InicioConductor extends AppCompatActivity {
                         @Override
                         public void onError(String error) {
                             Log.e(TAG, "❌ Error actualizando ingresos: " + error);
+                            MyApp.logError(new Exception("Error actualizando ingresos: " + error)); // ✅ Logging
                         }
                     });
         }
@@ -724,7 +747,6 @@ public class InicioConductor extends AppCompatActivity {
         tvConductor.setText("N/A");
         tvPlacaVehiculo.setText("Placa: N/A");
 
-        // ✅ ACTUALIZADO: Los ingresos ahora se muestran en las estadísticas
         totalIngresos = 0.0;
         reservasConfirmadasHoy = 0;
         asientosDisponibles = CAPACIDAD_TOTAL;
@@ -747,16 +769,90 @@ public class InicioConductor extends AppCompatActivity {
         rvProximasRutas.setVisibility(View.GONE);
     }
 
+    /**
+     * ✅ MÉTODO AUXILIAR: Registrar eventos analíticos usando MyApp
+     */
+    private void registrarEventoAnalitico(String evento, Integer reservas, Integer confirmadas) {
+        try {
+            java.util.Map<String, Object> params = new java.util.HashMap<>();
+            params.put("conductor_id", MyApp.getCurrentUserId());
+            params.put("conductor_nombre", tvConductor.getText().toString());
+
+            if (reservas != null) {
+                params.put("total_reservas", reservas);
+            }
+            if (confirmadas != null) {
+                params.put("reservas_confirmadas", confirmadas);
+            }
+
+            params.put("timestamp", System.currentTimeMillis());
+            params.put("pantalla", "InicioConductor");
+
+            MyApp.logEvent(evento, params);
+            Log.d(TAG, "📊 Evento analítico registrado: " + evento);
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando evento analítico: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ MÉTODO AUXILIAR: Registrar estadísticas usando MyApp
+     */
+    private void registrarEstadisticasAnaliticas(int reservasConfirmadas, int asientosDisp, double ingresos) {
+        try {
+            java.util.Map<String, Object> params = new java.util.HashMap<>();
+            params.put("conductor_id", MyApp.getCurrentUserId());
+            params.put("reservas_confirmadas", reservasConfirmadas);
+            params.put("asientos_disponibles", asientosDisp);
+            params.put("ingresos", ingresos);
+            params.put("capacidad_total", CAPACIDAD_TOTAL);
+            params.put("timestamp", System.currentTimeMillis());
+
+            MyApp.logEvent("estadisticas_conductor", params);
+            Log.d(TAG, "📊 Estadísticas registradas en análisis");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando estadísticas: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ MÉTODO AUXILIAR: Registrar acción sobre reserva usando MyApp
+     */
+    private void registrarAccionReserva(Reserva reserva, String accion) {
+        try {
+            java.util.Map<String, Object> params = new java.util.HashMap<>();
+            params.put("conductor_id", MyApp.getCurrentUserId());
+            params.put("reserva_id", reserva.getIdReserva());
+            params.put("pasajero_id", reserva.getUsuarioId());
+            params.put("pasajero_nombre", reserva.getNombre());
+            params.put("accion", accion);
+            params.put("ruta", reserva.getOrigen() + " → " + reserva.getDestino());
+            params.put("asiento", reserva.getPuestoReservado());
+            params.put("timestamp", System.currentTimeMillis());
+
+            MyApp.logEvent("accion_reserva_conductor", params);
+            Log.d(TAG, "📊 Acción de reserva registrada: " + accion);
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando acción de reserva: " + e.getMessage());
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "📱 onStart - Actividad visible");
+
+        // ✅ Registrar evento de inicio usando MyApp
+        registrarEventoAnalitico("pantalla_inicio_conductor_inicio", null, null);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "📱 onResume - Actividad en primer plano");
+
+        // ✅ Registrar evento de resumen usando MyApp
+        registrarEventoAnalitico("pantalla_inicio_conductor_resume", null, null);
     }
 
     @Override
@@ -776,7 +872,7 @@ public class InicioConductor extends AppCompatActivity {
         super.onDestroy();
         Log.d(TAG, "📱 onDestroy - Actividad destruida");
 
-        // ✅ NUEVO: Limpiar listeners cuando la actividad se destruya
+        // Limpiar listeners cuando la actividad se destruya
         if (reservasRef != null && reservasListener != null) {
             reservasRef.removeEventListener(reservasListener);
             Log.d(TAG, "🗑️ Listener de Firebase removido");
