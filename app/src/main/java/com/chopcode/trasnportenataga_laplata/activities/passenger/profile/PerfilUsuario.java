@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.activities.passenger;
+package com.chopcode.trasnportenataga_laplata.activities.passenger.profile;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +10,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.editProfile.EditarPerfil;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.history.HistorialReservas;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuarios;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Usuario;

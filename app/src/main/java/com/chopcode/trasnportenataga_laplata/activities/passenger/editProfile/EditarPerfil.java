@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.activities.passenger;
+package com.chopcode.trasnportenataga_laplata.activities.passenger.editProfile;
 
 import androidx.appcompat.app.AppCompatActivity;
 

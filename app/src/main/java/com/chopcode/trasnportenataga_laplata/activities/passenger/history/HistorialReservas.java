@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.activities.passenger;
+package com.chopcode.trasnportenataga_laplata.activities.passenger.history;
 
 import android.os.Bundle;
 import android.util.Log;

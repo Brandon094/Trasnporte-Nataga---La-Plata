@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.activities.driver.InicioConductor;
-import com.chopcode.trasnportenataga_laplata.activities.passenger.CrearReservas;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.createReservation.CrearReservas;
 import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuarios;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
