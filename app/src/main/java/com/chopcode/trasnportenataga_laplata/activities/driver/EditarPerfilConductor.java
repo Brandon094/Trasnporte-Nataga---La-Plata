@@ -10,21 +10,20 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.chopcode.trasnportenataga_laplata.R;
+import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.models.Conductor;
 import com.chopcode.trasnportenataga_laplata.models.Vehiculo;
 import com.chopcode.trasnportenataga_laplata.services.user.UserService;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class EditarPerfilConductor extends AppCompatActivity {
 
-    // ✅ NUEVO: Tag para logs
+    // Tag para logs
     private static final String TAG = "EditarPerfilConductor";
 
     // Servicios
@@ -49,13 +48,13 @@ public class EditarPerfilConductor extends AppCompatActivity {
 
         setContentView(R.layout.activity_editar_perfil);
 
-        // Inicializar servicios
+        // Inicializar servicios usando MyApp
         userService = new UserService();
-        vehiculoRef = FirebaseDatabase.getInstance().getReference("vehiculos");
-        Log.d(TAG, "✅ Servicios inicializados");
+        vehiculoRef = MyApp.getDatabaseReference("vehiculos");
+        Log.d(TAG, "✅ Servicios inicializados usando MyApp");
 
-        // Obtener usuario actual
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        // Obtener usuario actual usando MyApp
+        FirebaseUser currentUser = MyApp.getCurrentUser();
         if (currentUser == null) {
             Log.e(TAG, "❌ Usuario no autenticado - finalizando actividad");
             Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show();
@@ -85,7 +84,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
         tvNombreActual = findViewById(R.id.tvNombreActual);
         tvTelefonoActual = findViewById(R.id.tvTelefonoActual);
         tvPlacaActual = findViewById(R.id.tvPlacaActual);
-        tvMarcaActual = findViewById(R.id.tvMarcaActual);  // ✅ NUEVO: TextView para marca
+        tvMarcaActual = findViewById(R.id.tvMarcaActual);
         tvModeloActual = findViewById(R.id.tvModeloActual);
         tvColorActual = findViewById(R.id.tvColorActual);
         tvCapacidadActual = findViewById(R.id.tvCapacidadActual);
@@ -96,7 +95,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
         etNombre = findViewById(R.id.etNombre);
         etTelefono = findViewById(R.id.etTelefono);
         etPlaca = findViewById(R.id.etPlaca);
-        etMarca = findViewById(R.id.etMarca);  // ✅ NUEVO: EditText para marca
+        etMarca = findViewById(R.id.etMarca);
         etModelo = findViewById(R.id.etModelo);
         etColor = findViewById(R.id.etColor);
         etCapacidad = findViewById(R.id.etCapacidad);
@@ -142,9 +141,8 @@ public class EditarPerfilConductor extends AppCompatActivity {
     private void cargarDatosDriver() {
         Log.d(TAG, "📋 Cargando datos completos del conductor...");
 
-        // Cargar datos del conductor desde la base de datos
-        DatabaseReference conductorRef = FirebaseDatabase.getInstance()
-                .getReference("conductores")
+        // Cargar datos del conductor desde la base de datos usando MyApp
+        DatabaseReference conductorRef = MyApp.getDatabaseReference("conductores")
                 .child(userId);
 
         conductorRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -247,7 +245,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
         if (vehiculoActual != null) {
             tvPlacaActual.setText("Placa actual: " +
                     (vehiculoActual.getPlaca() != null ? vehiculoActual.getPlaca() : "No definida"));
-            tvMarcaActual.setText("Marca actual: " +  // ✅ NUEVO: Actualizar marca
+            tvMarcaActual.setText("Marca actual: " +
                     (vehiculoActual.getMarca() != null ? vehiculoActual.getMarca() : "No definida"));
             tvModeloActual.setText("Modelo actual: " +
                     (vehiculoActual.getModelo() != null ? vehiculoActual.getModelo() : "No definido"));
@@ -265,14 +263,14 @@ public class EditarPerfilConductor extends AppCompatActivity {
         Log.d(TAG, "🔄 Inicializando campos de vehículo vacíos");
 
         tvPlacaActual.setText("Placa actual: No definida");
-        tvMarcaActual.setText("Marca actual: No definida");  // ✅ NUEVO: Inicializar marca
+        tvMarcaActual.setText("Marca actual: No definida");
         tvModeloActual.setText("Modelo actual: No definido");
         tvColorActual.setText("Color actual: No definido");
         tvCapacidadActual.setText("Capacidad actual: 0");
         tvAnioActual.setText("Año actual: No definido");
 
         etPlaca.setText("");
-        etMarca.setText("");  // ✅ NUEVO: Limpiar campo marca
+        etMarca.setText("");
         etModelo.setText("");
         etColor.setText("");
         etCapacidad.setText("");
@@ -306,7 +304,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
         String nombre = etNombre.getText().toString().trim();
         String telefono = etTelefono.getText().toString().trim();
         String placa = etPlaca.getText().toString().trim();
-        String marca = etMarca.getText().toString().trim();  // ✅ NUEVO: Obtener marca
+        String marca = etMarca.getText().toString().trim();
         String modelo = etModelo.getText().toString().trim();
         String color = etColor.getText().toString().trim();
         String capacidadStr = etCapacidad.getText().toString().trim();
@@ -340,7 +338,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
             return;
         }
 
-        if (TextUtils.isEmpty(marca)) {  // ✅ NUEVO: Validar marca
+        if (TextUtils.isEmpty(marca)) {
             Log.w(TAG, "⚠️ Validación fallida - marca vacía");
             etMarca.setError("La marca es obligatoria");
             return;
@@ -411,7 +409,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
             Log.d(TAG, "🔄 Actualizando vehículo existente - ID: " + vehiculoId);
             // Actualizar vehículo existente
             vehiculoActual.setPlaca(placa);
-            vehiculoActual.setMarca(marca);  // ✅ NUEVO: Establecer marca
+            vehiculoActual.setMarca(marca);
             vehiculoActual.setModelo(modelo);
             vehiculoActual.setColor(color);
             vehiculoActual.setCapacidad(capacidad);
@@ -451,8 +449,8 @@ public class EditarPerfilConductor extends AppCompatActivity {
     private void actualizarConductor(String nombre, String telefono, String vehiculoId) {
         Log.d(TAG, "👤 Actualizando datos del conductor...");
 
-        DatabaseReference conductorRef = FirebaseDatabase.getInstance()
-                .getReference("conductores")
+        // Usar MyApp para obtener referencias de base de datos
+        DatabaseReference conductorRef = MyApp.getDatabaseReference("conductores")
                 .child(userId);
 
         // Actualizar datos del conductor
@@ -462,8 +460,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
         conductorRef.child("placaVehiculo").setValue(etPlaca.getText().toString().trim());
 
         // También actualizar en la colección de usuarios para consistencia
-        DatabaseReference usuarioRef = FirebaseDatabase.getInstance()
-                .getReference("usuarios")
+        DatabaseReference usuarioRef = MyApp.getDatabaseReference("usuarios")
                 .child(userId);
 
         usuarioRef.child("nombre").setValue(nombre);
@@ -471,12 +468,33 @@ public class EditarPerfilConductor extends AppCompatActivity {
 
         Log.d(TAG, "✅ Datos del conductor actualizados exitosamente");
 
+        // Registrar evento de análisis usando MyApp
+        registrarEventoAnalitico("perfil_conductor_actualizado", nombre, telefono);
+
         // Éxito
         btnGuardarCambios.setEnabled(true);
         btnGuardarCambios.setText("Guardar");
         Toast.makeText(this, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "🎉 Perfil actualizado exitosamente - finalizando actividad");
         finish();
+    }
+
+    /**
+     * Método helper para registrar eventos de análisis usando MyApp
+     */
+    private void registrarEventoAnalitico(String evento, String nombre, String telefono) {
+        try {
+            java.util.Map<String, Object> params = new java.util.HashMap<>();
+            params.put("user_id", userId);
+            params.put("conductor_nombre", nombre);
+            params.put("conductor_telefono", telefono);
+            params.put("timestamp", System.currentTimeMillis());
+
+            MyApp.logEvent(evento, params);
+            Log.d(TAG, "📊 Evento analítico registrado: " + evento);
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error registrando evento analítico: " + e.getMessage());
+        }
     }
 
     // Interface para callback del vehículo
