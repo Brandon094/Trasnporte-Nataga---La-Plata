@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.chopcode.trasnportenataga_laplata'
+    namespace 'com.chopcode.rutago_app'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.chopcode.trasnportenataga_laplata"
+        applicationId "com.chopcode.rutago_app"
         minSdk 24
         targetSdk 34
         versionCode 1

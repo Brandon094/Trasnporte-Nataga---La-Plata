@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.chopcode.trasnportenataga_laplata">
+    package="com.chopcode.rutago_app">
 
     <!-- 🔹 PERMISOS PARA FCM Y CONECTIVIDAD -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -14,14 +14,14 @@
     <!-- 🔹 PERMISOS DE SEGURIDAD PARA FCM (AGREGADO) -->
     <!-- Define un permiso único para tu app que solo ella puede usar -->
     <permission
-        android:name="com.chopcode.trasnportenataga_laplata.permission.C2D_MESSAGE"
+        android:name="com.chopcode.rutago_app.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <!-- Tu app debe declarar que usa ese permiso -->
     <uses-permission android:name="com.chopcode.trasnportenataga_laplata.permission.C2D_MESSAGE" />
 
     <application
-        android:name=".config.MyApp"
+        android:name="com.chopcode.rutago_app.config.MyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -45,7 +45,7 @@
 
         <!-- 🔹 ACTIVIDAD PRINCIPAL - Punto de entrada de la aplicación -->
         <activity
-            android:name=".activities.common.InicioDeSesion"
+            android:name="com.chopcode.rutago_app.activities.common.InicioDeSesion"
             android:exported="true"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar">
             <intent-filter>
@@ -56,7 +56,7 @@
 
         <!-- 🔹 SERVICIO DE NOTIFICACIONES FCM - Maneja mensajes en primer plano -->
         <service
-            android:name=".services.notifications.NotificationService"
+            android:name="com.chopcode.rutago_app.services.notifications.NotificationService"
             android:exported="false"
             android:permission="com.google.android.c2dm.permission.SEND"> <!-- AGREGADO -->
             <intent-filter>
@@ -66,59 +66,59 @@
 
         <!-- 🔹 ACTIVIDADES DE LA APLICACIÓN -->
         <activity
-            android:name=".activities.passenger.reservation.confirmReservation.ConfirmarReserva"
+            android:name="com.chopcode.rutago_app.activities.passenger.reservation.confirmReservation.ConfirmarReserva"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.passenger.reservation.createReservation.CrearReservas"
+            android:name="com.chopcode.rutago_app.activities.passenger.reservation.createReservation.CrearReservas"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.passenger.editProfile.EditarPerfil"
+            android:name="com.chopcode.rutago_app.activities.passenger.editProfile.EditarPerfil"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.driver.editProfile.EditarPerfilConductor"
+            android:name="com.chopcode.rutago_app.activities.driver.editProfile.EditarPerfilConductor"
             android:exported="false"
             android:label="Editar Perfil Conductor"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.driver.history.HistorialConductor"
+            android:name="com.chopcode.rutago_app.activities.driver.history.HistorialConductor"
             android:exported="false"
             android:label="@string/historial_reservas"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.passenger.history.HistorialReservas"
+            android:name="com.chopcode.rutago_app.activities.passenger.history.HistorialReservas"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.driver.InicioConductor"
+            android:name="com.chopcode.rutago_app.activities.driver.InicioConductor"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.passenger.InicioUsuarios"
+            android:name="com.chopcode.rutago_app.activities.passenger.InicioUsuarios"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.driver.profile.PerfilConductor"
+            android:name="com.chopcode.rutago_app.activities.driver.profile.PerfilConductor"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.passenger.profile.PerfilUsuario"
+            android:name="com.chopcode.rutago_app.activities.passenger.profile.PerfilUsuario"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.common.RegistroUsuarios"
+            android:name="com.chopcode.rutago_app.activities.common.RegistroUsuarios"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 

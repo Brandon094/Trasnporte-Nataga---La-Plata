@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Trasnporte Nataga - La Plata"
+rootProject.name = "RutaGo_App"
 include ':app'
