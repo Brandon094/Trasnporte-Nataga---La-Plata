@@ -9,13 +9,19 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.managers.NotificationManager; // ✅ NUEVO IMPORT
+import com.chopcode.trasnportenataga_laplata.config.MyApp; // ✅ NUEVO IMPORT
+import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
 import com.chopcode.trasnportenataga_laplata.services.auth.RegistroService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference; // ✅ NUEVO IMPORT
+
+import java.util.HashMap; // ✅ NUEVO IMPORT
+import java.util.Map; // ✅ NUEVO IMPORT
 
 public class RegistroUsuarios extends AppCompatActivity {
 
@@ -42,6 +48,13 @@ public class RegistroUsuarios extends AppCompatActivity {
 
         Log.d(TAG, "✅ onCreate: Iniciando actividad de registro de usuarios");
 
+        // ✅ VERIFICAR SI MyApp ESTÁ INICIALIZADO
+        if (MyApp.getInstance() == null) {
+            Log.e(TAG, "❌ MyApp no está inicializado. Verifica el AndroidManifest.xml");
+        } else {
+            Log.d(TAG, "✅ MyApp inicializado correctamente");
+        }
+
         // Inicializar vistas del layout
         initViews();
 
@@ -51,14 +64,21 @@ public class RegistroUsuarios extends AppCompatActivity {
         // Inicializar servicio de registro
         registroService = new RegistroService();
 
-        // ✅ NUEVO: Inicializar NotificationManager
-        notificationManager = NotificationManager.getInstance(this);
+        // ✅ NUEVO: Inicializar NotificationManager usando MyApp
+        notificationManager = NotificationManager.getInstance(MyApp.getAppContext());
 
         Log.d(TAG, "✅ Servicio de registro y NotificationManager inicializados");
 
         // Redirigir al usuario a la pantalla de inicio de sesión
         buttonIniciarSesion.setOnClickListener(v -> {
             Log.d(TAG, "📱 Clic en 'Iniciar Sesión', redirigiendo a pantalla de login");
+
+            // ✅ REGISTRAR EVENTO CON MyApp
+            Map<String, Object> params = new HashMap<>();
+            params.put("screen", "RegistroUsuarios");
+            params.put("action", "click_iniciar_sesion");
+            MyApp.logEvent("navigation_event", params);
+
             startActivity(new Intent(RegistroUsuarios.this, InicioDeSesion.class));
             finish(); // Cierra la pantalla de registro para que no vuelva atrás
         });
@@ -66,6 +86,13 @@ public class RegistroUsuarios extends AppCompatActivity {
         // Manejar el clic del botón de registro
         buttonRegistrar.setOnClickListener(v -> {
             Log.d(TAG, "📱 Clic en botón Registrar");
+
+            // ✅ REGISTRAR EVENTO CON MyApp
+            Map<String, Object> params = new HashMap<>();
+            params.put("screen", "RegistroUsuarios");
+            params.put("action", "click_registrar");
+            MyApp.logEvent("button_click", params);
+
             registrarUsuario();
         });
 
@@ -97,6 +124,13 @@ public class RegistroUsuarios extends AppCompatActivity {
         Log.d(TAG, "🔧 Configurando toolbar");
         topAppBar.setNavigationOnClickListener(v -> {
             Log.d(TAG, "📱 Clic en navegación de toolbar, regresando a actividad anterior");
+
+            // ✅ REGISTRAR EVENTO CON MyApp
+            Map<String, Object> params = new HashMap<>();
+            params.put("screen", "RegistroUsuarios");
+            params.put("action", "toolbar_back");
+            MyApp.logEvent("navigation_event", params);
+
             onBackPressed();
         });
     }
@@ -114,9 +148,21 @@ public class RegistroUsuarios extends AppCompatActivity {
         Log.d(TAG, "👤 Iniciando proceso de registro para: " + correo);
         Log.d(TAG, "📝 Datos capturados - Nombre: " + nombre + ", Teléfono: " + telefono);
 
+        // ✅ REGISTRAR EVENTO DE INICIO DE REGISTRO
+        Map<String, Object> registroParams = new HashMap<>();
+        registroParams.put("email", correo);
+        registroParams.put("has_phone", !telefono.isEmpty());
+        MyApp.logEvent("registro_iniciado", registroParams);
+
         // Validaciones mejoradas
         if (!validarCampos(nombre, correo, password, confirmPassword)) {
             Log.w(TAG, "❌ Validación de campos fallida");
+
+            // ✅ REGISTRAR ERROR DE VALIDACIÓN
+            Map<String, Object> errorParams = new HashMap<>();
+            errorParams.put("error_type", "validacion_campos");
+            MyApp.logEvent("registro_error", errorParams);
+
             return;
         }
 
@@ -133,25 +179,44 @@ public class RegistroUsuarios extends AppCompatActivity {
             public void onSuccess() {
                 Log.d(TAG, "🎉 Registro exitoso en Firebase Auth");
 
+                // ✅ REGISTRAR ÉXITO DE REGISTRO
+                Map<String, Object> successParams = new HashMap<>();
+                successParams.put("email", correo);
+                successParams.put("timestamp", System.currentTimeMillis());
+                MyApp.logEvent("registro_exitoso", successParams);
+
                 runOnUiThread(() -> {
                     buttonRegistrar.setEnabled(true);
                     buttonRegistrar.setText("Registrarse");
                     Log.d(TAG, "✅ Botón de registro reestablecido");
 
                     // ✅ Obtener y guardar el userId después del registro exitoso
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    FirebaseUser user = MyApp.getCurrentUser(); // ✅ USANDO MyApp
                     if (user != null) {
                         Log.d(TAG, "👤 Usuario de Firebase obtenido: " + user.getUid());
                         guardarUserIdEnPrefs(user.getUid());
 
                         // ✅ NUEVO: Guardar token FCM después del registro exitoso
                         guardarTokenFCM(user.getUid());
+
+                        // ✅ GUARDAR DATOS ADICIONALES EN REALTIME DATABASE USANDO MyApp
+                        guardarDatosUsuarioEnDatabase(user.getUid(), nombre, correo, telefono);
                     } else {
                         Log.e(TAG, "❌ Usuario de Firebase es null después del registro exitoso");
+
+                        // ✅ REGISTRAR ERROR EN CRASHLYTICS
+                        MyApp.logError(new Exception("Usuario null después de registro exitoso"));
                     }
 
                     Toast.makeText(RegistroUsuarios.this, "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "🚀 Redirigiendo a pantalla de inicio de sesión");
+
+                    // ✅ REGISTRAR NAVEGACIÓN
+                    Map<String, Object> navParams = new HashMap<>();
+                    navParams.put("from", "RegistroUsuarios");
+                    navParams.put("to", "InicioDeSesion");
+                    MyApp.logEvent("screen_transition", navParams);
+
                     startActivity(new Intent(RegistroUsuarios.this, InicioDeSesion.class));
                     finish();
                 });
@@ -160,6 +225,15 @@ public class RegistroUsuarios extends AppCompatActivity {
             @Override
             public void onFailure(String error) {
                 Log.e(TAG, "❌ Error en registro: " + error);
+
+                // ✅ REGISTRAR ERROR EN CRASHLYTICS
+                MyApp.logError(new Exception("Error en registro: " + error));
+
+                // ✅ REGISTRAR EVENTO DE ERROR
+                Map<String, Object> errorParams = new HashMap<>();
+                errorParams.put("error_message", error);
+                errorParams.put("email", correo);
+                MyApp.logEvent("registro_fallido", errorParams);
 
                 runOnUiThread(() -> {
                     buttonRegistrar.setEnabled(true);
@@ -170,6 +244,43 @@ public class RegistroUsuarios extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    /**
+     * ✅ NUEVO MÉTODO: Guardar datos del usuario en Realtime Database usando MyApp
+     */
+    private void guardarDatosUsuarioEnDatabase(String userId, String nombre, String correo, String telefono) {
+        try {
+            // ✅ USAR MyApp PARA OBTENER LA REFERENCIA A LA BASE DE DATOS
+            DatabaseReference userRef = MyApp.getDatabaseReference("usuarios/" + userId);
+
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("nombre", nombre);
+            userData.put("correo", correo);
+            userData.put("telefono", telefono);
+            userData.put("fechaRegistro", System.currentTimeMillis());
+            userData.put("rol", "usuario"); // Rol por defecto
+
+            userRef.setValue(userData)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "✅ Datos de usuario guardados en Realtime Database");
+
+                        // ✅ REGISTRAR EVENTO
+                        Map<String, Object> params = new HashMap<>();
+                        params.put("user_id", userId);
+                        MyApp.logEvent("user_data_saved", params);
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "❌ Error guardando datos en Realtime Database: " + e.getMessage());
+
+                        // ✅ REGISTRAR ERROR EN CRASHLYTICS
+                        MyApp.logError(e);
+                    });
+
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Excepción en guardarDatosUsuarioEnDatabase: " + e.getMessage());
+            MyApp.logError(e);
+        }
     }
 
     /**
@@ -184,6 +295,7 @@ public class RegistroUsuarios extends AppCompatActivity {
             Log.d(TAG, "💾 UserId guardado en SharedPreferences: " + userId);
         } catch (Exception e) {
             Log.e(TAG, "❌ Error guardando userId en SharedPreferences: " + e.getMessage(), e);
+            MyApp.logError(e); // ✅ USANDO MyApp PARA LOG DE ERROR
         }
     }
 
@@ -199,6 +311,7 @@ public class RegistroUsuarios extends AppCompatActivity {
                 Log.d(TAG, "✅ Llamada a saveFCMTokenToFirestore ejecutada para: " + userId);
             } catch (Exception e) {
                 Log.e(TAG, "❌ Error llamando a saveFCMTokenToFirestore: " + e.getMessage());
+                MyApp.logError(e); // ✅ USANDO MyApp PARA LOG DE ERROR
             }
         } else {
             Log.e(TAG, "❌ NotificationManager es null - no se puede guardar token FCM");
@@ -272,9 +385,27 @@ public class RegistroUsuarios extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Log.d(TAG, "📱 onBackPressed: Regresando a actividad anterior");
+
+        // ✅ REGISTRAR EVENTO
+        Map<String, Object> params = new HashMap<>();
+        params.put("screen", "RegistroUsuarios");
+        params.put("action", "back_pressed");
+        MyApp.logEvent("navigation_event", params);
+
         super.onBackPressed();
         // Opcional: agregar animación personalizada
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "🚀 onStart: Actividad visible");
+
+        // ✅ REGISTRAR VISITA A PANTALLA
+        Map<String, Object> params = new HashMap<>();
+        params.put("screen_name", "RegistroUsuarios");
+        MyApp.logEvent("screen_view", params);
     }
 
     @Override
