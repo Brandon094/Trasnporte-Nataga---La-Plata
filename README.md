@@ -1,4 +1,4 @@
-# 🚍 Transporte-Nataga --- La Plata
+# 🚍 RutaGo
 
 **Transporte-Nataga** es una aplicación que mejora la experiencia de pasajeros y conductores en la ruta Natagá - La Plata y viceversa. ✨
 
