@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.adapters.historial.HistorialConductorAdapter;
-import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
+import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
 import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
 import com.google.android.material.chip.Chip;

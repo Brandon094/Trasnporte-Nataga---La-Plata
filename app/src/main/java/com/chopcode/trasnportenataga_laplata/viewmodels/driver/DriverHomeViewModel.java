@@ -4,10 +4,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.chopcode.trasnportenataga_laplata.managers.driver.ReservasManager;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.ReservasManager;
 import com.chopcode.trasnportenataga_laplata.managers.statistics.DriverStatisticsManager;
-import com.chopcode.trasnportenataga_laplata.managers.driver.RutasManager;
-import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
+import com.chopcode.trasnportenataga_laplata.managers.routes.RutasManager;
+import com.chopcode.trasnportenataga_laplata.managers.notificactions.NotificationManager;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
 import com.chopcode.trasnportenataga_laplata.models.Ruta;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;

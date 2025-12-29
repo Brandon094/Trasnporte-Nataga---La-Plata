@@ -18,7 +18,7 @@ import com.chopcode.trasnportenataga_laplata.activities.driver.profile.PerfilCon
 import com.chopcode.trasnportenataga_laplata.adapters.reservas.ReservaAdapter;
 import com.chopcode.trasnportenataga_laplata.adapters.rutas.RutaAdapter;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
-import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
+import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
 import com.chopcode.trasnportenataga_laplata.models.Ruta;
 import com.chopcode.trasnportenataga_laplata.viewmodels.driver.DriverHomeViewModel;

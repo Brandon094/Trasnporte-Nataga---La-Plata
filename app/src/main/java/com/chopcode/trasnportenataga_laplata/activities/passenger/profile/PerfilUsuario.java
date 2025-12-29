@@ -14,7 +14,7 @@ import com.chopcode.trasnportenataga_laplata.activities.passenger.editProfile.Ed
 import com.chopcode.trasnportenataga_laplata.activities.passenger.history.HistorialReservas;
 import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuarios;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
-import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
+import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Usuario;
 import com.chopcode.trasnportenataga_laplata.services.user.UserService;
 import com.google.android.material.card.MaterialCardView;

@@ -15,7 +15,7 @@ import com.chopcode.trasnportenataga_laplata.activities.passenger.editProfile.Ed
 import com.chopcode.trasnportenataga_laplata.activities.passenger.profile.PerfilUsuario;
 import com.chopcode.trasnportenataga_laplata.adapters.horarios.HorarioPagerAdapter;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
-import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
+import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Horario;
 import com.chopcode.trasnportenataga_laplata.models.Usuario;
 import com.chopcode.trasnportenataga_laplata.services.reservations.HorarioService;

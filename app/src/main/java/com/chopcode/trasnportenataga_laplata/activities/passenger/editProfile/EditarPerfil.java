@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
-import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
+import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Usuario;
 import com.chopcode.trasnportenataga_laplata.services.user.UserService;
 

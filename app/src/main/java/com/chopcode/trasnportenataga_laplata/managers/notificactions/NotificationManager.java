@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.managers;
+package com.chopcode.trasnportenataga_laplata.managers.notificactions;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -11,7 +11,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;

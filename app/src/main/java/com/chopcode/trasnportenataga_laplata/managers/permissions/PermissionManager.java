@@ -1,4 +1,4 @@
-package com.chopcode.trasnportenataga_laplata.managers;
+package com.chopcode.trasnportenataga_laplata.managers.permissions;
 
 import android.Manifest;
 import android.app.Activity;

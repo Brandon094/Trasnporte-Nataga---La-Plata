@@ -1,6 +1,6 @@
 package com.chopcode.trasnportenataga_laplata.activities.common;
 
-import static com.chopcode.trasnportenataga_laplata.managers.PermissionManager.requestNotificationPermission;
+import static com.chopcode.trasnportenataga_laplata.managers.permissions.PermissionManager.requestNotificationPermission;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,8 +24,8 @@ import com.chopcode.trasnportenataga_laplata.activities.driver.InicioConductor;
 import com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.createReservation.CrearReservas;
 import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuarios;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
-import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
-import com.chopcode.trasnportenataga_laplata.managers.PermissionManager;
+import com.chopcode.trasnportenataga_laplata.managers.notificactions.NotificationManager;
+import com.chopcode.trasnportenataga_laplata.managers.permissions.PermissionManager;
 import com.chopcode.trasnportenataga_laplata.services.auth.IniciarService;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;

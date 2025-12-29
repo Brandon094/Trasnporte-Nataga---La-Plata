@@ -12,11 +12,10 @@ import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.config.MyApp; // ✅ NUEVO IMPORT
-import com.chopcode.trasnportenataga_laplata.managers.NotificationManager;
+import com.chopcode.trasnportenataga_laplata.managers.notificactions.NotificationManager;
 import com.chopcode.trasnportenataga_laplata.services.auth.RegistroService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference; // ✅ NUEVO IMPORT
 

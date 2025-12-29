@@ -13,7 +13,7 @@ import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.activities.driver.history.HistorialConductor;
 import com.chopcode.trasnportenataga_laplata.activities.driver.InicioConductor;
 import com.chopcode.trasnportenataga_laplata.activities.driver.editProfile.EditarPerfilConductor;
-import com.chopcode.trasnportenataga_laplata.managers.AuthManager;
+import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Vehiculo;
 import com.chopcode.trasnportenataga_laplata.services.user.UserService;
 import com.chopcode.trasnportenataga_laplata.services.reservations.VehiculoService;
