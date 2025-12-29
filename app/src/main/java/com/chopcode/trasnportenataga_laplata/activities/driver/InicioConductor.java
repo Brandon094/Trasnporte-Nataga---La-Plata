@@ -155,8 +155,10 @@ public class InicioConductor extends AppCompatActivity {
                         try {
                             Reserva reserva = snapshot.getValue(Reserva.class);
                             if (reserva != null) {
-                                // Filtrar por conductor y estado
-                                if (conductorNombre.equals(reserva.getConductor())) {
+                                // Filtrar por conductor y estado "Por confirmar"
+                                if (conductorNombre.equals(reserva.getConductor()) &&
+                                        "Por confirmar".equals(reserva.getEstadoReserva())) {
+
                                     reservasTiempoReal.add(reserva);
 
                                     // Contar reservas confirmadas
@@ -167,12 +169,12 @@ public class InicioConductor extends AppCompatActivity {
                             }
                         } catch (Exception e) {
                             Log.e(TAG, "❌ Error procesando reserva: " + e.getMessage());
-                            MyApp.logError(e); // ✅ Usar MyApp para logging
+                            MyApp.logError(e);
                         }
                     }
 
                     Log.d(TAG, "📊 Estadísticas en tiempo real:");
-                    Log.d(TAG, "   - Reservas totales: " + reservasTiempoReal.size());
+                    Log.d(TAG, "   - Reservas por confirmar: " + reservasTiempoReal.size());
                     Log.d(TAG, "   - Reservas confirmadas: " + nuevasConfirmadas);
 
                     // Crear copia final de las variables para usar en el Runnable
@@ -219,7 +221,7 @@ public class InicioConductor extends AppCompatActivity {
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     Log.e(TAG, "❌ Error en listener tiempo real: " + databaseError.getMessage());
-                    MyApp.logError(new Exception("DatabaseError: " + databaseError.getMessage())); // ✅ Logging
+                    MyApp.logError(new Exception("DatabaseError: " + databaseError.getMessage()));
                 }
             };
 
@@ -229,7 +231,7 @@ public class InicioConductor extends AppCompatActivity {
 
         } catch (Exception e) {
             Log.e(TAG, "💥 Error crítico configurando listener tiempo real: " + e.getMessage());
-            MyApp.logError(e); // ✅ Usar MyApp para logging
+            MyApp.logError(e);
         }
     }
 
@@ -368,17 +370,25 @@ public class InicioConductor extends AppCompatActivity {
                     public void onDriverReservationsLoaded(List<Reserva> reservas) {
                         Log.d(TAG, "✅ Reservas cargadas: " + reservas.size() + " reservas encontradas");
 
+                        // Filtrar solo las reservas "Por confirmar"
+                        List<Reserva> reservasPorConfirmar = new ArrayList<>();
+                        for (Reserva reserva : reservas) {
+                            if ("Por confirmar".equals(reserva.getEstadoReserva())) {
+                                reservasPorConfirmar.add(reserva);
+                            }
+                        }
+
                         // ✅ Registrar evento analítico
-                        registrarEventoAnalitico("reservas_cargadas", reservas.size(), null);
+                        registrarEventoAnalitico("reservas_cargadas", reservasPorConfirmar.size(), null);
 
                         runOnUiThread(() -> {
                             listaReservas.clear();
-                            listaReservas.addAll(reservas);
+                            listaReservas.addAll(reservasPorConfirmar); // Solo agregar las por confirmar
                             reservaAdapter.actualizarReservas(new ArrayList<>(listaReservas));
                             updateReservationsUI();
 
                             // Log detallado de reservas
-                            for (Reserva reserva : reservas) {
+                            for (Reserva reserva : reservasPorConfirmar) {
                                 Log.d(TAG, "   - Reserva: " + reserva.getIdReserva() +
                                         " | " + reserva.getNombre() +
                                         " | Asiento: " + reserva.getPuestoReservado() +
@@ -390,7 +400,7 @@ public class InicioConductor extends AppCompatActivity {
                     @Override
                     public void onError(String error) {
                         Log.e(TAG, "❌ Error cargando reservas: " + error);
-                        MyApp.logError(new Exception("Error cargando reservas: " + error)); // ✅ Logging
+                        MyApp.logError(new Exception("Error cargando reservas: " + error));
                         showEmptyReservations();
                     }
                 });
