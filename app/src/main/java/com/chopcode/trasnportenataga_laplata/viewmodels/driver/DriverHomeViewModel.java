@@ -26,6 +26,7 @@ public class DriverHomeViewModel extends ViewModel {
     private NotificationManager notificationManager;
     private Context context;
 
+    // LiveData existentes
     private final MutableLiveData<List<Reserva>> reservasLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<Ruta>> rutasLiveData = new MutableLiveData<>();
     private final MutableLiveData<Integer> reservasConfirmadasLiveData = new MutableLiveData<>();
@@ -36,6 +37,16 @@ public class DriverHomeViewModel extends ViewModel {
     private final MutableLiveData<List<String>> horariosLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loadingLiveData = new MutableLiveData<>();
+
+    // ✅ NUEVO: LiveData para estadísticas por ruta (primera ruta)
+    private final MutableLiveData<String> nombreRuta1LiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> reservasRuta1LiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> asientosRuta1LiveData = new MutableLiveData<>();
+
+    // ✅ NUEVO: LiveData para estadísticas por ruta (segunda ruta)
+    private final MutableLiveData<String> nombreRuta2LiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> reservasRuta2LiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> asientosRuta2LiveData = new MutableLiveData<>();
 
     public DriverHomeViewModel() {
         this.reservasManager = new ReservasManager();
@@ -53,7 +64,7 @@ public class DriverHomeViewModel extends ViewModel {
         }
     }
 
-    // Getters para LiveData
+    // Getters para LiveData existentes
     public LiveData<List<Reserva>> getReservasLiveData() { return reservasLiveData; }
     public LiveData<List<Ruta>> getRutasLiveData() { return rutasLiveData; }
     public LiveData<Integer> getReservasConfirmadasLiveData() { return reservasConfirmadasLiveData; }
@@ -64,6 +75,14 @@ public class DriverHomeViewModel extends ViewModel {
     public LiveData<List<String>> getHorariosLiveData() { return horariosLiveData; }
     public LiveData<String> getErrorLiveData() { return errorLiveData; }
     public LiveData<Boolean> getLoadingLiveData() { return loadingLiveData; }
+
+    // ✅ NUEVO: Getters para estadísticas por ruta
+    public LiveData<String> getNombreRuta1LiveData() { return nombreRuta1LiveData; }
+    public LiveData<Integer> getReservasRuta1LiveData() { return reservasRuta1LiveData; }
+    public LiveData<Integer> getAsientosRuta1LiveData() { return asientosRuta1LiveData; }
+    public LiveData<String> getNombreRuta2LiveData() { return nombreRuta2LiveData; }
+    public LiveData<Integer> getReservasRuta2LiveData() { return reservasRuta2LiveData; }
+    public LiveData<Integer> getAsientosRuta2LiveData() { return asientosRuta2LiveData; }
 
     // Métodos principales
     public void loadDriverData(String userId) {
@@ -129,6 +148,12 @@ public class DriverHomeViewModel extends ViewModel {
                     }
                 }
 
+                // ✅ Calcular estadísticas por ruta cuando se actualizan las reservas
+                List<Ruta> rutasActuales = rutasLiveData.getValue();
+                if (rutasActuales != null && !rutasActuales.isEmpty()) {
+                    calculateRouteStatistics(rutasActuales, reservas);
+                }
+
                 // ✅ Registrar evento analítico
                 registrarEventoAnalitico("realtime_update", conductorNombre, reservas.size());
             }
@@ -177,6 +202,12 @@ public class DriverHomeViewModel extends ViewModel {
                 Log.d(TAG, "✅ Reservas cargadas: " + reservas.size());
                 reservasLiveData.postValue(reservas);
 
+                // ✅ Calcular estadísticas por ruta cuando se cargan las reservas
+                List<Ruta> rutasActuales = rutasLiveData.getValue();
+                if (rutasActuales != null && !rutasActuales.isEmpty()) {
+                    calculateRouteStatistics(rutasActuales, reservas);
+                }
+
                 // ✅ Registrar evento analítico
                 registrarEventoAnalitico("reservas_loaded", conductorNombre, reservas.size());
             }
@@ -198,6 +229,12 @@ public class DriverHomeViewModel extends ViewModel {
                 Log.d(TAG, "✅ Rutas cargadas: " + rutas.size());
                 rutasLiveData.postValue(rutas);
 
+                // ✅ Calcular estadísticas por ruta cuando se cargan las rutas
+                List<Reserva> reservasActuales = reservasLiveData.getValue();
+                if (reservasActuales != null && !reservasActuales.isEmpty()) {
+                    calculateRouteStatistics(rutas, reservasActuales);
+                }
+
                 // ✅ Registrar evento analítico
                 registrarEventoAnalitico("rutas_loaded", null, rutas.size());
             }
@@ -208,6 +245,72 @@ public class DriverHomeViewModel extends ViewModel {
                 errorLiveData.postValue("Error cargando rutas: " + error);
             }
         });
+    }
+
+    // ✅ NUEVO MÉTODO: Calcular estadísticas por ruta
+    public void calculateRouteStatistics(List<Ruta> rutas, List<Reserva> reservas) {
+        Log.d(TAG, "📊 Calculando estadísticas por ruta");
+
+        if (rutas == null || rutas.isEmpty() || reservas == null) {
+            Log.w(TAG, "⚠️ No hay rutas o reservas para calcular estadísticas por ruta");
+            return;
+        }
+
+        // Procesar primera ruta si existe
+        if (rutas.size() >= 1) {
+            Ruta ruta1 = rutas.get(0);
+            String nombreRuta1 = ruta1.getOrigen() + " → " + ruta1.getDestino();
+            nombreRuta1LiveData.postValue(nombreRuta1);
+
+            // Calcular reservas y asientos para ruta 1
+            calculateRouteSpecificStats(ruta1, reservas, 1);
+        }
+
+        // Procesar segunda ruta si existe
+        if (rutas.size() >= 2) {
+            Ruta ruta2 = rutas.get(1);
+            String nombreRuta2 = ruta2.getOrigen() + " → " + ruta2.getDestino();
+            nombreRuta2LiveData.postValue(nombreRuta2);
+
+            // Calcular reservas y asientos para ruta 2
+            calculateRouteSpecificStats(ruta2, reservas, 2);
+        }
+    }
+
+    // ✅ NUEVO MÉTODO: Calcular estadísticas específicas por ruta
+    private void calculateRouteSpecificStats(Ruta ruta, List<Reserva> reservas, int routeNumber) {
+        int reservasRuta = 0;
+        int asientosOcupados = 0;
+
+        // Asumimos que cada ruta tiene una capacidad total
+        final int CAPACIDAD_RUTA = 14; // O usa ruta.getCapacidadTotal() si existe
+
+        // Contar reservas "Por confirmar" para esta ruta
+        for (Reserva reserva : reservas) {
+            if (reserva != null &&
+                    ruta.getOrigen().equals(reserva.getOrigen()) &&
+                    ruta.getDestino().equals(reserva.getDestino())) {
+
+                if ("Por confirmar".equals(reserva.getEstadoReserva())) {
+                    reservasRuta++;
+                    asientosOcupados++;
+                }
+            }
+        }
+
+        int asientosDisponibles = Math.max(0, CAPACIDAD_RUTA - asientosOcupados);
+
+        if (routeNumber == 1) {
+            reservasRuta1LiveData.postValue(reservasRuta);
+            asientosRuta1LiveData.postValue(asientosDisponibles);
+            Log.d(TAG, "📊 Ruta 1: " + ruta.getOrigen() + " → " + ruta.getDestino() +
+                    " - Reservas: " + reservasRuta + ", Asientos disponibles: " + asientosDisponibles);
+        } else if (routeNumber == 2) {
+            reservasRuta2LiveData.postValue(reservasRuta);
+            asientosRuta2LiveData.postValue(asientosDisponibles);
+            Log.d(TAG, "📊 Ruta 2: " + ruta.getOrigen() + " → " + ruta.getDestino() +
+                    " - Reservas: " + reservasRuta + ", Asientos disponibles: " + asientosDisponibles);
+        }
     }
 
     public void confirmReservation(Reserva reserva) {
@@ -221,9 +324,16 @@ public class DriverHomeViewModel extends ViewModel {
                 // ✅ Registrar evento analítico
                 registrarAccionReserva(reserva, "confirmar");
 
-                // Recargar estadísticas
+                // Recargar estadísticas generales
                 if (reserva.getConductor() != null) {
                     calculateStatistics(reserva.getConductor());
+                }
+
+                // Recargar estadísticas por ruta
+                List<Ruta> rutasActuales = rutasLiveData.getValue();
+                List<Reserva> reservasActuales = reservasLiveData.getValue();
+                if (rutasActuales != null && reservasActuales != null) {
+                    calculateRouteStatistics(rutasActuales, reservasActuales);
                 }
 
                 // Actualizar lista de reservas
@@ -254,9 +364,16 @@ public class DriverHomeViewModel extends ViewModel {
                 // ✅ Registrar evento analítico
                 registrarAccionReserva(reserva, "cancelar");
 
-                // Recargar estadísticas
+                // Recargar estadísticas generales
                 if (reserva.getConductor() != null) {
                     calculateStatistics(reserva.getConductor());
+                }
+
+                // Recargar estadísticas por ruta
+                List<Ruta> rutasActuales = rutasLiveData.getValue();
+                List<Reserva> reservasActuales = reservasLiveData.getValue();
+                if (rutasActuales != null && reservasActuales != null) {
+                    calculateRouteStatistics(rutasActuales, reservasActuales);
                 }
 
                 // Actualizar lista de reservas
@@ -426,6 +543,14 @@ public class DriverHomeViewModel extends ViewModel {
         placaVehiculoLiveData.postValue(null);
         horariosLiveData.postValue(null);
         errorLiveData.postValue(null);
+
+        // Limpiar datos de rutas
+        nombreRuta1LiveData.postValue(null);
+        reservasRuta1LiveData.postValue(0);
+        asientosRuta1LiveData.postValue(0);
+        nombreRuta2LiveData.postValue(null);
+        reservasRuta2LiveData.postValue(0);
+        asientosRuta2LiveData.postValue(0);
 
         Log.d(TAG, "🧹 Datos limpiados del ViewModel");
     }
