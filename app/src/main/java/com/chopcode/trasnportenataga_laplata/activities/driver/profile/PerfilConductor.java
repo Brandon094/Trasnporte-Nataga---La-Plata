@@ -64,14 +64,14 @@ public class PerfilConductor extends AppCompatActivity {
 
         // Cards de botones
         cardEditarPerfil = findViewById(R.id.cardEditarPerfil);
-        cardHistorialViajes = findViewById(R.id.cardHistorialViajes);
+        //cardHistorialViajes = findViewById(R.id.cardHistorialViajes);
         cardDisponibilidad = findViewById(R.id.cardInicio);
         cardCerrarSesion = findViewById(R.id.cardCerrarSesion);
     }
 
     private void configurarBotones() {
         cardEditarPerfil.setOnClickListener(view -> irEditarPerfil());
-        cardHistorialViajes.setOnClickListener(view -> irHistorialViajes());
+        //cardHistorialViajes.setOnClickListener(view -> irHistorialViajes());
         cardDisponibilidad.setOnClickListener(view -> irInicioConductor());
 
         cardCerrarSesion.setOnClickListener(new View.OnClickListener() {

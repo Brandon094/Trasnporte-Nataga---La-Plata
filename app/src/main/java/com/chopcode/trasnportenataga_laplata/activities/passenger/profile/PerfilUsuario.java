@@ -83,7 +83,7 @@ public class PerfilUsuario extends AppCompatActivity {
 
         // Cards del grid (nuevo diseño)
         cardEditarPerfil = findViewById(R.id.cardEditarPerfil);
-        cardHistorialReservas = findViewById(R.id.cardHistorialReservas);
+        //cardHistorialReservas = findViewById(R.id.cardHistorialReservas);
         cardVolverInicio = findViewById(R.id.cardVolverInicio);
         cardCerrarSesion = findViewById(R.id.cardCerrarSesion);
         Log.d(TAG, "✅ Cards del grid inicializadas");
@@ -116,7 +116,7 @@ public class PerfilUsuario extends AppCompatActivity {
         });
 
         // Botón Historial Reservas
-        cardHistorialReservas.setOnClickListener(new View.OnClickListener() {
+  /**      cardHistorialReservas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "🎯 Click en Historial Reservas - iniciando animación");
@@ -135,7 +135,7 @@ public class PerfilUsuario extends AppCompatActivity {
                         }).start();
             }
         });
-
+*/
         // Botón Volver al Inicio
         cardVolverInicio.setOnClickListener(new View.OnClickListener() {
             @Override
