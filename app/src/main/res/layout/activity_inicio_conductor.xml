@@ -13,6 +13,17 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
+        <!-- 🔄 PROGRESS BAR PARA CARGA -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
         <!-- Header con información del conductor -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardHeader"
