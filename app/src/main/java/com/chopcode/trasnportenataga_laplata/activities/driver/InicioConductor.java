@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,8 +26,11 @@ import com.chopcode.trasnportenataga_laplata.viewmodels.driver.DriverHomeViewMod
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class InicioConductor extends AppCompatActivity {
     // Views
@@ -34,6 +38,18 @@ public class InicioConductor extends AppCompatActivity {
     private TextView tvConductor, tvPlacaVehiculo;
     private TextView tvEmptyReservas, tvEmptyRutas, tvReservasConfirmadas, tvAsientosDisponibles;
     private TextView tvTotalIngresos, tvInfoCapacidad, tvInfoIngresos;
+
+    // ✅ NUEVAS VISTAS MEJORADAS
+    private TextView tvSubtituloEstadisticas, tvTendenciaIngresos;
+    private TextView tvInfoReservas, tvUltimaActualizacion;
+    private TextView tvNombreRutaHeader1, tvNombreRutaHeader2;
+    private TextView tvContadorReservas, tvContadorRutas;
+    private TextView tvSubtituloReservas, tvSubtituloRutas;
+
+    // ✅ TextViews para estadísticas por ruta
+    private TextView tvNombreRutaReservas, tvReservasRuta, tvNombreRutaAsientos, tvAsientosRuta;
+    private TextView tvNombreRutaReservas2, tvReservasRuta2, tvNombreRutaAsientos2, tvAsientosRuta2;
+
     private MaterialButton btnPerfilConductor, btnCerrarSesion;
     private ProgressBar progressBar;
 
@@ -51,6 +67,7 @@ public class InicioConductor extends AppCompatActivity {
 
     private static final String TAG = "InicioConductor";
     private static final int CAPACIDAD_TOTAL = 14;
+    private SimpleDateFormat timeFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +85,9 @@ public class InicioConductor extends AppCompatActivity {
 
         authManager = AuthManager.getInstance();
 
+        // Inicializar formatos de fecha/hora
+        timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
         initializeViews();
         setupRecyclerView();
         setupButtons();
@@ -79,6 +99,7 @@ public class InicioConductor extends AppCompatActivity {
     private void initializeViews() {
         Log.d(TAG, "🔧 Inicializando vistas...");
 
+        // Vistas básicas
         tvConductor = findViewById(R.id.tvConductor);
         tvPlacaVehiculo = findViewById(R.id.tvPlacaVehiculo);
         tvTotalIngresos = findViewById(R.id.tvTotalIngresos);
@@ -90,17 +111,74 @@ public class InicioConductor extends AppCompatActivity {
         tvInfoIngresos = findViewById(R.id.tvInfoIngresos);
         progressBar = findViewById(R.id.progressBar);
 
+        // ✅ NUEVAS VISTAS MEJORADAS
+        tvSubtituloEstadisticas = findViewById(R.id.tvSubtituloEstadisticas);
+        tvTendenciaIngresos = findViewById(R.id.tvTendenciaIngresos);
+        tvInfoReservas = findViewById(R.id.tvInfoReservas);
+        tvUltimaActualizacion = findViewById(R.id.tvUltimaActualizacion);
+        tvNombreRutaHeader1 = findViewById(R.id.tvNombreRutaHeader1);
+        tvNombreRutaHeader2 = findViewById(R.id.tvNombreRutaHeader2);
+        tvContadorReservas = findViewById(R.id.tvContadorReservas);
+        tvContadorRutas = findViewById(R.id.tvContadorRutas);
+        tvSubtituloReservas = findViewById(R.id.tvSubtituloReservas);
+        tvSubtituloRutas = findViewById(R.id.tvSubtituloRutas);
+
+        // ✅ TextViews para estadísticas por ruta
+        tvNombreRutaReservas = findViewById(R.id.tvNombreRutaReservas);
+        tvReservasRuta = findViewById(R.id.tvReservasRuta);
+        tvNombreRutaAsientos = findViewById(R.id.tvNombreRutaAsientos);
+        tvAsientosRuta = findViewById(R.id.tvAsientosRuta);
+
+        // ✅ Intentar inicializar TextViews para segunda ruta
+        try {
+            tvNombreRutaReservas2 = findViewById(R.id.tvNombreRutaReservas2);
+            tvReservasRuta2 = findViewById(R.id.tvReservasRuta2);
+            tvNombreRutaAsientos2 = findViewById(R.id.tvNombreRutaAsientos2);
+            tvAsientosRuta2 = findViewById(R.id.tvAsientosRuta2);
+        } catch (Exception e) {
+            Log.d(TAG, "ℹ️ No se encontraron TextViews para segunda ruta: " + e.getMessage());
+        }
+
         btnPerfilConductor = findViewById(R.id.btnPerfilConductor);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         rvReservas = findViewById(R.id.recyclerReservas);
         rvProximasRutas = findViewById(R.id.recyclerProximasRutas);
 
-        // Configurar textos informativos
+        // ✅ Configurar textos informativos mejorados
         if (tvInfoCapacidad != null) {
-            tvInfoCapacidad.setText("De " + CAPACIDAD_TOTAL + " totales");
+            tvInfoCapacidad.setText("De " + CAPACIDAD_TOTAL + " totales • Ocupación: 0%");
         }
         if (tvInfoIngresos != null) {
-            tvInfoIngresos.setText("Acumulado del día");
+            tvInfoIngresos.setText("Acumulado desde el inicio del día");
+        }
+        if (tvInfoReservas != null) {
+            tvInfoReservas.setText("Total del día • Actualizado ahora");
+        }
+        if (tvUltimaActualizacion != null) {
+            String currentTime = timeFormat.format(new Date());
+            tvUltimaActualizacion.setText("Última actualización: " + currentTime);
+        }
+
+        // ✅ Configurar valores por defecto para estadísticas por ruta
+        if (tvNombreRutaReservas != null) {
+            tvNombreRutaReservas.setText("Cargando...");
+        }
+        if (tvNombreRutaAsientos != null) {
+            tvNombreRutaAsientos.setText("Cargando...");
+        }
+        if (tvReservasRuta != null) {
+            tvReservasRuta.setText("0");
+        }
+        if (tvAsientosRuta != null) {
+            tvAsientosRuta.setText("0");
+        }
+
+        // ✅ Configurar encabezados de rutas por defecto
+        if (tvNombreRutaHeader1 != null) {
+            tvNombreRutaHeader1.setText("Ruta de Ida");
+        }
+        if (tvNombreRutaHeader2 != null) {
+            tvNombreRutaHeader2.setText("Ruta de Regreso");
         }
 
         Log.d(TAG, "✅ Todas las vistas inicializadas");
@@ -138,8 +216,20 @@ public class InicioConductor extends AppCompatActivity {
                 listaReservas.addAll(reservas);
                 reservaAdapter.actualizarReservas(new ArrayList<>(reservas));
 
+                // ✅ Actualizar contador de reservas
+                if (tvContadorReservas != null) {
+                    tvContadorReservas.setText(String.valueOf(reservas.size()));
+                }
+
                 // ✅ Registrar evento analítico
                 registrarEventoAnalitico("reservas_actualizadas", reservas.size(), null);
+
+                // ✅ Actualizar tiempo de actualización
+                actualizarTiempoActualizacion();
+            } else {
+                if (tvContadorReservas != null) {
+                    tvContadorReservas.setText("0");
+                }
             }
             updateReservationsUI();
         });
@@ -153,8 +243,19 @@ public class InicioConductor extends AppCompatActivity {
                 listaRutas.addAll(rutas);
                 rutaAdapter.notifyDataSetChanged();
 
+                // ✅ Actualizar contador de rutas
+                if (tvContadorRutas != null) {
+                    tvContadorRutas.setText(String.valueOf(rutas.size()));
+                }
+
                 // ✅ Registrar evento analítico
                 registrarEventoAnalitico("rutas_actualizadas", rutas.size(), null);
+
+                // ✅ Actualizar información de rutas
+                actualizarInformacionRutas(rutas);
+
+                // ✅ Actualizar tiempo de actualización
+                actualizarTiempoActualizacion();
 
                 // Mostrar información de la próxima ruta
                 if (!rutas.isEmpty()) {
@@ -164,15 +265,22 @@ public class InicioConductor extends AppCompatActivity {
                     Log.d(TAG, "✅ Ruta próxima: " + proximaRuta.getOrigen() +
                             " → " + proximaRuta.getDestino() + " (" + horario + ")");
                 }
+            } else {
+                if (tvContadorRutas != null) {
+                    tvContadorRutas.setText("0");
+                }
             }
             updateRoutesUI();
         });
 
-        // Observar estadísticas
+        // Observar estadísticas generales
         viewModel.getReservasConfirmadasLiveData().observe(this, count -> {
             if (count != null) {
                 tvReservasConfirmadas.setText(String.valueOf(count));
                 Log.d(TAG, "📊 Reservas confirmadas: " + count);
+
+                // ✅ Actualizar información de capacidad
+                actualizarInformacionCapacidad();
             }
         });
 
@@ -180,6 +288,9 @@ public class InicioConductor extends AppCompatActivity {
             if (asientos != null) {
                 tvAsientosDisponibles.setText(String.valueOf(asientos));
                 Log.d(TAG, "📊 Asientos disponibles: " + asientos);
+
+                // ✅ Actualizar información de capacidad
+                actualizarInformacionCapacidad();
             }
         });
 
@@ -187,14 +298,81 @@ public class InicioConductor extends AppCompatActivity {
             if (ingresos != null) {
                 tvTotalIngresos.setText(formatCurrency(ingresos));
                 Log.d(TAG, "💰 Ingresos actualizados: $" + ingresos);
+
+                // ✅ Actualizar tiempo de actualización
+                actualizarTiempoActualizacion();
             }
         });
+
+        // ✅ NUEVO: Observar estadísticas de la primera ruta
+        viewModel.getNombreRuta1LiveData().observe(this, nombreRuta -> {
+            if (nombreRuta != null && !nombreRuta.isEmpty()) {
+                tvNombreRutaReservas.setText(nombreRuta);
+                tvNombreRutaAsientos.setText(nombreRuta);
+                if (tvNombreRutaHeader1 != null) {
+                    tvNombreRutaHeader1.setText("Ruta: " + nombreRuta);
+                }
+                Log.d(TAG, "📊 Nombre Ruta 1 actualizado: " + nombreRuta);
+            }
+        });
+
+        viewModel.getReservasRuta1LiveData().observe(this, reservas -> {
+            if (reservas != null) {
+                tvReservasRuta.setText(String.valueOf(reservas));
+                Log.d(TAG, "📊 Reservas Ruta 1: " + reservas);
+
+                // ✅ Actualizar tiempo de actualización
+                actualizarTiempoActualizacion();
+            }
+        });
+
+        viewModel.getAsientosRuta1LiveData().observe(this, asientos -> {
+            if (asientos != null) {
+                tvAsientosRuta.setText(String.valueOf(asientos));
+                Log.d(TAG, "📊 Asientos Ruta 1: " + asientos);
+            }
+        });
+
+        // ✅ NUEVO: Observar estadísticas de la segunda ruta (si existen las vistas)
+        if (tvNombreRutaReservas2 != null && tvNombreRutaAsientos2 != null) {
+            viewModel.getNombreRuta2LiveData().observe(this, nombreRuta -> {
+                if (nombreRuta != null && !nombreRuta.isEmpty()) {
+                    tvNombreRutaReservas2.setText(nombreRuta);
+                    tvNombreRutaAsientos2.setText(nombreRuta);
+                    if (tvNombreRutaHeader2 != null) {
+                        tvNombreRutaHeader2.setText("Ruta: " + nombreRuta);
+                    }
+                    Log.d(TAG, "📊 Nombre Ruta 2 actualizado: " + nombreRuta);
+                }
+            });
+
+            viewModel.getReservasRuta2LiveData().observe(this, reservas -> {
+                if (reservas != null) {
+                    tvReservasRuta2.setText(String.valueOf(reservas));
+                    Log.d(TAG, "📊 Reservas Ruta 2: " + reservas);
+                }
+            });
+
+            viewModel.getAsientosRuta2LiveData().observe(this, asientos -> {
+                if (asientos != null) {
+                    tvAsientosRuta2.setText(String.valueOf(asientos));
+                    Log.d(TAG, "📊 Asientos Ruta 2: " + asientos);
+                }
+            });
+        } else {
+            Log.d(TAG, "ℹ️ No se configuraron observadores para segunda ruta - vistas no encontradas");
+        }
 
         // Observar estado de carga
         viewModel.getLoadingLiveData().observe(this, isLoading -> {
             if (isLoading != null) {
                 progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
                 Log.d(TAG, isLoading ? "⏳ Cargando datos..." : "✅ Carga completada");
+
+                if (!isLoading) {
+                    // ✅ Actualizar tiempo de actualización cuando termina la carga
+                    actualizarTiempoActualizacion();
+                }
             }
         });
 
@@ -263,6 +441,23 @@ public class InicioConductor extends AppCompatActivity {
             goToDriverProfile();
         });
 
+        // ✅ NUEVO: Configurar click en encabezado de estadísticas para actualizar
+        View headerEstadisticas = findViewById(R.id.tvTituloEstadisticas);
+        if (headerEstadisticas != null) {
+            headerEstadisticas.setOnClickListener(view -> {
+                Log.d(TAG, "🔄 Actualizando estadísticas manualmente");
+
+                // ✅ Registrar evento de actualización
+                registrarEventoAnalitico("actualizar_estadisticas_manual", null, null);
+
+                // Mostrar mensaje de actualización
+                Toast.makeText(this, "Actualizando estadísticas...", Toast.LENGTH_SHORT).show();
+
+                // Recargar datos
+                viewModel.reloadAllData();
+            });
+        }
+
         Log.d(TAG, "✅ Botones configurados");
     }
 
@@ -306,6 +501,9 @@ public class InicioConductor extends AppCompatActivity {
                     } else {
                         viewModel.cancelReservation(reserva);
                     }
+
+                    // ✅ Actualizar tiempo de actualización después de la acción
+                    actualizarTiempoActualizacion();
                 })
                 .setNegativeButton("Volver", (dialog, which) -> {
                     Log.d(TAG, "❌ Usuario canceló la acción");
@@ -333,8 +531,99 @@ public class InicioConductor extends AppCompatActivity {
         tvEmptyRutas.setVisibility(hayRutas ? View.GONE : View.VISIBLE);
         rvProximasRutas.setVisibility(hayRutas ? View.VISIBLE : View.GONE);
 
+        // ✅ Controlar visibilidad de la segunda ruta
+        View layoutRuta2 = findViewById(R.id.layoutRuta2);
+        boolean haySegundaRuta = hayRutas && listaRutas.size() >= 2;
+
+        if (layoutRuta2 != null) {
+            layoutRuta2.setVisibility(haySegundaRuta ? View.VISIBLE : View.GONE);
+            Log.d(TAG, "✅ Visibilidad de segunda ruta: " +
+                    (haySegundaRuta ? "VISIBLE" : "GONE"));
+        }
+
         Log.d(TAG, "✅ UI de rutas actualizada - " +
                 (hayRutas ? "Mostrando " + listaRutas.size() + " rutas" : "Sin rutas"));
+    }
+
+    // ✅ NUEVO: Método para actualizar tiempo de actualización
+    private void actualizarTiempoActualizacion() {
+        if (tvUltimaActualizacion != null) {
+            String currentTime = timeFormat.format(new Date());
+            tvUltimaActualizacion.setText("Última actualización: " + currentTime);
+            Log.d(TAG, "🕐 Tiempo de actualización actualizado: " + currentTime);
+        }
+    }
+
+    // ✅ NUEVO: Método para actualizar información de capacidad
+    private void actualizarInformacionCapacidad() {
+        if (tvInfoCapacidad != null && tvAsientosDisponibles != null) {
+            try {
+                int disponibles = Integer.parseInt(tvAsientosDisponibles.getText().toString());
+                int ocupados = CAPACIDAD_TOTAL - disponibles;
+                int porcentajeOcupacion = (ocupados * 100) / CAPACIDAD_TOTAL;
+
+                String info = String.format(Locale.getDefault(),
+                        "De %d totales • Ocupación: %d%%",
+                        CAPACIDAD_TOTAL, porcentajeOcupacion);
+                tvInfoCapacidad.setText(info);
+
+                Log.d(TAG, "📊 Información de capacidad actualizada: " + info);
+            } catch (NumberFormatException e) {
+                Log.e(TAG, "❌ Error al calcular porcentaje de ocupación: " + e.getMessage());
+            }
+        }
+    }
+
+    // ✅ NUEVO: Método para actualizar información de rutas
+    private void actualizarInformacionRutas(List<Ruta> rutas) {
+        if (rutas != null && !rutas.isEmpty()) {
+            // Actualizar hora próxima para cada ruta si está disponible
+            for (int i = 0; i < Math.min(rutas.size(), 2); i++) {
+                Ruta ruta = rutas.get(i);
+                String horario = ruta.getHora() != null ?
+                        ruta.getHora().getHora() : "--:--";
+
+                if (i == 0) {
+                    // Ruta 1 - Buscar el TextView dentro del encabezado de la primera ruta
+                    View headerRuta1 = findViewById(R.id.tvNombreRutaHeader1);
+                    if (headerRuta1 != null && headerRuta1.getParent() instanceof ViewGroup) {
+                        ViewGroup parent = (ViewGroup) headerRuta1.getParent();
+                        // Buscar el TextView que muestra la hora próxima
+                        for (int j = 0; j < parent.getChildCount(); j++) {
+                            View child = parent.getChildAt(j);
+                            if (child instanceof TextView) {
+                                TextView textView = (TextView) child;
+                                String currentText = textView.getText().toString();
+                                // Verificar si es el TextView de hora por su contenido actual
+                                if (currentText.contains("Próximo:")) {
+                                    textView.setText("Próximo: " + horario);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } else if (i == 1) {
+                    // Ruta 2 - Buscar el TextView dentro del encabezado de la segunda ruta
+                    View headerRuta2 = findViewById(R.id.tvNombreRutaHeader2);
+                    if (headerRuta2 != null && headerRuta2.getParent() instanceof ViewGroup) {
+                        ViewGroup parent = (ViewGroup) headerRuta2.getParent();
+                        // Buscar el TextView que muestra la hora próxima
+                        for (int j = 0; j < parent.getChildCount(); j++) {
+                            View child = parent.getChildAt(j);
+                            if (child instanceof TextView) {
+                                TextView textView = (TextView) child;
+                                String currentText = textView.getText().toString();
+                                // Verificar si es el TextView de hora por su contenido actual
+                                if (currentText.contains("Próximo:")) {
+                                    textView.setText("Próximo: " + horario);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private String formatCurrency(double amount) {
@@ -371,6 +660,34 @@ public class InicioConductor extends AppCompatActivity {
         tvReservasConfirmadas.setText("0");
         tvAsientosDisponibles.setText(String.valueOf(CAPACIDAD_TOTAL));
         tvTotalIngresos.setText("$0");
+
+        // ✅ Actualizar contadores
+        if (tvContadorReservas != null) {
+            tvContadorReservas.setText("0");
+        }
+        if (tvContadorRutas != null) {
+            tvContadorRutas.setText("0");
+        }
+
+        // ✅ Actualizar tiempo de actualización
+        actualizarTiempoActualizacion();
+
+        // ✅ Actualizar información de capacidad
+        actualizarInformacionCapacidad();
+
+        // ✅ Datos por defecto para estadísticas por ruta
+        if (tvNombreRutaReservas != null) {
+            tvNombreRutaReservas.setText("Sin ruta asignada");
+        }
+        if (tvNombreRutaAsientos != null) {
+            tvNombreRutaAsientos.setText("Sin ruta asignada");
+        }
+        if (tvReservasRuta != null) {
+            tvReservasRuta.setText("0");
+        }
+        if (tvAsientosRuta != null) {
+            tvAsientosRuta.setText("0");
+        }
 
         Log.d(TAG, "✅ Datos por defecto mostrados");
     }
