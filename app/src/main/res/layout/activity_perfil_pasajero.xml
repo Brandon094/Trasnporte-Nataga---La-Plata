@@ -271,8 +271,8 @@
 
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Botón Historial -->
+                    <!--  Botón Historial -->
+                    <!--
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardHistorialReservas"
                         android:layout_width="0dp"
@@ -312,6 +312,7 @@
 
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
+                    -->
 
                     <!-- Botón Volver al Inicio -->
                     <com.google.android.material.card.MaterialCardView
