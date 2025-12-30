@@ -70,7 +70,8 @@ public class ConfirmarReserva extends AppCompatActivity {
         // ✅ Inicializar servicios CON CONTEXTO usando MyApp para el ID de usuario
         reservaService = new ReservaService();
         authManager = AuthManager.getInstance();
-        notificationManager = NotificationManager.getInstance(this); // ✅ Pasar contexto
+        //notificationManager = NotificationManager.getInstance(this); // ✅ Pasar contexto
+        notificationManager = null; // Temporalmente deshabilitado
         timeoutHandler = new Handler();
 
         // Recibir TODOS los datos enviados desde CrearReservas
@@ -161,14 +162,14 @@ public class ConfirmarReserva extends AppCompatActivity {
         }
 
         // Valores por defecto para datos críticos
-        if (conductorNombre == null) conductorNombre = "Conductor Asignado";
-        if (conductorTelefono == null) conductorTelefono = "300 123 4567";
-        if (vehiculoPlaca == null) vehiculoPlaca = "ABC123";
-        if (vehiculoModelo == null) vehiculoModelo = "----";
-        if (usuarioNombre == null) usuarioNombre = "Usuario";
-        if (usuarioTelefono == null) usuarioTelefono = "No disponible";
-        if (tiempoEstimado == null) tiempoEstimado = "60 min";
-        if (conductorId == null) conductorId = "conductor_default_id";
+        if (conductorNombre == null) conductorNombre = "N/A";
+        if (conductorTelefono == null) conductorTelefono = "N/A";
+        if (vehiculoPlaca == null) vehiculoPlaca = "N/A";
+        if (vehiculoModelo == null) vehiculoModelo = "N/A";
+        if (usuarioNombre == null) usuarioNombre = "N/A";
+        if (usuarioTelefono == null) usuarioTelefono = "N/A";
+        if (tiempoEstimado == null) tiempoEstimado = "N/A";
+        if (conductorId == null) conductorId = "N/A";
 
         metodoPago = "Efectivo"; // Por defecto
 
@@ -431,8 +432,14 @@ public class ConfirmarReserva extends AppCompatActivity {
                                 registrarEventoAnalitico("reserva_registrada_exitosa", asientoSeleccionado, null);
                                 registrarReservaExitosaAnalitico();
 
+                                // ✅ NOTIFICACIONES DESHABILITADAS TEMPORALMENTE
+                                Log.d(TAG, "📢 NOTIFICACIONES DESHABILITADAS - Navegando directamente a inicio");
+
+                                // ✅ Navegar inmediatamente sin esperar notificaciones
+                                navegarAInicioUsuarios();
+
                                 // ✅ ENVIAR NOTIFICACIÓN AL CONDUCTOR CON MANEJO DE ERRORES MEJORADO
-                                enviarNotificacionAlConductor();
+                                //enviarNotificacionAlConductor();
                             }
                         });
                     }
