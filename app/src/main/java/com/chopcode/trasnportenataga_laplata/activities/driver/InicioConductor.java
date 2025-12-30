@@ -1,10 +1,10 @@
+// InicioConductor.java (Versión actualizada con strings)
 package com.chopcode.trasnportenataga_laplata.activities.driver;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +23,9 @@ import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
 import com.chopcode.trasnportenataga_laplata.models.Ruta;
 import com.chopcode.trasnportenataga_laplata.viewmodels.driver.DriverHomeViewModel;
+import com.chopcode.trasnportenataga_laplata.viewmodels.driver.EstadisticasViewModel;
+import com.chopcode.trasnportenataga_laplata.viewmodels.driver.ReservasViewModel;
+import com.chopcode.trasnportenataga_laplata.viewmodels.driver.RutasViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -33,60 +36,55 @@ import java.util.List;
 import java.util.Locale;
 
 public class InicioConductor extends AppCompatActivity {
-    // Views
+    private static final String TAG = "InicioConductor";
+
+    // Views principales
     private RecyclerView rvReservas, rvProximasRutas;
     private TextView tvConductor, tvPlacaVehiculo;
-    private TextView tvEmptyReservas, tvEmptyRutas, tvReservasConfirmadas, tvAsientosDisponibles;
-    private TextView tvTotalIngresos, tvInfoCapacidad, tvInfoIngresos;
+    private TextView tvEmptyReservas, tvEmptyRutas;
+    private ProgressBar progressBar;
+    private MaterialButton btnPerfilConductor, btnCerrarSesion;
 
-    // ✅ NUEVAS VISTAS MEJORADAS
-    private TextView tvSubtituloEstadisticas, tvTendenciaIngresos;
-    private TextView tvInfoReservas, tvUltimaActualizacion;
-    private TextView tvNombreRutaHeader1, tvNombreRutaHeader2;
-    private TextView tvContadorReservas, tvContadorRutas;
-    private TextView tvSubtituloReservas, tvSubtituloRutas;
+    // Views de estadísticas
+    private TextView tvReservasConfirmadas, tvAsientosDisponibles, tvTotalIngresos;
+    private TextView tvInfoCapacidad, tvInfoIngresos, tvInfoReservas;
+    private TextView tvUltimaActualizacion;
 
-    // ✅ TextViews para estadísticas por ruta
+    // Views por ruta
     private TextView tvNombreRutaReservas, tvReservasRuta, tvNombreRutaAsientos, tvAsientosRuta;
     private TextView tvNombreRutaReservas2, tvReservasRuta2, tvNombreRutaAsientos2, tvAsientosRuta2;
+    private TextView tvContadorReservas, tvContadorRutas;
 
-    private MaterialButton btnPerfilConductor, btnCerrarSesion;
-    private ProgressBar progressBar;
+    // ViewModels
+    private DriverHomeViewModel viewModel;
+    private ReservasViewModel reservasViewModel;
+    private EstadisticasViewModel estadisticasViewModel;
+    private RutasViewModel rutasViewModel;
 
-    // Adapters
+    private AuthManager authManager;
     private ReservaAdapter reservaAdapter;
     private RutaAdapter rutaAdapter;
-
-    // Data
     private List<Reserva> listaReservas = new ArrayList<>();
     private List<Ruta> listaRutas = new ArrayList<>();
-
-    // ViewModel
-    private DriverHomeViewModel viewModel;
-    private AuthManager authManager;
-
-    private static final String TAG = "InicioConductor";
-    private static final int CAPACIDAD_TOTAL = 14;
     private SimpleDateFormat timeFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inicio_conductor);
-        Log.d(TAG, "🚀 onCreate - Iniciando actividad de conductor");
-
-        // ✅ Registrar evento de inicio usando MyApp
-        registrarEventoAnalitico("pantalla_inicio_conductor_inicio", null, null);
-
-        // Inicializar ViewModel
-        viewModel = new ViewModelProvider(this).get(DriverHomeViewModel.class);
-        // ✅ Inicializar ViewModel con contexto
-        viewModel.initialize(this.getApplicationContext());
+        Log.d(TAG, "🚀 Iniciando actividad con nueva arquitectura");
 
         authManager = AuthManager.getInstance();
-
-        // Inicializar formatos de fecha/hora
         timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        // Inicializar ViewModels
+        viewModel = new ViewModelProvider(this).get(DriverHomeViewModel.class);
+        reservasViewModel = viewModel.getReservasViewModel();
+        estadisticasViewModel = viewModel.getEstadisticasViewModel();
+        rutasViewModel = viewModel.getRutasViewModel();
+
+        // Inicializar contexto en ViewModels que lo necesiten
+        viewModel.initialize(getApplicationContext());
 
         initializeViews();
         setupRecyclerView();
@@ -97,294 +95,286 @@ public class InicioConductor extends AppCompatActivity {
     }
 
     private void initializeViews() {
-        Log.d(TAG, "🔧 Inicializando vistas...");
-
-        // Vistas básicas
+        // Inicializar todas las vistas según tu XML
         tvConductor = findViewById(R.id.tvConductor);
         tvPlacaVehiculo = findViewById(R.id.tvPlacaVehiculo);
-        tvTotalIngresos = findViewById(R.id.tvTotalIngresos);
-        tvEmptyReservas = findViewById(R.id.tvEmptyReservas);
-        tvEmptyRutas = findViewById(R.id.tvEmptyRutas);
         tvReservasConfirmadas = findViewById(R.id.tvReservasConfirmadas);
         tvAsientosDisponibles = findViewById(R.id.tvAsientosDisponibles);
+        tvTotalIngresos = findViewById(R.id.tvTotalIngresos);
         tvInfoCapacidad = findViewById(R.id.tvInfoCapacidad);
         tvInfoIngresos = findViewById(R.id.tvInfoIngresos);
-        progressBar = findViewById(R.id.progressBar);
-
-        // ✅ NUEVAS VISTAS MEJORADAS
-        tvSubtituloEstadisticas = findViewById(R.id.tvSubtituloEstadisticas);
-        tvTendenciaIngresos = findViewById(R.id.tvTendenciaIngresos);
         tvInfoReservas = findViewById(R.id.tvInfoReservas);
         tvUltimaActualizacion = findViewById(R.id.tvUltimaActualizacion);
-        tvNombreRutaHeader1 = findViewById(R.id.tvNombreRutaHeader1);
-        tvNombreRutaHeader2 = findViewById(R.id.tvNombreRutaHeader2);
-        tvContadorReservas = findViewById(R.id.tvContadorReservas);
-        tvContadorRutas = findViewById(R.id.tvContadorRutas);
-        tvSubtituloReservas = findViewById(R.id.tvSubtituloReservas);
-        tvSubtituloRutas = findViewById(R.id.tvSubtituloRutas);
 
-        // ✅ TextViews para estadísticas por ruta
         tvNombreRutaReservas = findViewById(R.id.tvNombreRutaReservas);
         tvReservasRuta = findViewById(R.id.tvReservasRuta);
         tvNombreRutaAsientos = findViewById(R.id.tvNombreRutaAsientos);
         tvAsientosRuta = findViewById(R.id.tvAsientosRuta);
 
-        // ✅ Intentar inicializar TextViews para segunda ruta
-        try {
-            tvNombreRutaReservas2 = findViewById(R.id.tvNombreRutaReservas2);
-            tvReservasRuta2 = findViewById(R.id.tvReservasRuta2);
-            tvNombreRutaAsientos2 = findViewById(R.id.tvNombreRutaAsientos2);
-            tvAsientosRuta2 = findViewById(R.id.tvAsientosRuta2);
-        } catch (Exception e) {
-            Log.d(TAG, "ℹ️ No se encontraron TextViews para segunda ruta: " + e.getMessage());
-        }
+        tvNombreRutaReservas2 = findViewById(R.id.tvNombreRutaReservas2);
+        tvReservasRuta2 = findViewById(R.id.tvReservasRuta2);
+        tvNombreRutaAsientos2 = findViewById(R.id.tvNombreRutaAsientos2);
+        tvAsientosRuta2 = findViewById(R.id.tvAsientosRuta2);
 
-        btnPerfilConductor = findViewById(R.id.btnPerfilConductor);
-        btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
+        tvContadorReservas = findViewById(R.id.tvContadorReservas);
+        tvContadorRutas = findViewById(R.id.tvContadorRutas);
+
+        progressBar = findViewById(R.id.progressBar);
         rvReservas = findViewById(R.id.recyclerReservas);
         rvProximasRutas = findViewById(R.id.recyclerProximasRutas);
+        tvEmptyReservas = findViewById(R.id.tvEmptyReservas);
+        tvEmptyRutas = findViewById(R.id.tvEmptyRutas);
 
-        // ✅ Configurar textos informativos mejorados
+        // Botones
+        btnPerfilConductor = findViewById(R.id.btnPerfilConductor);
+        btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
+
+        // Configurar valores iniciales usando strings
+        tvReservasConfirmadas.setText(getString(R.string.contador_reservas, 0));
+        tvAsientosDisponibles.setText("28"); // Valor por defecto
+        tvTotalIngresos.setText(getString(R.string.formato_moneda, "0"));
+        tvContadorReservas.setText(getString(R.string.contador_reservas, 0));
+        tvContadorRutas.setText(getString(R.string.contador_rutas, 0));
+
+        // Configurar información por defecto usando strings
         if (tvInfoCapacidad != null) {
-            tvInfoCapacidad.setText("De " + CAPACIDAD_TOTAL + " totales • Ocupación: 0%");
+            tvInfoCapacidad.setText(getString(R.string.ocupacion_porcentaje, 28, 0));
         }
         if (tvInfoIngresos != null) {
-            tvInfoIngresos.setText("Acumulado desde el inicio del día");
+            tvInfoIngresos.setText(getString(R.string.acumulado_desde_inicio));
         }
         if (tvInfoReservas != null) {
-            tvInfoReservas.setText("Total del día • Actualizado ahora");
-        }
-        if (tvUltimaActualizacion != null) {
-            String currentTime = timeFormat.format(new Date());
-            tvUltimaActualizacion.setText("Última actualización: " + currentTime);
+            tvInfoReservas.setText(getString(R.string.total_del_dia));
         }
 
-        // ✅ Configurar valores por defecto para estadísticas por ruta
-        if (tvNombreRutaReservas != null) {
-            tvNombreRutaReservas.setText("Cargando...");
-        }
-        if (tvNombreRutaAsientos != null) {
-            tvNombreRutaAsientos.setText("Cargando...");
-        }
-        if (tvReservasRuta != null) {
-            tvReservasRuta.setText("0");
-        }
-        if (tvAsientosRuta != null) {
-            tvAsientosRuta.setText("0");
+        // Actualizar tiempo de actualización
+        actualizarTiempoActualizacion();
+    }
+
+    private void setupButtons() {
+        Log.d(TAG, "🔧 Configurando botones...");
+
+        // Botón de cerrar sesión
+        btnCerrarSesion.setOnClickListener(view -> {
+            Log.d(TAG, "🚪 Cerrando sesión de conductor...");
+
+            // Mostrar diálogo de confirmación usando strings
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle(getString(R.string.cerrar_sesion))
+                    .setMessage(getString(R.string.confirmar_cerrar_sesion))
+                    .setPositiveButton(getString(R.string.confirmar), (dialog, which) -> {
+                        authManager.signOut(this);
+                        Toast.makeText(this, getString(R.string.sesion_cerrada_exito), Toast.LENGTH_SHORT).show();
+                        finish();
+                    })
+                    .setNegativeButton(getString(R.string.cancelar), null)
+                    .show();
+        });
+
+        // Botón de perfil del conductor
+        btnPerfilConductor.setOnClickListener(view -> {
+            Log.d(TAG, "👤 Navegando a perfil de conductor");
+            goToDriverProfile();
+        });
+
+        // Configurar click en encabezado de estadísticas para actualizar
+        View headerEstadisticas = findViewById(R.id.tvTituloEstadisticas);
+        if (headerEstadisticas != null) {
+            headerEstadisticas.setOnClickListener(view -> {
+                Log.d(TAG, "🔄 Actualizando estadísticas manualmente");
+                Toast.makeText(this, getString(R.string.actualizando_datos), Toast.LENGTH_SHORT).show();
+                viewModel.reloadAllData();
+            });
         }
 
-        // ✅ Configurar encabezados de rutas por defecto
-        if (tvNombreRutaHeader1 != null) {
-            tvNombreRutaHeader1.setText("Ruta de Ida");
-        }
-        if (tvNombreRutaHeader2 != null) {
-            tvNombreRutaHeader2.setText("Ruta de Regreso");
-        }
-
-        Log.d(TAG, "✅ Todas las vistas inicializadas");
+        Log.d(TAG, "✅ Botones configurados");
     }
 
     private void setupObservers() {
         Log.d(TAG, "👀 Configurando observadores...");
 
-        // Observar nombre del conductor
+        // Observar datos del conductor (ViewModel principal)
         viewModel.getNombreConductorLiveData().observe(this, nombre -> {
-            if (nombre != null && !nombre.isEmpty()) {
+            if (nombre != null) {
                 tvConductor.setText(nombre);
                 Log.d(TAG, "✅ Nombre del conductor actualizado: " + nombre);
             } else {
-                tvConductor.setText("N/A");
+                tvConductor.setText(getString(R.string.no_disponible));
             }
         });
 
-        // Observar placa del vehículo
         viewModel.getPlacaVehiculoLiveData().observe(this, placa -> {
-            if (placa != null && !placa.isEmpty()) {
+            if (placa != null) {
                 tvPlacaVehiculo.setText(getString(R.string.placaVehiculo, placa));
                 Log.d(TAG, "✅ Placa del vehículo actualizada: " + placa);
             } else {
-                tvPlacaVehiculo.setText(getString(R.string.placaVehiculo, "N/A"));
+                tvPlacaVehiculo.setText(getString(R.string.placaVehiculo, getString(R.string.no_disponible)));
             }
         });
 
         // Observar reservas
-        viewModel.getReservasLiveData().observe(this, reservas -> {
+        reservasViewModel.getReservasLiveData().observe(this, reservas -> {
             Log.d(TAG, "🔄 Reservas actualizadas: " + (reservas != null ? reservas.size() : 0));
 
-            listaReservas.clear();
-            if (reservas != null && !reservas.isEmpty()) {
+            if (reservas != null) {
+                listaReservas.clear();
                 listaReservas.addAll(reservas);
                 reservaAdapter.actualizarReservas(new ArrayList<>(reservas));
+                updateReservationsUI();
 
-                // ✅ Actualizar contador de reservas
-                if (tvContadorReservas != null) {
-                    tvContadorReservas.setText(String.valueOf(reservas.size()));
-                }
-
-                // ✅ Registrar evento analítico
-                registrarEventoAnalitico("reservas_actualizadas", reservas.size(), null);
-
-                // ✅ Actualizar tiempo de actualización
-                actualizarTiempoActualizacion();
+                // Actualizar contador
+                tvContadorReservas.setText(getString(R.string.contador_reservas, reservas.size()));
+                Log.d(TAG, "✅ Contador de reservas: " + reservas.size());
             } else {
-                if (tvContadorReservas != null) {
-                    tvContadorReservas.setText("0");
-                }
+                tvContadorReservas.setText(getString(R.string.contador_reservas, 0));
             }
-            updateReservationsUI();
         });
 
-        // Observar rutas
-        viewModel.getRutasLiveData().observe(this, rutas -> {
-            Log.d(TAG, "🔄 Rutas actualizadas: " + (rutas != null ? rutas.size() : 0));
-
-            listaRutas.clear();
-            if (rutas != null && !rutas.isEmpty()) {
-                listaRutas.addAll(rutas);
-                rutaAdapter.notifyDataSetChanged();
-
-                // ✅ Actualizar contador de rutas
-                if (tvContadorRutas != null) {
-                    tvContadorRutas.setText(String.valueOf(rutas.size()));
-                }
-
-                // ✅ Registrar evento analítico
-                registrarEventoAnalitico("rutas_actualizadas", rutas.size(), null);
-
-                // ✅ Actualizar información de rutas
-                actualizarInformacionRutas(rutas);
-
-                // ✅ Actualizar tiempo de actualización
-                actualizarTiempoActualizacion();
-
-                // Mostrar información de la próxima ruta
-                if (!rutas.isEmpty()) {
-                    Ruta proximaRuta = rutas.get(0);
-                    String horario = proximaRuta.getHora() != null ?
-                            proximaRuta.getHora().getHora() : "--:--";
-                    Log.d(TAG, "✅ Ruta próxima: " + proximaRuta.getOrigen() +
-                            " → " + proximaRuta.getDestino() + " (" + horario + ")");
-                }
-            } else {
-                if (tvContadorRutas != null) {
-                    tvContadorRutas.setText("0");
-                }
+        reservasViewModel.getContadorReservasLiveData().observe(this, contador -> {
+            if (contador != null) {
+                tvContadorReservas.setText(getString(R.string.contador_reservas, contador));
             }
-            updateRoutesUI();
         });
 
         // Observar estadísticas generales
-        viewModel.getReservasConfirmadasLiveData().observe(this, count -> {
+        estadisticasViewModel.getReservasConfirmadasLiveData().observe(this, count -> {
             if (count != null) {
                 tvReservasConfirmadas.setText(String.valueOf(count));
                 Log.d(TAG, "📊 Reservas confirmadas: " + count);
 
-                // ✅ Actualizar información de capacidad
-                actualizarInformacionCapacidad();
+                // Actualizar información de capacidad
+                actualizarInformacionCapacidad(count);
             }
         });
 
-        viewModel.getAsientosDisponiblesLiveData().observe(this, asientos -> {
+        estadisticasViewModel.getAsientosDisponiblesLiveData().observe(this, asientos -> {
             if (asientos != null) {
                 tvAsientosDisponibles.setText(String.valueOf(asientos));
                 Log.d(TAG, "📊 Asientos disponibles: " + asientos);
 
-                // ✅ Actualizar información de capacidad
-                actualizarInformacionCapacidad();
+                // Actualizar información de capacidad
+                actualizarInformacionCapacidad(null);
             }
         });
 
-        viewModel.getIngresosLiveData().observe(this, ingresos -> {
+        estadisticasViewModel.getIngresosLiveData().observe(this, ingresos -> {
             if (ingresos != null) {
                 tvTotalIngresos.setText(formatCurrency(ingresos));
-                Log.d(TAG, "💰 Ingresos actualizados: $" + ingresos);
+                Log.d(TAG, "💰 Ingresos: " + formatCurrency(ingresos));
 
-                // ✅ Actualizar tiempo de actualización
+                // Actualizar tiempo de actualización
                 actualizarTiempoActualizacion();
             }
         });
 
-        // ✅ NUEVO: Observar estadísticas de la primera ruta
-        viewModel.getNombreRuta1LiveData().observe(this, nombreRuta -> {
-            if (nombreRuta != null && !nombreRuta.isEmpty()) {
-                tvNombreRutaReservas.setText(nombreRuta);
-                tvNombreRutaAsientos.setText(nombreRuta);
-                if (tvNombreRutaHeader1 != null) {
-                    tvNombreRutaHeader1.setText("Ruta: " + nombreRuta);
-                }
-                Log.d(TAG, "📊 Nombre Ruta 1 actualizado: " + nombreRuta);
+        // Observar estadísticas por ruta 1
+        estadisticasViewModel.getReservasRuta1LiveData().observe(this, count -> {
+            if (count != null) {
+                tvReservasRuta.setText(String.valueOf(count));
+                Log.d(TAG, "📊 Reservas Ruta 1: " + count);
             }
         });
 
-        viewModel.getReservasRuta1LiveData().observe(this, reservas -> {
-            if (reservas != null) {
-                tvReservasRuta.setText(String.valueOf(reservas));
-                Log.d(TAG, "📊 Reservas Ruta 1: " + reservas);
-
-                // ✅ Actualizar tiempo de actualización
-                actualizarTiempoActualizacion();
-            }
-        });
-
-        viewModel.getAsientosRuta1LiveData().observe(this, asientos -> {
+        estadisticasViewModel.getAsientosRuta1LiveData().observe(this, asientos -> {
             if (asientos != null) {
                 tvAsientosRuta.setText(String.valueOf(asientos));
                 Log.d(TAG, "📊 Asientos Ruta 1: " + asientos);
             }
         });
 
-        // ✅ NUEVO: Observar estadísticas de la segunda ruta (si existen las vistas)
-        if (tvNombreRutaReservas2 != null && tvNombreRutaAsientos2 != null) {
-            viewModel.getNombreRuta2LiveData().observe(this, nombreRuta -> {
-                if (nombreRuta != null && !nombreRuta.isEmpty()) {
-                    tvNombreRutaReservas2.setText(nombreRuta);
-                    tvNombreRutaAsientos2.setText(nombreRuta);
-                    if (tvNombreRutaHeader2 != null) {
-                        tvNombreRutaHeader2.setText("Ruta: " + nombreRuta);
-                    }
-                    Log.d(TAG, "📊 Nombre Ruta 2 actualizado: " + nombreRuta);
+        estadisticasViewModel.getNombreRuta1LiveData().observe(this, nombre -> {
+            if (nombre != null) {
+                tvNombreRutaReservas.setText(nombre);
+                tvNombreRutaAsientos.setText(nombre);
+                Log.d(TAG, "📊 Nombre Ruta 1: " + nombre);
+            }
+        });
+
+        // Observar estadísticas por ruta 2 (si existen las vistas)
+        try {
+            estadisticasViewModel.getReservasRuta2LiveData().observe(this, count -> {
+                if (count != null && tvReservasRuta2 != null) {
+                    tvReservasRuta2.setText(String.valueOf(count));
+                    Log.d(TAG, "📊 Reservas Ruta 2: " + count);
                 }
             });
 
-            viewModel.getReservasRuta2LiveData().observe(this, reservas -> {
-                if (reservas != null) {
-                    tvReservasRuta2.setText(String.valueOf(reservas));
-                    Log.d(TAG, "📊 Reservas Ruta 2: " + reservas);
-                }
-            });
-
-            viewModel.getAsientosRuta2LiveData().observe(this, asientos -> {
-                if (asientos != null) {
+            estadisticasViewModel.getAsientosRuta2LiveData().observe(this, asientos -> {
+                if (asientos != null && tvAsientosRuta2 != null) {
                     tvAsientosRuta2.setText(String.valueOf(asientos));
                     Log.d(TAG, "📊 Asientos Ruta 2: " + asientos);
                 }
             });
-        } else {
-            Log.d(TAG, "ℹ️ No se configuraron observadores para segunda ruta - vistas no encontradas");
+
+            estadisticasViewModel.getNombreRuta2LiveData().observe(this, nombre -> {
+                if (nombre != null && tvNombreRutaReservas2 != null && tvNombreRutaAsientos2 != null) {
+                    tvNombreRutaReservas2.setText(nombre);
+                    tvNombreRutaAsientos2.setText(nombre);
+                    Log.d(TAG, "📊 Nombre Ruta 2: " + nombre);
+                }
+            });
+        } catch (Exception e) {
+            Log.d(TAG, "ℹ️ No se configuraron observadores para segunda ruta: " + e.getMessage());
         }
 
-        // Observar estado de carga
+        // Observar rutas
+        rutasViewModel.getRutasLiveData().observe(this, rutas -> {
+            Log.d(TAG, "🔄 Rutas actualizadas: " + (rutas != null ? rutas.size() : 0));
+
+            if (rutas != null) {
+                listaRutas.clear();
+                listaRutas.addAll(rutas);
+                rutaAdapter.notifyDataSetChanged();
+                updateRoutesUI();
+
+                // Actualizar contador
+                tvContadorRutas.setText(getString(R.string.contador_rutas, rutas.size()));
+                Log.d(TAG, "✅ Contador de rutas: " + rutas.size());
+
+                // Actualizar estadísticas por ruta cuando se cargan nuevas rutas
+                if (!rutas.isEmpty() && !listaReservas.isEmpty()) {
+                    estadisticasViewModel.calculateRouteStatistics(rutas, listaReservas);
+                }
+
+                // Actualizar tiempo de actualización
+                actualizarTiempoActualizacion();
+            } else {
+                tvContadorRutas.setText(getString(R.string.contador_rutas, 0));
+            }
+        });
+
+        rutasViewModel.getContadorRutasLiveData().observe(this, contador -> {
+            if (contador != null) {
+                tvContadorRutas.setText(getString(R.string.contador_rutas, contador));
+            }
+        });
+
+        // Observar estado de carga del ViewModel principal
         viewModel.getLoadingLiveData().observe(this, isLoading -> {
             if (isLoading != null) {
                 progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
                 Log.d(TAG, isLoading ? "⏳ Cargando datos..." : "✅ Carga completada");
-
-                if (!isLoading) {
-                    // ✅ Actualizar tiempo de actualización cuando termina la carga
-                    actualizarTiempoActualizacion();
-                }
             }
         });
 
-        // Observar errores
+        // Observar errores del ViewModel principal
         viewModel.getErrorLiveData().observe(this, error -> {
             if (error != null && !error.isEmpty()) {
                 Log.e(TAG, "❌ Error observado: " + error);
                 Toast.makeText(InicioConductor.this,
-                        "Error: " + error, Toast.LENGTH_SHORT).show();
+                        getString(R.string.error_carga_estadisticas), Toast.LENGTH_SHORT).show();
+            }
+        });
 
-                // ✅ Registrar error en analytics
-                registrarErrorAnalitico("error_ui", error);
+        // Observar cuando una reserva es procesada
+        reservasViewModel.getReservaProcesadaLiveData().observe(this, procesada -> {
+            if (procesada != null && procesada) {
+                Log.d(TAG, "✅ Reserva procesada exitosamente");
+                Toast.makeText(this, getString(R.string.reserva_procesada_exito), Toast.LENGTH_SHORT).show();
+                // Actualizar estadísticas después de procesar una reserva
+                if (viewModel.getNombreConductorLiveData().getValue() != null) {
+                    estadisticasViewModel.calculateStatistics(viewModel.getNombreConductorLiveData().getValue());
+                }
             }
         });
 
@@ -419,48 +409,6 @@ public class InicioConductor extends AppCompatActivity {
         Log.d(TAG, "✅ RecyclerView de rutas configurado");
     }
 
-    private void setupButtons() {
-        Log.d(TAG, "🔧 Configurando botones...");
-
-        btnCerrarSesion.setOnClickListener(view -> {
-            Log.d(TAG, "🚪 Cerrando sesión de conductor...");
-
-            // ✅ Registrar evento de cierre de sesión usando MyApp
-            registrarEventoAnalitico("conductor_cerro_sesion", null, null);
-
-            authManager.signOut(this);
-            Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show();
-        });
-
-        btnPerfilConductor.setOnClickListener(view -> {
-            Log.d(TAG, "👤 Navegando a perfil de conductor");
-
-            // ✅ Registrar evento de navegación usando MyApp
-            registrarEventoAnalitico("navegar_perfil_conductor", null, null);
-
-            goToDriverProfile();
-        });
-
-        // ✅ NUEVO: Configurar click en encabezado de estadísticas para actualizar
-        View headerEstadisticas = findViewById(R.id.tvTituloEstadisticas);
-        if (headerEstadisticas != null) {
-            headerEstadisticas.setOnClickListener(view -> {
-                Log.d(TAG, "🔄 Actualizando estadísticas manualmente");
-
-                // ✅ Registrar evento de actualización
-                registrarEventoAnalitico("actualizar_estadisticas_manual", null, null);
-
-                // Mostrar mensaje de actualización
-                Toast.makeText(this, "Actualizando estadísticas...", Toast.LENGTH_SHORT).show();
-
-                // Recargar datos
-                viewModel.reloadAllData();
-            });
-        }
-
-        Log.d(TAG, "✅ Botones configurados");
-    }
-
     private void loadDriverData() {
         Log.d(TAG, "🔧 Cargando datos del conductor...");
 
@@ -481,38 +429,73 @@ public class InicioConductor extends AppCompatActivity {
         viewModel.loadDriverData(userId);
     }
 
+    private void showDefaultData() {
+        Log.d(TAG, "ℹ️ Mostrando datos por defecto");
+
+        showEmptyReservations();
+        showEmptyRoutes();
+        tvConductor.setText(getString(R.string.no_disponible));
+        tvPlacaVehiculo.setText(getString(R.string.placaVehiculo, getString(R.string.no_disponible)));
+
+        // Valores por defecto usando strings
+        tvReservasConfirmadas.setText(getString(R.string.contador_reservas, 0));
+        tvAsientosDisponibles.setText("28"); // Valor por defecto
+        tvTotalIngresos.setText(getString(R.string.formato_moneda, "0"));
+        tvContadorReservas.setText(getString(R.string.contador_reservas, 0));
+        tvContadorRutas.setText(getString(R.string.contador_rutas, 0));
+
+        // Datos por defecto para cada ruta individual
+        if (tvReservasRuta != null) tvReservasRuta.setText(getString(R.string.contador_reservas, 0));
+        if (tvAsientosRuta != null) tvAsientosRuta.setText("14"); // Valor por defecto
+        if (tvReservasRuta2 != null) tvReservasRuta2.setText(getString(R.string.contador_reservas, 0));
+        if (tvAsientosRuta2 != null) tvAsientosRuta2.setText("14"); // Valor por defecto
+
+        // Actualizar tiempo de actualización
+        actualizarTiempoActualizacion();
+
+        // Actualizar información de capacidad
+        actualizarInformacionCapacidad(0);
+
+        // Datos por defecto para estadísticas por ruta
+        if (tvNombreRutaReservas != null) tvNombreRutaReservas.setText(getString(R.string.nataga_laplata));
+        if (tvNombreRutaAsientos != null) tvNombreRutaAsientos.setText(getString(R.string.nataga_laplata));
+        if (tvNombreRutaReservas2 != null) tvNombreRutaReservas2.setText(getString(R.string.laplata_nataga));
+        if (tvNombreRutaAsientos2 != null) tvNombreRutaAsientos2.setText(getString(R.string.laplata_nataga));
+
+        Log.d(TAG, "✅ Datos por defecto mostrados");
+    }
+
     private void showConfirmationDialog(Reserva reserva, boolean isConfirmation) {
-        Log.d(TAG, "💬 Mostrando diálogo de " + (isConfirmation ? "confirmación" : "cancelación") +
-                " para reserva: " + reserva.getIdReserva());
+        Log.d(TAG, "💬 Mostrando diálogo de " + (isConfirmation ? "confirmación" : "cancelación"));
 
         new MaterialAlertDialogBuilder(this)
-                .setTitle(isConfirmation ? "Confirmar Reserva" : "Cancelar Reserva")
+                .setTitle(isConfirmation ?
+                        getString(R.string.confirmar_reserva) :
+                        getString(R.string.cancelar_reserva))
                 .setMessage(isConfirmation ?
-                        "¿Confirmar reserva de " + reserva.getNombre() + "?" :
-                        "¿Cancelar reserva de " + reserva.getNombre() + "?")
-                .setPositiveButton(isConfirmation ? "Confirmar" : "Cancelar", (dialog, which) -> {
+                        String.format(getString(R.string.confirmar_reserva_mensaje), reserva.getNombre()) :
+                        String.format(getString(R.string.cancelar_reserva_mensaje), reserva.getNombre()))
+                .setPositiveButton(isConfirmation ?
+                        getString(R.string.confirmar) :
+                        getString(R.string.cancelar), (dialog, which) -> {
                     Log.d(TAG, "✅ Usuario confirmó " + (isConfirmation ? "confirmación" : "cancelación"));
 
-                    // ✅ Registrar evento de acción
-                    registrarAccionReserva(reserva, isConfirmation ? "confirmar" : "cancelar");
-
                     if (isConfirmation) {
-                        viewModel.confirmReservation(reserva);
+                        reservasViewModel.confirmReservation(reserva);
                     } else {
-                        viewModel.cancelReservation(reserva);
+                        reservasViewModel.cancelReservation(reserva);
                     }
 
-                    // ✅ Actualizar tiempo de actualización después de la acción
+                    // Actualizar tiempo de actualización
                     actualizarTiempoActualizacion();
                 })
-                .setNegativeButton("Volver", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.volver), (dialog, which) -> {
                     Log.d(TAG, "❌ Usuario canceló la acción");
                     dialog.dismiss();
                 })
                 .show();
     }
 
-    // Métodos de UI
     private void updateReservationsUI() {
         Log.d(TAG, "🔄 Actualizando UI de reservas - Total: " + listaReservas.size());
 
@@ -531,7 +514,7 @@ public class InicioConductor extends AppCompatActivity {
         tvEmptyRutas.setVisibility(hayRutas ? View.GONE : View.VISIBLE);
         rvProximasRutas.setVisibility(hayRutas ? View.VISIBLE : View.GONE);
 
-        // ✅ Controlar visibilidad de la segunda ruta
+        // Controlar visibilidad de la segunda ruta
         View layoutRuta2 = findViewById(R.id.layoutRuta2);
         boolean haySegundaRuta = hayRutas && listaRutas.size() >= 2;
 
@@ -545,96 +528,36 @@ public class InicioConductor extends AppCompatActivity {
                 (hayRutas ? "Mostrando " + listaRutas.size() + " rutas" : "Sin rutas"));
     }
 
-    // ✅ NUEVO: Método para actualizar tiempo de actualización
     private void actualizarTiempoActualizacion() {
         if (tvUltimaActualizacion != null) {
             String currentTime = timeFormat.format(new Date());
-            tvUltimaActualizacion.setText("Última actualización: " + currentTime);
-            Log.d(TAG, "🕐 Tiempo de actualización actualizado: " + currentTime);
+            tvUltimaActualizacion.setText(String.format(getString(R.string.ultima_actualizacion), currentTime));
+            Log.d(TAG, "🕐 Tiempo de actualización: " + currentTime);
         }
     }
 
-    // ✅ NUEVO: Método para actualizar información de capacidad
-    private void actualizarInformacionCapacidad() {
+    private void actualizarInformacionCapacidad(Integer reservasConfirmadas) {
         if (tvInfoCapacidad != null && tvAsientosDisponibles != null) {
             try {
+                // Leer el valor actual de asientos disponibles
                 int disponibles = Integer.parseInt(tvAsientosDisponibles.getText().toString());
-                int ocupados = CAPACIDAD_TOTAL - disponibles;
-                int porcentajeOcupacion = (ocupados * 100) / CAPACIDAD_TOTAL;
 
-                String info = String.format(Locale.getDefault(),
-                        "De %d totales • Ocupación: %d%%",
-                        CAPACIDAD_TOTAL, porcentajeOcupacion);
+                // Si se pasa reservasConfirmadas, actualizar ocupados
+                int ocupados = reservasConfirmadas != null ? reservasConfirmadas :
+                        (28 - disponibles); // Total fijo de 28 asientos
+
+                final int CAPACIDAD_TOTAL = 28;
+                int porcentajeOcupacion = ocupados > 0 ? (ocupados * 100) / CAPACIDAD_TOTAL : 0;
+
+                String info = getString(R.string.ocupacion_porcentaje_detallada,
+                        CAPACIDAD_TOTAL, disponibles, ocupados, porcentajeOcupacion);
                 tvInfoCapacidad.setText(info);
 
-                Log.d(TAG, "📊 Información de capacidad actualizada: " + info);
+                Log.d(TAG, "📊 Información de capacidad: " + info);
             } catch (NumberFormatException e) {
-                Log.e(TAG, "❌ Error al calcular porcentaje de ocupación: " + e.getMessage());
+                Log.e(TAG, "❌ Error al calcular información de capacidad: " + e.getMessage());
+                tvInfoCapacidad.setText(getString(R.string.ocupacion_porcentaje, 28, 0));
             }
-        }
-    }
-
-    // ✅ NUEVO: Método para actualizar información de rutas
-    private void actualizarInformacionRutas(List<Ruta> rutas) {
-        if (rutas != null && !rutas.isEmpty()) {
-            // Actualizar hora próxima para cada ruta si está disponible
-            for (int i = 0; i < Math.min(rutas.size(), 2); i++) {
-                Ruta ruta = rutas.get(i);
-                String horario = ruta.getHora() != null ?
-                        ruta.getHora().getHora() : "--:--";
-
-                if (i == 0) {
-                    // Ruta 1 - Buscar el TextView dentro del encabezado de la primera ruta
-                    View headerRuta1 = findViewById(R.id.tvNombreRutaHeader1);
-                    if (headerRuta1 != null && headerRuta1.getParent() instanceof ViewGroup) {
-                        ViewGroup parent = (ViewGroup) headerRuta1.getParent();
-                        // Buscar el TextView que muestra la hora próxima
-                        for (int j = 0; j < parent.getChildCount(); j++) {
-                            View child = parent.getChildAt(j);
-                            if (child instanceof TextView) {
-                                TextView textView = (TextView) child;
-                                String currentText = textView.getText().toString();
-                                // Verificar si es el TextView de hora por su contenido actual
-                                if (currentText.contains("Próximo:")) {
-                                    textView.setText("Próximo: " + horario);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                } else if (i == 1) {
-                    // Ruta 2 - Buscar el TextView dentro del encabezado de la segunda ruta
-                    View headerRuta2 = findViewById(R.id.tvNombreRutaHeader2);
-                    if (headerRuta2 != null && headerRuta2.getParent() instanceof ViewGroup) {
-                        ViewGroup parent = (ViewGroup) headerRuta2.getParent();
-                        // Buscar el TextView que muestra la hora próxima
-                        for (int j = 0; j < parent.getChildCount(); j++) {
-                            View child = parent.getChildAt(j);
-                            if (child instanceof TextView) {
-                                TextView textView = (TextView) child;
-                                String currentText = textView.getText().toString();
-                                // Verificar si es el TextView de hora por su contenido actual
-                                if (currentText.contains("Próximo:")) {
-                                    textView.setText("Próximo: " + horario);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private String formatCurrency(double amount) {
-        if (amount == 0) {
-            return "$0";
-        } else if (amount < 1000) {
-            return String.format("$%.0f", amount);
-        } else if (amount < 1000000) {
-            return String.format("$%.1fK", amount / 1000);
-        } else {
-            return String.format("$%.1fM", amount / 1000000);
         }
     }
 
@@ -646,50 +569,8 @@ public class InicioConductor extends AppCompatActivity {
             Log.d(TAG, "✅ Intent iniciado para PerfilConductor");
         } else {
             Log.w(TAG, "⚠️ Usuario no logeado - no se puede navegar al perfil");
-            Toast.makeText(this, "Debe iniciar sesión primero", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.debe_iniciar_sesion), Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void showDefaultData() {
-        Log.d(TAG, "ℹ️ Mostrando datos por defecto");
-
-        showEmptyReservations();
-        showEmptyRoutes();
-        tvConductor.setText("N/A");
-        tvPlacaVehiculo.setText(getString(R.string.placaVehiculo, "N/A"));
-        tvReservasConfirmadas.setText("0");
-        tvAsientosDisponibles.setText(String.valueOf(CAPACIDAD_TOTAL));
-        tvTotalIngresos.setText("$0");
-
-        // ✅ Actualizar contadores
-        if (tvContadorReservas != null) {
-            tvContadorReservas.setText("0");
-        }
-        if (tvContadorRutas != null) {
-            tvContadorRutas.setText("0");
-        }
-
-        // ✅ Actualizar tiempo de actualización
-        actualizarTiempoActualizacion();
-
-        // ✅ Actualizar información de capacidad
-        actualizarInformacionCapacidad();
-
-        // ✅ Datos por defecto para estadísticas por ruta
-        if (tvNombreRutaReservas != null) {
-            tvNombreRutaReservas.setText("Sin ruta asignada");
-        }
-        if (tvNombreRutaAsientos != null) {
-            tvNombreRutaAsientos.setText("Sin ruta asignada");
-        }
-        if (tvReservasRuta != null) {
-            tvReservasRuta.setText("0");
-        }
-        if (tvAsientosRuta != null) {
-            tvAsientosRuta.setText("0");
-        }
-
-        Log.d(TAG, "✅ Datos por defecto mostrados");
     }
 
     private void showEmptyReservations() {
@@ -706,73 +587,9 @@ public class InicioConductor extends AppCompatActivity {
         rvProximasRutas.setVisibility(View.GONE);
     }
 
-    // ✅ MÉTODO AUXILIAR: Registrar eventos analíticos usando MyApp
-    private void registrarEventoAnalitico(String evento, Integer cantidad, Integer confirmadas) {
-        try {
-            java.util.Map<String, Object> params = new java.util.HashMap<>();
-            params.put("conductor_id", MyApp.getCurrentUserId());
-            params.put("pantalla", "InicioConductor");
-            params.put("timestamp", System.currentTimeMillis());
-
-            if (cantidad != null) {
-                params.put("cantidad", cantidad);
-            }
-            if (confirmadas != null) {
-                params.put("confirmadas", confirmadas);
-            }
-
-            MyApp.logEvent(evento, params);
-            Log.d(TAG, "📊 Evento analítico registrado: " + evento);
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando evento analítico: " + e.getMessage());
-        }
-    }
-
-    // ✅ MÉTODO AUXILIAR: Registrar errores usando MyApp
-    private void registrarErrorAnalitico(String tipoError, String mensaje) {
-        try {
-            java.util.Map<String, Object> params = new java.util.HashMap<>();
-            params.put("conductor_id", MyApp.getCurrentUserId());
-            params.put("pantalla", "InicioConductor");
-            params.put("tipo_error", tipoError);
-            params.put("mensaje_error", mensaje);
-            params.put("timestamp", System.currentTimeMillis());
-
-            MyApp.logEvent("error_pantalla", params);
-            Log.d(TAG, "📊 Error registrado en análisis: " + tipoError);
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando error analítico: " + e.getMessage());
-        }
-    }
-
-    // ✅ MÉTODO AUXILIAR: Registrar acción sobre reserva usando MyApp
-    private void registrarAccionReserva(Reserva reserva, String accion) {
-        try {
-            java.util.Map<String, Object> params = new java.util.HashMap<>();
-            params.put("conductor_id", MyApp.getCurrentUserId());
-            params.put("reserva_id", reserva.getIdReserva());
-            params.put("pasajero_id", reserva.getUsuarioId());
-            params.put("pasajero_nombre", reserva.getNombre());
-            params.put("accion", accion);
-            params.put("ruta", reserva.getOrigen() + " → " + reserva.getDestino());
-            params.put("asiento", reserva.getPuestoReservado());
-            params.put("precio", reserva.getPrecio());
-            params.put("timestamp", System.currentTimeMillis());
-
-            MyApp.logEvent("accion_reserva_conductor", params);
-            Log.d(TAG, "📊 Acción de reserva registrada: " + accion);
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando acción de reserva: " + e.getMessage());
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(TAG, "📱 onStart - Actividad visible");
-
-        // ✅ Registrar evento de inicio usando MyApp
-        registrarEventoAnalitico("pantalla_inicio_conductor_start", null, null);
+    private String formatCurrency(double amount) {
+        // Usar el string de formato directamente
+        return getString(R.string.formato_moneda, String.format(Locale.getDefault(), "%.0f", amount));
     }
 
     @Override
@@ -780,15 +597,7 @@ public class InicioConductor extends AppCompatActivity {
         super.onResume();
         Log.d(TAG, "📱 onResume - Actividad en primer plano");
 
-        // ✅ Registrar evento de resumen usando MyApp
-        registrarEventoAnalitico("pantalla_inicio_conductor_resume", null, null);
-
         // Recargar datos si es necesario
-        recargarSiEsNecesario();
-    }
-
-    private void recargarSiEsNecesario() {
-        // Verificar si los datos están cargados
         if (viewModel.getNombreConductorLiveData().getValue() != null) {
             Log.d(TAG, "🔄 Recargando datos en onResume");
             viewModel.reloadAllData();
@@ -796,23 +605,11 @@ public class InicioConductor extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "📱 onPause - Actividad en segundo plano");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "📱 onStop - Actividad no visible");
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "📱 onDestroy - Actividad destruida");
 
-        // Limpiar ViewModel si es necesario
-        viewModel.clearData();
+        // Limpiar ViewModel
+        viewModel.clearAllData();
     }
 }

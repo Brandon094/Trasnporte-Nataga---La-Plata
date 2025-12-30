@@ -47,7 +47,7 @@
                     style="@style/TextAppearance.MaterialComponents.Headline5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/panelConductor"
+                    android:text="@string/panel_conductor_title"
                     android:textAlignment="center"
                     android:textColor="@color/primary_text"/>
 
@@ -62,7 +62,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/ic_driver"
-                        android:contentDescription="@string/nombreConductor" />
+                        android:contentDescription="@string/conductor" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -126,7 +126,7 @@
                             style="@style/TextAppearance.MaterialComponents.Subtitle1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/reservasPendientes"
+                            android:text="@string/reservas_activas"
                             android:textColor="@color/primary_text"
                             android:textStyle="bold"/>
 
@@ -135,7 +135,7 @@
                             style="@style/TextAppearance.MaterialComponents.Caption"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Reservas pendientes de confirmación"
+                            android:text="@string/reservas_pendientes_confirmacion"
                             android:layout_marginTop="4dp"
                             android:textColor="@color/text_tertiary"/>
                     </LinearLayout>
@@ -145,7 +145,7 @@
                         style="@style/TextAppearance.MaterialComponents.Subtitle2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
+                        android:text="@string/contador_reservas"
                         android:background="@drawable/bg_badge"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="4dp"
@@ -170,7 +170,7 @@
                     android:id="@+id/tvEmptyReservas"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/no_hay_reservas"
+                    android:text="@string/sin_reservas_activas"
                     style="@style/TextAppearance.MaterialComponents.Body1"
                     android:gravity="center"
                     android:padding="32dp"
@@ -218,7 +218,7 @@
                             style="@style/TextAppearance.MaterialComponents.Headline6"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="📊 Resumen del Día"
+                            android:text="@string/resumen_dia"
                             android:textColor="@color/primary_text"
                             android:textStyle="bold"/>
 
@@ -227,7 +227,7 @@
                             style="@style/TextAppearance.MaterialComponents.Caption"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Estadísticas en tiempo real"
+                            android:text="@string/estadisticas_tiempo_real"
                             android:layout_marginTop="4dp"
                             android:textColor="@color/text_tertiary"/>
                     </LinearLayout>
@@ -237,7 +237,7 @@
                         android:layout_height="24dp"
                         android:src="@drawable/ic_refresh"
                         android:tint="@color/primary_500"
-                        android:contentDescription="Actualizar estadísticas"/>
+                        android:contentDescription="@string/tooltip_actualizar"/>
                 </LinearLayout>
 
                 <!-- 🎯 SECCIÓN 1: INGRESOS DESTACADOS -->
@@ -251,7 +251,7 @@
                         style="@style/TextAppearance.MaterialComponents.Subtitle2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="💰 Ingresos del Día"
+                        android:text="@string/ingresos_del_dia"
                         android:textColor="@color/text_secondary"
                         android:layout_marginBottom="12dp"/>
 
@@ -296,7 +296,7 @@
                                         style="@style/TextAppearance.MaterialComponents.Subtitle2"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Ingresos Totales"
+                                        android:text="@string/ingresos_totales_label"
                                         android:textColor="@color/text_secondary"/>
                                 </LinearLayout>
 
@@ -304,7 +304,7 @@
                                     android:id="@+id/tvInfoIngresos"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Acumulado desde el inicio del día"
+                                    android:text="@string/acumulado_desde_inicio"
                                     android:textColor="@color/text_tertiary"
                                     android:textSize="12sp"
                                     android:layout_marginTop="8dp"
@@ -324,7 +324,7 @@
                                     style="@style/TextAppearance.MaterialComponents.Headline4"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="$0.00"
+                                    android:text="@string/formato_moneda"
                                     android:textColor="@color/warning_700"
                                     android:textStyle="bold"
                                     android:textAlignment="textEnd"/>
@@ -333,7 +333,7 @@
                                     android:id="@+id/tvTendenciaIngresos"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="+12% vs ayer"
+                                    android:text="@string/vs_ayer"
                                     android:textColor="@color/success_600"
                                     android:textSize="12sp"
                                     android:layout_marginTop="4dp"
@@ -356,7 +356,7 @@
                         style="@style/TextAppearance.MaterialComponents.Subtitle2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="📈 Desempeño General"
+                        android:text="@string/desempeno_general"
                         android:textColor="@color/text_secondary"
                         android:layout_marginBottom="12dp"/>
 
@@ -405,7 +405,7 @@
                                         style="@style/TextAppearance.MaterialComponents.Caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Confirmadas"
+                                        android:text="@string/confirmadas"
                                         android:textColor="@color/text_secondary"/>
                                 </LinearLayout>
 
@@ -425,7 +425,7 @@
                                     style="@style/TextAppearance.MaterialComponents.Body2"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Reservas Confirmadas"
+                                    android:text="@string/reservas_confirmadas_label"
                                     android:textAlignment="center"
                                     android:textColor="@color/text_secondary"
                                     android:layout_marginBottom="8dp"/>
@@ -436,7 +436,7 @@
                                     style="@style/TextAppearance.MaterialComponents.Caption"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Total del día • Actualizado ahora"
+                                    android:text="@string/total_del_dia"
                                     android:textAlignment="center"
                                     android:textColor="@color/text_tertiary"
                                     android:textStyle="italic"/>
@@ -481,7 +481,7 @@
                                         style="@style/TextAppearance.MaterialComponents.Caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Disponibilidad"
+                                        android:text="@string/disponibilidad"
                                         android:textColor="@color/text_secondary"/>
                                 </LinearLayout>
 
@@ -501,7 +501,7 @@
                                     style="@style/TextAppearance.MaterialComponents.Body2"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Asientos Disponibles"
+                                    android:text="@string/asientos_disponibles_label"
                                     android:textAlignment="center"
                                     android:textColor="@color/text_secondary"
                                     android:layout_marginBottom="8dp"/>
@@ -512,7 +512,7 @@
                                     style="@style/TextAppearance.MaterialComponents.Caption"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="14 asientos totales • Ocupación: 0%"
+                                    android:text="@string/ocupacion_porcentaje"
                                     android:textAlignment="center"
                                     android:textColor="@color/text_tertiary"
                                     android:textStyle="italic"/>
@@ -532,7 +532,7 @@
                         style="@style/TextAppearance.MaterialComponents.Subtitle2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="🛣️ Desglose por Ruta"
+                        android:text="@string/desglose_ruta"
                         android:textColor="@color/text_secondary"
                         android:layout_marginBottom="12dp"/>
 
@@ -541,7 +541,7 @@
                         style="@style/TextAppearance.MaterialComponents.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Estadísticas específicas para cada itinerario programado"
+                        android:text="@string/estadisticas_especificas"
                         android:textColor="@color/text_tertiary"
                         android:layout_marginBottom="16dp"
                         android:textStyle="italic"/>
@@ -576,7 +576,7 @@
                                 style="@style/TextAppearance.MaterialComponents.Subtitle2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Ruta de Ida"
+                                android:text="@string/ruta_ida"
                                 android:textColor="@color/info_700"
                                 android:textStyle="bold"/>
 
@@ -589,7 +589,7 @@
                                 style="@style/TextAppearance.MaterialComponents.Caption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Próximo: --:--"
+                                android:text="@string/proximo_horario"
                                 android:textColor="@color/text_tertiary"/>
                         </LinearLayout>
 
@@ -642,7 +642,7 @@
                                         style="@style/TextAppearance.MaterialComponents.Caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Nataga → La Plata"
+                                        android:text="@string/nataga_laplata"
                                         android:textAlignment="center"
                                         android:textColor="@color/text_secondary"
                                         android:layout_marginBottom="4dp"
@@ -653,7 +653,7 @@
                                         style="@style/TextAppearance.MaterialComponents.Caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Reservas confirmadas"
+                                        android:text="@string/reservas_confirmadas_ruta"
                                         android:textAlignment="center"
                                         android:textColor="@color/text_tertiary"
                                         android:textSize="11sp"
@@ -703,7 +703,7 @@
                                         style="@style/TextAppearance.MaterialComponents.Caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Nataga → La Plata"
+                                        android:text="@string/nataga_laplata"
                                         android:textAlignment="center"
                                         android:textColor="@color/text_secondary"
                                         android:layout_marginBottom="4dp"
@@ -714,7 +714,7 @@
                                         style="@style/TextAppearance.MaterialComponents.Caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Asientos disponibles"
+                                        android:text="@string/asientos_disponibles_ruta"
                                         android:textAlignment="center"
                                         android:textColor="@color/text_tertiary"
                                         android:textSize="11sp"
@@ -755,7 +755,7 @@
                                 style="@style/TextAppearance.MaterialComponents.Subtitle2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Ruta de Regreso"
+                                android:text="@string/ruta_regreso"
                                 android:textColor="@color/secondary_700"
                                 android:textStyle="bold"/>
 
@@ -768,7 +768,7 @@
                                 style="@style/TextAppearance.MaterialComponents.Caption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Próximo: 18:30"
+                                android:text="@string/proximo_horario"
                                 android:textColor="@color/text_tertiary"/>
                         </LinearLayout>
 
@@ -821,7 +821,7 @@
                                         style="@style/TextAppearance.MaterialComponents.Caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="La Plata → Nataga"
+                                        android:text="@string/laplata_nataga"
                                         android:textAlignment="center"
                                         android:textColor="@color/text_secondary"
                                         android:layout_marginBottom="4dp"
@@ -832,7 +832,7 @@
                                         style="@style/TextAppearance.MaterialComponents.Caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Reservas confirmadas"
+                                        android:text="@string/reservas_confirmadas_ruta"
                                         android:textAlignment="center"
                                         android:textColor="@color/text_tertiary"
                                         android:textSize="11sp"
@@ -882,7 +882,7 @@
                                         style="@style/TextAppearance.MaterialComponents.Caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="La Plata → Nataga"
+                                        android:text="@string/laplata_nataga"
                                         android:textAlignment="center"
                                         android:textColor="@color/text_secondary"
                                         android:layout_marginBottom="4dp"
@@ -893,7 +893,7 @@
                                         style="@style/TextAppearance.MaterialComponents.Caption"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Asientos disponibles"
+                                        android:text="@string/asientos_disponibles_ruta"
                                         android:textAlignment="center"
                                         android:textColor="@color/text_tertiary"
                                         android:textSize="11sp"
@@ -931,7 +931,7 @@
                             style="@style/TextAppearance.MaterialComponents.Caption"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Actualizado en tiempo real"
+                            android:text="@string/actualizado_tiempo_real"
                             android:textColor="@color/info_700"
                             android:textStyle="bold"/>
                     </LinearLayout>
@@ -940,7 +940,7 @@
                         style="@style/TextAppearance.MaterialComponents.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Los datos se actualizan automáticamente cada 5 minutos"
+                        android:text="@string/actualizacion_automatica"
                         android:textAlignment="center"
                         android:textColor="@color/text_tertiary"
                         android:textStyle="italic"/>
@@ -950,7 +950,7 @@
                         style="@style/TextAppearance.MaterialComponents.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Última actualización: 14:25"
+                        android:text="@string/ultima_actualizacion"
                         android:textAlignment="center"
                         android:layout_marginTop="4dp"
                         android:textColor="@color/text_tertiary"/>
@@ -994,7 +994,7 @@
                             style="@style/TextAppearance.MaterialComponents.Subtitle1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/proximasRutas"
+                            android:text="@string/proximas_rutas"
                             android:textColor="@color/primary_text"
                             android:textStyle="bold"/>
 
@@ -1003,7 +1003,7 @@
                             style="@style/TextAppearance.MaterialComponents.Caption"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Próximos itinerarios programados"
+                            android:text="@string/proximos_itinerarios"
                             android:layout_marginTop="4dp"
                             android:textColor="@color/text_tertiary"/>
                     </LinearLayout>
@@ -1013,7 +1013,7 @@
                         style="@style/TextAppearance.MaterialComponents.Subtitle2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
+                        android:text="@string/contador_rutas"
                         android:background="@drawable/bg_badge_secondary"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="4dp"
@@ -1038,7 +1038,7 @@
                     android:id="@+id/tvEmptyRutas"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/no_hay_rutas"
+                    android:text="@string/sin_proximas_rutas"
                     style="@style/TextAppearance.MaterialComponents.Body1"
                     android:gravity="center"
                     android:padding="32dp"
@@ -1065,7 +1065,7 @@
                 android:layout_height="52dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="@string/perfilConductor"
+                android:text="@string/perfil_conductor"
                 android:textAllCaps="false"
                 app:cornerRadius="26dp"
                 app:icon="@drawable/ic_driver"
@@ -1080,7 +1080,7 @@
                 android:layout_width="0dp"
                 android:layout_height="52dp"
                 android:layout_weight="1"
-                android:text="@string/cerrarSesion"
+                android:text="@string/cerrar_sesion"
                 android:textAllCaps="false"
                 app:cornerRadius="26dp"
                 app:icon="@drawable/ic_logout"

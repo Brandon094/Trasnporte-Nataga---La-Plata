@@ -87,17 +87,128 @@
     <string name="asiento_disponible">%d Asientos disponibles</string>
 
     <!-- ==================== -->
-    <!-- DRIVER PANEL -->
+    <!-- DRIVER PANEL STRINGS -->
     <!-- ==================== -->
-    <string name="panelConductor">Panel del conductor</string>
-    <string name="verReservas">Ver reservas</string>
-    <string name="ingresosDiarios">Ingresos diarios:</string>
-    <string name="totalIngresos">$%1$.0f COP</string>
-    <string name="verEstadisticas">Ver estadísticas</string>
-    <string name="perfilConductor">Perfil conductor</string>
-    <string name="actualizarDatos">Actualizar datos</string>
-    <string name="notificaciones">Notificaciones (%d)</string>
 
+    <!-- Panel del conductor -->
+    <string name="panel_conductor_title">Panel del Conductor</string>
+    <string name="conductor">Conductor</string>
+    <string name="reservas_activas">Reservas Activas</string>
+    <string name="reservas_pendientes_confirmacion">Reservas pendientes de confirmación</string>
+
+    <!-- Estadísticas mejoradas -->
+    <string name="resumen_dia">📊 Resumen del Día</string>
+    <string name="estadisticas_tiempo_real">Estadísticas en tiempo real</string>
+    <string name="ingresos_del_dia">💰 Ingresos del Día</string>
+    <string name="ingresos_totales_label">Ingresos Totales</string>
+    <string name="acumulado_desde_inicio">Acumulado desde el inicio del día</string>
+    <string name="vs_ayer">%s vs ayer</string>
+
+    <!-- Desempeño general -->
+    <string name="desempeno_general">📈 Desempeño General</string>
+    <string name="confirmadas">Confirmadas</string>
+    <string name="disponibilidad">Disponibilidad</string>
+    <string name="reservas_confirmadas_label">Reservas Confirmadas</string>
+    <string name="total_del_dia">Total del día • Actualizado ahora</string>
+    <string name="asientos_disponibles_label">Asientos Disponibles</string>
+    <string name="ocupacion_porcentaje">%d asientos totales • Ocupación: %d%%</string>
+
+    <!-- Desglose por ruta -->
+    <string name="desglose_ruta">🛣️ Desglose por Ruta</string>
+    <string name="estadisticas_especificas">Estadísticas específicas para cada itinerario programado</string>
+    <string name="ruta_ida">Ruta de Ida</string>
+    <string name="ruta_regreso">Ruta de Regreso</string>
+    <string name="proximo_horario">Próximo: %s</string>
+
+    <!-- Textos específicos para rutas -->
+    <string name="nataga_laplata">Nataga → La Plata</string>
+    <string name="laplata_nataga">La Plata → Nataga</string>
+    <string name="reservas_confirmadas_ruta">Reservas confirmadas</string>
+    <string name="asientos_disponibles_ruta">Asientos disponibles</string>
+
+    <!-- Pie de estadísticas -->
+    <string name="actualizado_tiempo_real">Actualizado en tiempo real</string>
+    <string name="actualizacion_automatica">Los datos se actualizan automáticamente cada 5 minutos</string>
+    <string name="ultima_actualizacion">Última actualización: %s</string>
+
+    <!-- Próximas rutas -->
+    <string name="proximas_rutas">Próximas Rutas</string>
+    <string name="proximos_itinerarios">Próximos itinerarios programados</string>
+
+    <!-- Contadores -->
+    <string name="contador_reservas">%d</string>
+    <string name="contador_rutas">%d</string>
+
+    <!-- Botones de acción -->
+    <string name="perfil_conductor">Perfil Conductor</string>
+    <string name="cerrar_sesion">Cerrar Sesión</string>
+
+    <!-- Mensajes informativos -->
+    <string name="cargando_estadisticas">Cargando estadísticas…</string>
+    <string name="actualizando_datos">Actualizando datos…</string>
+    <string name="error_carga_estadisticas">Error al cargar las estadísticas</string>
+    <string name="sin_conexion">Sin conexión a internet</string>
+    <string name="reintentar">Reintentar</string>
+
+    <!-- Estados de disponibilidad -->
+    <string name="disponible">Disponible</string>
+    <string name="ocupado">Ocupado</string>
+    <string name="sin_programar">Sin programar</string>
+    <string name="completo">Completo</string>
+
+    <!-- Formatos de texto -->
+    <string name="formato_moneda">$%s</string>
+    <string name="formato_porcentaje">%d%%</string>
+    <string name="formato_hora">%02d:%02d</string>
+    <string name="formato_fecha_hora">%s - %s</string>
+
+    <!-- Tooltips e información adicional -->
+    <string name="tooltip_actualizar">Actualizar estadísticas</string>
+    <string name="tooltip_reservas">Ver detalles de reservas</string>
+    <string name="tooltip_rutas">Ver itinerarios completos</string>
+    <string name="info_ocupacion">Ocupación del vehículo</string>
+    <string name="info_ingresos_diarios">Ingresos acumulados hoy</string>
+    <string name="info_reservas_activas">Reservas pendientes de confirmación por el conductor</string>
+    <string name="info_proximas_rutas">Próximos horarios programados para hoy</string>
+
+    <!-- Textos para cuando no hay datos -->
+    <string name="sin_reservas_activas">No hay reservas activas en este momento</string>
+    <string name="sin_proximas_rutas">No hay rutas programadas para hoy</string>
+    <string name="sin_estadisticas">No hay datos estadísticos disponibles</string>
+    <string name="sin_ingresos_hoy">Sin ingresos registrados hoy</string>
+
+    <!-- Configuración del conductor -->
+    <string name="estado_conductor">Estado del conductor</string>
+    <string name="conductor_activo">Activo</string>
+    <string name="conductor_inactivo">Inactivo</string>
+    <string name="cambiar_estado">Cambiar estado</string>
+    <string name="modo_disponible">Modo disponible</string>
+    <string name="modo_descanso">Modo descanso</string>
+
+    <!-- Notificaciones conductor -->
+    <string name="nueva_reserva_notificacion">Nueva reserva recibida</string>
+    <string name="reserva_confirmada_notificacion">Reserva confirmada por pasajero</string>
+    <string name="reserva_cancelada_notificacion">Reserva cancelada</string>
+    <string name="recordatorio_ruta">Recordatorio: Próxima ruta en %s minutos</string>
+
+    <!-- Actualización de perfil conductor -->
+    <string name="actualizar_vehiculo">Actualizar vehículo</string>
+    <string name="actualizar_horarios">Actualizar horarios</string>
+    <string name="gestionar_rutas">Gestionar rutas</string>
+    <string name="ver_rendimiento">Ver rendimiento</string>
+    <string name="ver_historial">Ver historial completo</string>
+
+    <!-- Strings adicionales para la clase InicioConductor -->
+    <string name="confirmar_cerrar_sesion">¿Está seguro que desea cerrar sesión?</string>
+    <string name="sesion_cerrada_exito">Sesión cerrada</string>
+    <string name="confirmar_reserva">Confirmar Reserva</string>
+    <string name="cancelar_reserva">Cancelar Reserva</string>
+    <string name="confirmar_reserva_mensaje">¿Confirmar reserva de %s?</string>
+    <string name="cancelar_reserva_mensaje">¿Cancelar reserva de %s?</string>
+    <string name="no_disponible">N/A</string>
+    <string name="reserva_procesada_exito">Reserva procesada exitosamente</string>
+    <string name="debe_iniciar_sesion">Debe iniciar sesión primero</string>
+    <string name="ocupacion_porcentaje_detallada">%d asientos totales • Disponibles: %d • Ocupados: %d (%d%%)</string>
     <!-- ==================== -->
     <!-- VEHICLE & PROFILE -->
     <!-- ==================== -->
@@ -125,7 +236,7 @@
     <string name="historial_reservas">Historial de Reservas</string>
     <string name="filtros">Filtros</string>
     <string name="todas">Todas</string>
-    <string name="confirmadas">Confirmadas</string>
+    <!-- <string name="confirmadas">Confirmadas</string> -->
     <string name="canceladas">Canceladas</string>
     <string name="hoy">Hoy</string>
     <string name="semana">Esta semana</string>
