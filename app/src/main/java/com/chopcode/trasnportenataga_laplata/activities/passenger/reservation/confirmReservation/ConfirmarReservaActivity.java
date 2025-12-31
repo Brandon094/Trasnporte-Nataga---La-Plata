@@ -14,8 +14,9 @@ import android.widget.Toast;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuariosActivity;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
-import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
-import com.chopcode.trasnportenataga_laplata.managers.notificactions.NotificationManager;
+import com.chopcode.trasnportenataga_laplata.managers.analytics.ReservationAnalyticsHelper;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.ReservationUserManager;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.confirmation.ConfirmationDataProcessor;
 import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -25,7 +26,9 @@ import java.util.Map;
 
 public class ConfirmarReservaActivity extends AppCompatActivity {
 
-    // TextViews de la nueva interfaz
+    private static final String TAG = "ConfirmarReserva";
+
+    // UI Elements
     private TextView tvRuta, tvFechaHora, tvTiempoEstimado, tvPrecio, tvAsiento;
     private TextView tvUsuario, tvTelefonoP, tvConductor, tvTelefonoC, tvPlaca;
     private RadioGroup radioGroupPago;
@@ -33,178 +36,97 @@ public class ConfirmarReservaActivity extends AppCompatActivity {
     private MaterialButton btnConfirmarReserva, btnCancelar;
     private MaterialToolbar topAppBar;
 
-    // Variables de datos
-    private int asientoSeleccionado;
-    private String horarioId, horarioHora, rutaSeleccionada, fechaViaje;
-    private String origen, destino, tiempoEstimado, metodoPago;
-    private double precio;
+    // Managers (usando los que ya tienes)
+    private ReservationAnalyticsHelper analyticsHelper;
+    private ReservationUserManager userManager;
+    private ConfirmationDataProcessor dataProcessor;
 
-    // Datos del conductor
-    private String conductorNombre, conductorTelefono, conductorId;
-
-    // Datos del vehículo
-    private String vehiculoPlaca, vehiculoModelo, vehiculoCapacidad;
-
-    // Datos del usuario
-    private String usuarioNombre, usuarioTelefono, usuarioId;
-
-    // Servicios
+    // Services
     private ReservaService reservaService;
-    private AuthManager authManager;
-    private NotificationManager notificationManager;
-
-    // Handler para timeouts
     private Handler timeoutHandler;
-
-    private static final String TAG = "ConfirmarReserva";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ✅ Registrar evento analítico de inicio de pantalla
-        registrarEventoAnalitico("pantalla_confirmar_reserva_inicio", null, null);
+        // ✅ Inicializar managers REUTILIZADOS
+        analyticsHelper = new ReservationAnalyticsHelper("ConfirmarReserva");
+        analyticsHelper.logPantallaInicio();
+
+        userManager = new ReservationUserManager(analyticsHelper);
+        dataProcessor = new ConfirmationDataProcessor(analyticsHelper);
 
         setContentView(R.layout.activity_confirmar_reserva);
 
-        // ✅ Inicializar servicios CON CONTEXTO usando MyApp para el ID de usuario
+        // ✅ Inicializar servicios
         reservaService = new ReservaService();
-        authManager = AuthManager.getInstance();
-        //notificationManager = NotificationManager.getInstance(this); // ✅ Pasar contexto
-        notificationManager = null; // Temporalmente deshabilitado
         timeoutHandler = new Handler();
 
-        // Recibir TODOS los datos enviados desde CrearReservas
-        recibirDatosIntent();
+        // ✅ Procesar datos del Intent
+        processIntentData();
 
-        // Inicializar vistas
-        inicializarVistas();
+        // ✅ Inicializar vistas
+        initializeViews();
 
-        // Configurar toolbar
-        configurarToolbar();
-
-        // Configurar listeners
-        configurarListeners();
-
-        // Cargar información en la interfaz
-        cargarInformacionBasica();
-        cargarInformacionUsuarioYConductor();
+        // ✅ Configurar UI
+        configureToolbar();
+        configureListeners();
+        loadDataIntoUI();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // ✅ Limpiar todos los callbacks del handler para evitar memory leaks
-        if (timeoutHandler != null) {
-            timeoutHandler.removeCallbacksAndMessages(null);
-        }
-
-        // ✅ Registrar evento de destrucción
-        registrarEventoAnalitico("pantalla_confirmar_reserva_destroy", null, null);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "📱 onResume - Actividad en primer plano");
-
-        // ✅ Registrar evento analítico de resumen
-        registrarEventoAnalitico("pantalla_confirmar_reserva_resume", null, null);
-    }
-
-    /**
-     * Recibir TODOS los datos del Intent
-     */
-    private void recibirDatosIntent() {
+    private void processIntentData() {
         Intent intent = getIntent();
 
-        // ✅ Registrar evento de recepción de datos
-        registrarEventoAnalitico("datos_recibidos_confirmar_reserva", null, null);
+        // ✅ Procesar datos del viaje
+        dataProcessor.processIntentData(intent);
 
-        // Datos principales del viaje
-        asientoSeleccionado = intent.getIntExtra("asientoSeleccionado", -1);
-        horarioId = intent.getStringExtra("horarioId");
-        horarioHora = intent.getStringExtra("horarioHora");
-        rutaSeleccionada = intent.getStringExtra("rutaSelecionada");
-        fechaViaje = intent.getStringExtra("fechaViaje");
-        precio = intent.getDoubleExtra("precio", 12000.0);
-        tiempoEstimado = intent.getStringExtra("tiempoEstimado");
+        // ✅ Actualizar userManager con datos del usuario (si vienen en el Intent)
+        String usuarioId = intent.getStringExtra("usuarioId");
+        String usuarioNombre = intent.getStringExtra("usuarioNombre");
+        String usuarioTelefono = intent.getStringExtra("usuarioTelefono");
 
-        // Datos del conductor
-        conductorNombre = intent.getStringExtra("conductorNombre");
-        conductorTelefono = intent.getStringExtra("conductorTelefono");
-        conductorId = intent.getStringExtra("conductorId");
-
-        // Datos del vehículo
-        vehiculoPlaca = intent.getStringExtra("vehiculoPlaca");
-        vehiculoModelo = intent.getStringExtra("vehiculoModelo");
-        vehiculoCapacidad = intent.getStringExtra("vehiculoCapacidad");
-
-        // Datos del usuario
-        usuarioNombre = intent.getStringExtra("usuarioNombre");
-        usuarioTelefono = intent.getStringExtra("usuarioTelefono");
-        usuarioId = intent.getStringExtra("usuarioId");
-
-        // Origen y destino
-        origen = intent.getStringExtra("origen");
-        destino = intent.getStringExtra("destino");
-
-        // Si no se recibieron origen/destino, extraer de la ruta
-        if (origen == null && rutaSeleccionada != null) {
-            String[] partes = rutaSeleccionada.split(" -> ");
-            if (partes.length == 2) {
-                origen = partes[0].trim();
-                destino = partes[1].trim();
-            } else {
-                origen = "Natagá";
-                destino = "La Plata";
-            }
+        if (usuarioNombre != null) {
+            userManager.updateFromIntent(usuarioId, usuarioNombre, usuarioTelefono);
+            Log.d(TAG, "✅ Datos de usuario actualizados desde Intent");
+        } else {
+            // Si no vienen en el Intent, cargar del usuario autenticado
+            loadAuthenticatedUser();
         }
-
-        // Valores por defecto para datos críticos
-        if (conductorNombre == null) conductorNombre = "N/A";
-        if (conductorTelefono == null) conductorTelefono = "N/A";
-        if (vehiculoPlaca == null) vehiculoPlaca = "N/A";
-        if (vehiculoModelo == null) vehiculoModelo = "N/A";
-        if (usuarioNombre == null) usuarioNombre = "N/A";
-        if (usuarioTelefono == null) usuarioTelefono = "N/A";
-        if (tiempoEstimado == null) tiempoEstimado = "N/A";
-        if (conductorId == null) conductorId = "N/A";
-
-        metodoPago = "Efectivo"; // Por defecto
-
-        // ✅ Registrar detalles de los datos recibidos
-        registrarDatosRecibidosAnalitico();
-
-        Log.d(TAG, "✓ TODOS los datos recibidos via Intent:");
-        Log.d(TAG, "  - Ruta: " + rutaSeleccionada + ", Asiento: " + asientoSeleccionado);
-        Log.d(TAG, "  - Conductor: " + conductorNombre + ", ID: " + conductorId + ", Tel: " + conductorTelefono);
-        Log.d(TAG, "  - Vehículo: " + vehiculoPlaca + " - " + vehiculoModelo);
-        Log.d(TAG, "  - Usuario: " + usuarioNombre + ", Tel: " + usuarioTelefono);
     }
 
-    /**
-     * Inicializar todas las vistas
-     */
-    private void inicializarVistas() {
+    private void loadAuthenticatedUser() {
+        userManager.loadAuthenticatedUser(new ReservationUserManager.UserDataCallback() {
+            @Override
+            public void onUserDataLoaded(String usuarioId, String usuarioNombre, String usuarioTelefono) {
+                Log.d(TAG, "✅ Usuario cargado: " + usuarioNombre);
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "Error cargando usuario: " + error);
+            }
+        });
+    }
+
+    private void initializeViews() {
         // Toolbar
         topAppBar = findViewById(R.id.topAppBar);
 
-        // Sección Detalles del Viaje
+        // Detalles del Viaje
         tvRuta = findViewById(R.id.tvRuta);
         tvFechaHora = findViewById(R.id.tvFechaHora);
         tvAsiento = findViewById(R.id.tvAsiento);
         tvTiempoEstimado = findViewById(R.id.tvTiempoEstimado);
         tvPrecio = findViewById(R.id.tvPrecio);
 
-        // Sección Información de Contacto
+        // Información de Contacto
         tvUsuario = findViewById(R.id.tvUsuario);
         tvTelefonoP = findViewById(R.id.tvTelefonoP);
         tvConductor = findViewById(R.id.tvConductor);
         tvTelefonoC = findViewById(R.id.tvTelefonoC);
         tvPlaca = findViewById(R.id.tvPlaca);
 
-        // Sección Método de Pago
+        // Método de Pago
         radioGroupPago = findViewById(R.id.radioGroupPago);
         radioEfectivo = findViewById(R.id.radioEfectivo);
         radioTransferencia = findViewById(R.id.radioTransferencia);
@@ -214,10 +136,7 @@ public class ConfirmarReservaActivity extends AppCompatActivity {
         btnCancelar = findViewById(R.id.btnCancelar);
     }
 
-    /**
-     * Configurar la toolbar
-     */
-    private void configurarToolbar() {
+    private void configureToolbar() {
         setSupportActionBar(topAppBar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -225,506 +144,260 @@ public class ConfirmarReservaActivity extends AppCompatActivity {
         }
 
         topAppBar.setNavigationOnClickListener(v -> {
-            // ✅ Registrar evento de navegación en toolbar
-            registrarEventoAnalitico("click_toolbar_navigation", null, null);
+            Map<String, Object> params = new HashMap<>();
+            params.put("accion", "navegacion_atras");
+            analyticsHelper.logEvent("click_boton", params);
             onBackPressed();
         });
     }
 
-    /**
-     * Configurar listeners
-     */
-    private void configurarListeners() {
-        // Listener para método de pago
+    private void configureListeners() {
+        // Método de pago
         radioGroupPago.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.radioEfectivo) {
-                metodoPago = "Efectivo";
+                dataProcessor.setMetodoPago("Efectivo");
+
+                // ✅ CORREGIDO: Usar Map en lugar de String
+                Map<String, Object> params = new HashMap<>();
+                params.put("tipo", "efectivo");
+                params.put("asiento", dataProcessor.getAsientoSeleccionado());
+                analyticsHelper.logEvent("metodo_pago_seleccionado", params);
+
             } else if (checkedId == R.id.radioTransferencia) {
-                metodoPago = "Transferencia";
+                dataProcessor.setMetodoPago("Transferencia");
+
+                // ✅ CORREGIDO: Usar Map en lugar de String
+                Map<String, Object> params = new HashMap<>();
+                params.put("tipo", "transferencia");
+                params.put("asiento", dataProcessor.getAsientoSeleccionado());
+                analyticsHelper.logEvent("metodo_pago_seleccionado", params);
             }
-
-            // ✅ Registrar evento de cambio de método de pago
-            registrarEventoAnalitico("metodo_pago_seleccionado", null, metodoPago.equals("Efectivo") ? 1 : 2);
-
-            Log.d(TAG, "Método de pago seleccionado: " + metodoPago);
         });
 
-        // Botón Confirmar Reserva
+        // Botón Confirmar
         btnConfirmarReserva.setOnClickListener(v -> {
-            // ✅ Registrar evento de click en confirmar
-            registrarEventoAnalitico("click_confirmar_reserva", asientoSeleccionado, null);
+            Map<String, Object> params = new HashMap<>();
+            params.put("accion", "confirmar_reserva");
+            params.put("asiento", dataProcessor.getAsientoSeleccionado());
+            analyticsHelper.logEvent("click_boton", params);
 
-            if (validarFormulario()) {
-                registrarReserva();
+            if (validateForm()) {
+                confirmReservation();
+            } else {
+                Toast.makeText(this, "Por favor selecciona un método de pago", Toast.LENGTH_SHORT).show();
             }
         });
 
         // Botón Cancelar
         btnCancelar.setOnClickListener(v -> {
-            // ✅ Registrar evento de click en cancelar
-            registrarEventoAnalitico("click_cancelar_reserva", asientoSeleccionado, null);
+            Map<String, Object> params = new HashMap<>();
+            params.put("accion", "cancelar_reserva");
+            params.put("asiento", dataProcessor.getAsientoSeleccionado());
+            analyticsHelper.logEvent("click_boton", params);
 
-            mostrarDialogoCancelacion();
+            showCancellationDialog();
         });
     }
 
-    /**
-     * Cargar información básica en la interfaz
-     */
-    private void cargarInformacionBasica() {
-        // Ruta
-        tvRuta.setText(rutaSeleccionada);
+    private void loadDataIntoUI() {
+        // Datos del viaje
+        tvRuta.setText(dataProcessor.getRutaSeleccionada());
 
-        // Fecha y Hora
-        String fechaHoraCompleta = fechaViaje + " - " + horarioHora;
+        String fechaHoraCompleta = dataProcessor.getFechaViaje() + " - " + dataProcessor.getHorarioHora();
         tvFechaHora.setText(fechaHoraCompleta);
 
-        // Asiento
-        tvAsiento.setText("A" + asientoSeleccionado);
+        tvAsiento.setText("A" + dataProcessor.getAsientoSeleccionado());
+        tvTiempoEstimado.setText(dataProcessor.getTiempoEstimado());
 
-        // Tiempo estimado
-        tvTiempoEstimado.setText(tiempoEstimado);
-
-        // Precio
-        String precioFormateado = String.format("$%,d", (int) precio);
+        String precioFormateado = String.format("$%,d", (int) dataProcessor.getPrecio());
         tvPrecio.setText(precioFormateado);
 
-        // Seleccionar método de pago por defecto (Efectivo)
-        radioEfectivo.setChecked(true);
+        // Datos del usuario
+        tvUsuario.setText(userManager.getUsuarioNombre());
+        tvTelefonoP.setText(userManager.getUsuarioTelefono());
 
-        // ✅ Registrar evento de información cargada
-        registrarEventoAnalitico("informacion_basica_cargada", asientoSeleccionado, null);
-    }
+        // Datos del conductor
+        tvConductor.setText(dataProcessor.getConductorNombre());
+        tvTelefonoC.setText(dataProcessor.getConductorTelefono());
 
-    /**
-     * Cargar información del usuario y conductor
-     */
-    private void cargarInformacionUsuarioYConductor() {
-        // Usuario (datos del Intent)
-        tvUsuario.setText(usuarioNombre);
-        tvTelefonoP.setText(usuarioTelefono);
-
-        // Conductor (datos del Intent)
-        tvConductor.setText(conductorNombre);
-        tvTelefonoC.setText(conductorTelefono);
-
-        // Vehículo (datos del Intent)
-        String infoVehiculo = "Vehículo: " + vehiculoPlaca + " - " + vehiculoModelo;
+        String infoVehiculo = "Vehículo: " + dataProcessor.getVehiculoPlaca() +
+                " - " + dataProcessor.getVehiculoModelo();
         tvPlaca.setText(infoVehiculo);
 
-        // ✅ Registrar evento de información de usuario y conductor cargada
-        registrarInfoUsuarioConductorAnalitico();
-
-        Log.d(TAG, "✓ Información cargada desde Intent");
+        // Método de pago por defecto
+        radioEfectivo.setChecked(true);
     }
 
-    /**
-     * Validar formulario antes de registrar
-     */
-    private boolean validarFormulario() {
-        if (metodoPago == null || metodoPago.isEmpty()) {
-            Toast.makeText(this, "Por favor selecciona un método de pago", Toast.LENGTH_SHORT).show();
+    private boolean validateForm() {
+        String metodoPago = dataProcessor.getMetodoPago();
+        boolean isValid = metodoPago != null && !metodoPago.isEmpty();
 
-            // ✅ Registrar evento de validación fallida
-            registrarEventoAnalitico("validacion_fallida_sin_metodo_pago", null, null);
-
-            return false;
+        if (isValid) {
+            // ✅ Usar el método correcto de analyticsHelper
+            Map<String, Object> params = new HashMap<>();
+            params.put("asiento", dataProcessor.getAsientoSeleccionado());
+            params.put("ruta", dataProcessor.getRutaSeleccionada());
+            params.put("metodo_pago", metodoPago);
+            analyticsHelper.logEvent("validacion_exitosa", params);
+        } else {
+            // ✅ Usar logError en lugar de logValidacionFallida si no existe
+            Map<String, Object> params = new HashMap<>();
+            params.put("razon", "sin_metodo_pago");
+            analyticsHelper.logEvent("validacion_fallida", params);
         }
 
-        // ✅ Registrar evento de validación exitosa
-        registrarEventoAnalitico("validacion_exitosa_confirmar", asientoSeleccionado, null);
-
-        return true;
+        return isValid;
     }
 
-    /**
-     * Mostrar diálogo de cancelación
-     */
-    private void mostrarDialogoCancelacion() {
-        // ✅ Registrar evento de diálogo mostrado
-        registrarEventoAnalitico("dialogo_cancelacion_mostrado", asientoSeleccionado, null);
+    private void showCancellationDialog() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("asiento", dataProcessor.getAsientoSeleccionado());
+        analyticsHelper.logEvent("dialogo_cancelacion_mostrado", params);
 
         new android.app.AlertDialog.Builder(this)
                 .setTitle("Cancelar reserva")
                 .setMessage("¿Estás seguro de que quieres cancelar la reserva?")
                 .setPositiveButton("Sí", (dialog, which) -> {
-                    // ✅ Registrar evento de confirmación de cancelación
-                    registrarEventoAnalitico("cancelacion_reserva_confirmada", asientoSeleccionado, null);
-
+                    Map<String, Object> confirmParams = new HashMap<>();
+                    confirmParams.put("asiento", dataProcessor.getAsientoSeleccionado());
+                    confirmParams.put("accion", "confirmada");
+                    analyticsHelper.logEvent("cancelacion_reserva", confirmParams);
                     finish();
                 })
                 .setNegativeButton("No", (dialog, which) -> {
-                    // ✅ Registrar evento de rechazo de cancelación
-                    registrarEventoAnalitico("cancelacion_reserva_rechazada", asientoSeleccionado, null);
-
+                    Map<String, Object> cancelParams = new HashMap<>();
+                    cancelParams.put("asiento", dataProcessor.getAsientoSeleccionado());
+                    cancelParams.put("accion", "rechazada");
+                    analyticsHelper.logEvent("cancelacion_reserva", cancelParams);
                     dialog.dismiss();
                 })
                 .show();
     }
 
-    /**
-     * ✅ MÉTODO MEJORADO: Registrar la reserva con mejor manejo de errores usando MyApp
-     */
-    private void registrarReserva() {
-        // ✅ Usar MyApp para obtener el ID del usuario
+    private void confirmReservation() {
         String userId = MyApp.getCurrentUserId();
         if (userId == null) {
             Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
 
-            // ✅ Registrar evento de error
-            registrarEventoAnalitico("error_usuario_no_autenticado", null, null);
+            Map<String, Object> params = new HashMap<>();
+            params.put("error", "usuario_no_autenticado");
+            analyticsHelper.logEvent("error", params);
 
             return;
         }
 
-        String estadoReserva = "Por confirmar";
-
-        Log.d(TAG, "Registrando reserva con datos del Intent:");
-        Log.d(TAG, "  - Conductor: " + conductorNombre + ", ID: " + conductorId + ", Tel: " + conductorTelefono);
-
-        // ✅ Registrar evento de inicio de registro
-        registrarEventoAnalitico("registro_reserva_inicio", asientoSeleccionado, null);
-
-        // Deshabilitar botón para evitar múltiples clics
         btnConfirmarReserva.setEnabled(false);
         btnConfirmarReserva.setText("Procesando...");
 
-        // ✅ TIMEOUT para evitar que se quede bloqueado
-        Runnable timeoutRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (!isFinishing()) {
-                    Log.w(TAG, "⏰ TIMEOUT - La operación está tomando demasiado tiempo");
+        String estadoReserva = "Por confirmar";
 
-                    // ✅ Registrar evento de timeout
-                    registrarEventoAnalitico("timeout_registro_reserva", asientoSeleccionado, null);
+        // Timeout
+        Runnable timeoutRunnable = () -> {
+            runOnUiThread(() -> {
+                btnConfirmarReserva.setEnabled(true);
+                btnConfirmarReserva.setText("Confirmar Reserva");
+                Toast.makeText(this,
+                        "La operación está tardando más de lo esperado. Verifica tu conexión.",
+                        Toast.LENGTH_LONG).show();
 
-                    runOnUiThread(() -> {
-                        if (!isFinishing()) {
-                            btnConfirmarReserva.setEnabled(true);
-                            btnConfirmarReserva.setText("Confirmar Reserva");
-                            Toast.makeText(ConfirmarReservaActivity.this,
-                                    "La operación está tardando más de lo esperado. Verifica tu conexión.",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            }
+                Map<String, Object> params = new HashMap<>();
+                params.put("tipo", "timeout_registro_reserva");
+                analyticsHelper.logEvent("timeout", params);
+            });
         };
-
-        // Establecer timeout de 15 segundos
         timeoutHandler.postDelayed(timeoutRunnable, 15000);
 
         reservaService.actualizarDisponibilidadAsientos(
-                this, horarioId, asientoSeleccionado, origen, destino, tiempoEstimado,
-                metodoPago, estadoReserva, vehiculoPlaca, precio, conductorNombre, conductorTelefono,
+                this,
+                dataProcessor.getHorarioId(),
+                dataProcessor.getAsientoSeleccionado(),
+                dataProcessor.getOrigen(),
+                dataProcessor.getDestino(),
+                dataProcessor.getTiempoEstimado(),
+                dataProcessor.getMetodoPago(),
+                estadoReserva,
+                dataProcessor.getVehiculoPlaca(),
+                dataProcessor.getPrecio(),
+                dataProcessor.getConductorNombre(),
+                dataProcessor.getConductorTelefono(),
                 new ReservaService.ReservaCallback() {
                     @Override
                     public void onReservaExitosa() {
-                        // ✅ Cancelar el timeout
                         timeoutHandler.removeCallbacks(timeoutRunnable);
-
                         runOnUiThread(() -> {
-                            if (!isFinishing()) {
-                                Toast.makeText(ConfirmarReservaActivity.this, "✅ Reserva creada exitosamente", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ConfirmarReservaActivity.this,
+                                    "✅ Reserva creada exitosamente", Toast.LENGTH_LONG).show();
 
-                                // ✅ Registrar evento de reserva exitosa
-                                registrarEventoAnalitico("reserva_registrada_exitosa", asientoSeleccionado, null);
-                                registrarReservaExitosaAnalitico();
+                            Map<String, Object> params = new HashMap<>();
+                            params.put("asiento", dataProcessor.getAsientoSeleccionado());
+                            params.put("ruta", dataProcessor.getRutaSeleccionada());
+                            params.put("conductor", dataProcessor.getConductorNombre());
+                            analyticsHelper.logEvent("reserva_exitosa", params);
 
-                                // ✅ NOTIFICACIONES DESHABILITADAS TEMPORALMENTE
-                                Log.d(TAG, "📢 NOTIFICACIONES DESHABILITADAS - Navegando directamente a inicio");
-
-                                // ✅ Navegar inmediatamente sin esperar notificaciones
-                                navegarAInicioUsuarios();
-
-                                // ✅ ENVIAR NOTIFICACIÓN AL CONDUCTOR CON MANEJO DE ERRORES MEJORADO
-                                //enviarNotificacionAlConductor();
-                            }
+                            navigateToHome();
                         });
                     }
 
                     @Override
                     public void onError(String error) {
-                        // ✅ Cancelar el timeout
                         timeoutHandler.removeCallbacks(timeoutRunnable);
-
                         runOnUiThread(() -> {
-                            if (!isFinishing()) {
-                                btnConfirmarReserva.setEnabled(true);
-                                btnConfirmarReserva.setText("Confirmar Reserva");
+                            btnConfirmarReserva.setEnabled(true);
+                            btnConfirmarReserva.setText("Confirmar Reserva");
 
-                                // ✅ Usar MyApp para logging de errores
-                                MyApp.logError(new Exception("Error registrando reserva: " + error));
+                            MyApp.logError(new Exception("Error registrando reserva: " + error));
 
-                                // ✅ Registrar evento de error
-                                registrarEventoAnalitico("error_registro_reserva", asientoSeleccionado, null);
+                            Map<String, Object> params = new HashMap<>();
+                            params.put("error", error);
+                            params.put("asiento", dataProcessor.getAsientoSeleccionado());
+                            analyticsHelper.logEvent("error_registro_reserva", params);
 
-                                Toast.makeText(ConfirmarReservaActivity.this, "❌ Error al confirmar reserva: " + error, Toast.LENGTH_LONG).show();
-                            }
+                            Toast.makeText(ConfirmarReservaActivity.this,
+                                    "❌ Error al confirmar reserva: " + error, Toast.LENGTH_LONG).show();
                         });
                     }
                 });
     }
 
-    /**
-     * ✅ NOTIFICACIÓN MEJORADA: Con timeout y mejor manejo de errores usando MyApp
-     */
-    private void enviarNotificacionAlConductor() {
-        if (conductorId == null || conductorId.isEmpty()) {
-            Log.w(TAG, "No se puede enviar notificación: ID del conductor no válido");
-
-            // ✅ Registrar evento de error
-            registrarEventoAnalitico("error_conductor_id_invalido", asientoSeleccionado, null);
-
-            // ✅ NAVEGAR DE TODAS FORMAS AUNQUE FALLE LA NOTIFICACIÓN
-            navegarAInicioUsuarios();
-            return;
-        }
-
-        String fechaHoraCompleta = fechaViaje + " - " + horarioHora;
-
-        // Mostrar progreso
-        btnConfirmarReserva.setText("Enviando notificación...");
-
-        // ✅ Registrar evento de inicio de notificación
-        registrarEventoAnalitico("notificacion_conductor_inicio", asientoSeleccionado, null);
-
-        // ✅ TIMEOUT para notificación
-        Runnable notificationTimeout = new Runnable() {
-            @Override
-            public void run() {
-                if (!isFinishing()) {
-                    Log.w(TAG, "⏰ TIMEOUT NOTIFICACIÓN - Envío de notificación tardando demasiado");
-
-                    // ✅ Registrar evento de timeout
-                    registrarEventoAnalitico("timeout_notificacion_conductor", asientoSeleccionado, null);
-
-                    runOnUiThread(() -> {
-                        if (!isFinishing()) {
-                            mostrarErrorNotificacion("El envío de notificación está tardando demasiado. La reserva fue creada exitosamente.");
-                        }
-                    });
-                }
-            }
-        };
-        timeoutHandler.postDelayed(notificationTimeout, 10000);
-
-        // ✅ NOTIFICACIÓN CON MANEJO DE ÉXITO/ERROR MEJORADO
-        notificationManager.notificarNuevaReservaAlConductor(
-                conductorId,
-                usuarioNombre,
-                rutaSeleccionada,
-                fechaHoraCompleta,
-                asientoSeleccionado,
-                precio,
-                metodoPago,
-                new NotificationManager.NotificationCallback() {
-                    @Override
-                    public void onSuccess() {
-                        // ✅ Cancelar timeout de notificación
-                        timeoutHandler.removeCallbacks(notificationTimeout);
-
-                        runOnUiThread(() -> {
-                            if (!isFinishing()) {
-                                Log.d(TAG, "✅ Notificación enviada exitosamente al conductor");
-
-                                // ✅ Registrar evento de notificación exitosa
-                                registrarEventoAnalitico("notificacion_conductor_exitosa", asientoSeleccionado, null);
-
-                                Toast.makeText(ConfirmarReservaActivity.this, "✅ Reserva confirmada y notificación enviada", Toast.LENGTH_LONG).show();
-                                navegarAInicioUsuarios();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        // ✅ Cancelar timeout de notificación
-                        timeoutHandler.removeCallbacks(notificationTimeout);
-
-                        runOnUiThread(() -> {
-                            if (!isFinishing()) {
-                                Log.e(TAG, "❌ Error enviando notificación: " + error);
-
-                                // ✅ Usar MyApp para logging de errores
-                                MyApp.logError(new Exception("Error enviando notificación conductor: " + error));
-
-                                // ✅ Registrar evento de error en notificación
-                                registrarEventoAnalitico("error_notificacion_conductor", asientoSeleccionado, null);
-
-                                mostrarErrorNotificacion("Error enviando notificación al conductor: " + error);
-                            }
-                        });
-                    }
-                });
-    }
-
-    /**
-     * ✅ MÉTODO NUEVO: Navegar a inicio de usuarios
-     */
-    private void navegarAInicioUsuarios() {
-        Log.d(TAG, "🏠 Navegando a InicioUsuarios");
-
-        // ✅ Registrar evento de navegación
-        registrarEventoAnalitico("navegacion_inicio_usuarios", asientoSeleccionado, null);
-
+    private void navigateToHome() {
         try {
-            Intent intent = new Intent(ConfirmarReservaActivity.this, InicioUsuariosActivity.class);
+            Map<String, Object> params = new HashMap<>();
+            params.put("destino", "InicioUsuariosActivity");
+            analyticsHelper.logEvent("navegacion", params);
+
+            Intent intent = new Intent(this, InicioUsuariosActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error navegando a InicioUsuarios: " + e.getMessage());
+            Log.e(TAG, "Error navegando a inicio: " + e.getMessage());
 
-            // ✅ Usar MyApp para logging de errores
-            MyApp.logError(e);
+            Map<String, Object> params = new HashMap<>();
+            params.put("error", e.getMessage());
+            analyticsHelper.logEvent("error_navegacion", params);
 
-            // ✅ Registrar evento de error en navegación
-            registrarEventoAnalitico("error_navegacion_inicio", asientoSeleccionado, null);
-
-            // Si hay error, al menos finalizar esta actividad
             finish();
         }
     }
 
-    /**
-     * ✅ MOSTRAR ERROR DE NOTIFICACIÓN MEJORADO
-     */
-    private void mostrarErrorNotificacion(String mensaje) {
-        try {
-            // ✅ Registrar evento de diálogo de error
-            registrarEventoAnalitico("dialogo_error_notificacion", asientoSeleccionado, null);
-
-            new android.app.AlertDialog.Builder(this)
-                    .setTitle("Información de Notificación")
-                    .setMessage(mensaje + "\n\nLa reserva se creó exitosamente, pero hubo un problema con la notificación al conductor.")
-                    .setPositiveButton("Continuar", (dialog, which) -> {
-                        // ✅ Registrar evento de confirmación de diálogo
-                        registrarEventoAnalitico("confirmacion_dialogo_error", asientoSeleccionado, null);
-
-                        navegarAInicioUsuarios();
-                    })
-                    .setCancelable(false) // ✅ Evitar que el usuario cierre el diálogo sin acción
-                    .show();
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error mostrando diálogo: " + e.getMessage());
-
-            // ✅ Usar MyApp para logging de errores
-            MyApp.logError(e);
-
-            // ✅ Registrar evento de error en diálogo
-            registrarEventoAnalitico("error_mostrando_dialogo", asientoSeleccionado, null);
-
-            // Si falla el diálogo, navegar directamente
-            navegarAInicioUsuarios();
-        }
-    }
-
-    /**
-     * Manejar el botón físico de back
-     */
     @Override
     public void onBackPressed() {
-        // ✅ Registrar evento de botón físico back
-        registrarEventoAnalitico("boton_back_fisico", asientoSeleccionado, null);
+        Map<String, Object> params = new HashMap<>();
+        params.put("tipo", "boton_back_fisico");
+        analyticsHelper.logEvent("navegacion", params);
 
-        mostrarDialogoCancelacion();
+        showCancellationDialog();
     }
 
-    /**
-     * ✅ MÉTODO AUXILIAR: Registrar eventos analíticos usando MyApp
-     */
-    private void registrarEventoAnalitico(String evento, Integer asiento, Integer tipo) {
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("user_id", MyApp.getCurrentUserId());
-            params.put("pantalla", "ConfirmarReserva");
-
-            if (asiento != null) {
-                params.put("asiento", asiento);
-            }
-            if (tipo != null) {
-                params.put("tipo", tipo);
-            }
-
-            params.put("ruta", rutaSeleccionada != null ? rutaSeleccionada : "N/A");
-            params.put("conductor", conductorNombre != null ? conductorNombre : "N/A");
-            params.put("metodo_pago", metodoPago != null ? metodoPago : "N/A");
-            params.put("precio", precio);
-            params.put("timestamp", System.currentTimeMillis());
-
-            MyApp.logEvent(evento, params);
-            Log.d(TAG, "📊 Evento analítico registrado: " + evento);
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando evento analítico: " + e.getMessage());
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (timeoutHandler != null) {
+            timeoutHandler.removeCallbacksAndMessages(null);
         }
-    }
 
-    /**
-     * ✅ MÉTODO AUXILIAR: Registrar detalles de datos recibidos usando MyApp
-     */
-    private void registrarDatosRecibidosAnalitico() {
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("user_id", MyApp.getCurrentUserId());
-            params.put("asiento", asientoSeleccionado);
-            params.put("ruta", rutaSeleccionada != null ? rutaSeleccionada : "N/A");
-            params.put("conductor", conductorNombre != null ? conductorNombre : "N/A");
-            params.put("conductor_id", conductorId != null ? conductorId : "N/A");
-            params.put("vehiculo_placa", vehiculoPlaca != null ? vehiculoPlaca : "N/A");
-            params.put("precio", precio);
-            params.put("metodo_pago", metodoPago);
-            params.put("timestamp", System.currentTimeMillis());
-            params.put("pantalla", "ConfirmarReserva");
-
-            MyApp.logEvent("datos_recibidos_detalle_confirmar", params);
-            Log.d(TAG, "📊 Detalles de datos recibidos registrados en analytics");
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando detalles de datos: " + e.getMessage());
-        }
-    }
-
-    /**
-     * ✅ MÉTODO AUXILIAR: Registrar información de usuario y conductor usando MyApp
-     */
-    private void registrarInfoUsuarioConductorAnalitico() {
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("user_id", MyApp.getCurrentUserId());
-            params.put("usuario_nombre", usuarioNombre != null ? usuarioNombre : "N/A");
-            params.put("conductor_nombre", conductorNombre != null ? conductorNombre : "N/A");
-            params.put("conductor_telefono", conductorTelefono != null ? conductorTelefono : "N/A");
-            params.put("vehiculo_placa", vehiculoPlaca != null ? vehiculoPlaca : "N/A");
-            params.put("timestamp", System.currentTimeMillis());
-            params.put("pantalla", "ConfirmarReserva");
-
-            MyApp.logEvent("info_usuario_conductor_cargada", params);
-            Log.d(TAG, "📊 Información de usuario y conductor registrada en analytics");
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando info usuario/conductor: " + e.getMessage());
-        }
-    }
-
-    /**
-     * ✅ MÉTODO AUXILIAR: Registrar reserva exitosa usando MyApp
-     */
-    private void registrarReservaExitosaAnalitico() {
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("user_id", MyApp.getCurrentUserId());
-            params.put("asiento", asientoSeleccionado);
-            params.put("ruta", rutaSeleccionada != null ? rutaSeleccionada : "N/A");
-            params.put("conductor", conductorNombre != null ? conductorNombre : "N/A");
-            params.put("metodo_pago", metodoPago);
-            params.put("precio", precio);
-            params.put("timestamp", System.currentTimeMillis());
-            params.put("pantalla", "ConfirmarReserva");
-
-            MyApp.logEvent("reserva_completa_detalle", params);
-            Log.d(TAG, "📊 Detalles de reserva completa registrados en analytics");
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando detalles de reserva: " + e.getMessage());
-        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("pantalla", "ConfirmarReserva");
+        analyticsHelper.logEvent("pantalla_destroy", params);
     }
 }
