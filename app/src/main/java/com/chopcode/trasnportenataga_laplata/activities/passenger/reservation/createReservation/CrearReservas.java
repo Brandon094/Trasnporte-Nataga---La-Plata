@@ -859,7 +859,7 @@ public class CrearReservas extends AppCompatActivity {
                 R.id.btnAsiento1, R.id.btnAsiento2, R.id.btnAsiento3, R.id.btnAsiento4,
                 R.id.btnAsiento5, R.id.btnAsiento6, R.id.btnAsiento7, R.id.btnAsiento8,
                 R.id.btnAsiento9, R.id.btnAsiento10, R.id.btnAsiento11, R.id.btnAsiento12,
-                R.id.btnAsiento13, R.id.btnAsiento14
+                R.id.btnAsiento13
         };
 
         for (int i = 0; i < botonesAsientos.length; i++) {
