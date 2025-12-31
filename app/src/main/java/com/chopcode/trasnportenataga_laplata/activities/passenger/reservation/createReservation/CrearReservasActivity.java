@@ -19,7 +19,8 @@ import com.chopcode.trasnportenataga_laplata.managers.analytics.ReservationAnaly
 import com.chopcode.trasnportenataga_laplata.managers.seats.SeatManager;
 import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.managers.ui.ExpandableSectionManager;
-import com.chopcode.trasnportenataga_laplata.managers.reservations.dataprocessor.ReservationDataProcessor; // ✅ NUEVO IMPORT
+import com.chopcode.trasnportenataga_laplata.managers.reservations.dataprocessor.ReservationDataProcessor;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.DriverVehicleManager; // ✅ NUEVO IMPORT
 import com.chopcode.trasnportenataga_laplata.models.Usuario;
 import com.chopcode.trasnportenataga_laplata.models.Vehiculo;
 import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
@@ -61,9 +62,7 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
 
     // Services
     private ReservaService reservaService;
-    private VehiculoService vehiculoService;
     private UserService userService;
-    private AuthManager authManager;
 
     // Views de información del viaje
     private TextView tvRutaSeleccionada, tvDescripcionRuta, tvHorarioSeleccionado, tvFechaViaje;
@@ -78,15 +77,13 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
     private TextView tvRutaResumen;
     private TextView tvHorarioResumen;
 
-    // Informacion del vehiculo
-    private String placaVehiculo = "Cargando...";
-    private String modeloVehiculo = "Cargando...";
-    private Integer capacidadVehiculo;
-
-    // Información del conductor
-    private String conductorNombre = "Cargando...";
-    private String conductorTelefono = "Cargando...";
+    // Información del conductor y vehículo (ahora manejada por DriverVehicleManager)
     private String conductorId;
+    private String conductorNombre;
+    private String conductorTelefono;
+    private String placaVehiculo;
+    private String modeloVehiculo;
+    private Integer capacidadVehiculo;
 
     // Datos del usuario autenticado
     private String usuarioNombre;
@@ -96,7 +93,8 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
     // Managers
     private ReservationAnalyticsHelper analyticsHelper;
     private SeatManager seatManager;
-    private ReservationDataProcessor reservationDataProcessor; // ✅ NUEVO
+    private ReservationDataProcessor reservationDataProcessor;
+    private DriverVehicleManager driverVehicleManager; // ✅ NUEVO MANAGER
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,26 +104,30 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
         analyticsHelper = new ReservationAnalyticsHelper("CrearReservas");
         analyticsHelper.logPantallaInicio();
 
-        // ✅ NUEVO: Inicializar ReservationDataProcessor
+        // ✅ Inicializar managers
         reservationDataProcessor = new ReservationDataProcessor(analyticsHelper);
 
         setContentView(R.layout.activity_crear_reservas);
 
-        // ✅ MEJORADO: Inicializar SeatManager con capacidad automática
+        // ✅ Inicializar SeatManager
         seatManager = new SeatManager(this, analyticsHelper);
         seatManager.setSeatSelectionListener(this);
+
+        // ✅ Inicializar DriverVehicleManager
+        driverVehicleManager = new DriverVehicleManager(this, analyticsHelper, seatManager);
 
         // Obtener datos del intent
         obtenerDatosDelIntent();
 
         // Inicializar servicios
         reservaService = new ReservaService();
-        vehiculoService = new VehiculoService();
         userService = new UserService();
-        authManager = AuthManager.getInstance();
 
         // Referencias a la UI
         inicializarViews();
+
+        // ✅ Configurar DriverVehicleManager con referencias UI
+        driverVehicleManager.setUIReferences(tvNombreConductor, tvVehiculoInfo, tvCapacidadInfo);
 
         // Configurar navegación
         configurarNavegacion();
@@ -145,12 +147,12 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
             restaurarEstado(savedInstanceState);
         }
 
-        // ✅ MEJORADO: Configurar asientos automáticamente usando el método optimizado
+        // Configurar asientos
         configurarSeleccionAsientos();
 
         // Cargar información del vehículo y conductor si tenemos horario
         if (horarioId != null) {
-            cargarInformacionVehiculoYConductor();
+            cargarInformacionVehiculoYConductor(); // ✅ Ahora usa DriverVehicleManager
             cargarAsientosDesdeFirebase(horarioId);
         } else {
             mostrarErrorSinHorario();
@@ -296,7 +298,7 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
         tvVehiculoInfo.setText("Vehículo: Cargando...");
         tvCapacidadInfo.setText("Capacidad: " + capacidadTotal + " asientos");
         tvCapacidadDispo.setText("Capacidad disponible: " + capacidadTotal);
-        tvNombreConductor.setText(conductorNombre);
+        tvNombreConductor.setText("Cargando...");
     }
 
     private void cargarUsuarioAutenticado() {
@@ -354,6 +356,16 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
 
         rutaSeleccionada = savedInstanceState.getString("rutaSeleccionada");
         conductorNombre = savedInstanceState.getString("conductorNombre", "Cargando...");
+
+        // ✅ Obtener datos del DriverVehicleManager si ya estaban cargados
+        if (driverVehicleManager != null) {
+            conductorNombre = driverVehicleManager.getConductorNombre();
+            conductorTelefono = driverVehicleManager.getConductorTelefono();
+            placaVehiculo = driverVehicleManager.getPlacaVehiculo();
+            modeloVehiculo = driverVehicleManager.getModeloVehiculo();
+            capacidadVehiculo = driverVehicleManager.getCapacidadVehiculo();
+            conductorId = driverVehicleManager.getConductorId();
+        }
 
         boolean isInfoExpanded = savedInstanceState.getBoolean("isInfoExpanded", true);
         if (expandableSectionManager != null) {
@@ -416,9 +428,11 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
      * ✅ MEJORADO: Usando ReservationDataProcessor para validaciones y envío
      */
     private void validacionesReserva() {
-        // ✅ NUEVO: Usar el procesador para preparar la confirmación
+        // ✅ Obtener datos actualizados del DriverVehicleManager
+        obtenerDatosActualizadosDelManager();
+
         Intent intent = reservationDataProcessor.prepareReservationConfirmation(
-                this, // Contexto
+                this,
                 seatManager,
                 rutaSeleccionada,
                 horarioId,
@@ -436,11 +450,23 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
         );
 
         if (intent != null) {
-            // ✅ NUEVO: Iniciar actividad con el Intent preparado
             startActivity(intent);
         } else {
-            // Mostrar mensaje de error genérico si el procesador devuelve null
             Toast.makeText(this, "Error: Datos de reserva incompletos", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * ✅ NUEVO: Obtener datos actualizados del DriverVehicleManager
+     */
+    private void obtenerDatosActualizadosDelManager() {
+        if (driverVehicleManager != null) {
+            conductorId = driverVehicleManager.getConductorId();
+            conductorNombre = driverVehicleManager.getConductorNombre();
+            conductorTelefono = driverVehicleManager.getConductorTelefono();
+            placaVehiculo = driverVehicleManager.getPlacaVehiculo();
+            modeloVehiculo = driverVehicleManager.getModeloVehiculo();
+            capacidadVehiculo = driverVehicleManager.getCapacidadVehiculo();
         }
     }
 
@@ -451,6 +477,47 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
     }
 
     // ============================================================
+    // ✅ REFACTORIZADO: Métodos de conductor/vehículo usando DriverVehicleManager
+    // ============================================================
+
+    private void cargarInformacionVehiculoYConductor() {
+        Log.d(TAG, "Cargando información del vehículo y conductor usando DriverVehicleManager...");
+
+        driverVehicleManager.loadDriverVehicleInfo(horarioId, new DriverVehicleManager.DriverVehicleCallback() {
+            @Override
+            public void onDriverVehicleLoaded(String conductorId, String conductorNombre,
+                                              String conductorTelefono, String placaVehiculo,
+                                              String modeloVehiculo, Integer capacidadVehiculo) {
+
+                // ✅ Actualizar variables locales con los datos cargados
+                CrearReservasActivity.this.conductorId = conductorId;
+                CrearReservasActivity.this.conductorNombre = conductorNombre;
+                CrearReservasActivity.this.conductorTelefono = conductorTelefono;
+                CrearReservasActivity.this.placaVehiculo = placaVehiculo;
+                CrearReservasActivity.this.modeloVehiculo = modeloVehiculo;
+                CrearReservasActivity.this.capacidadVehiculo = capacidadVehiculo;
+
+                Log.d(TAG, "✅ Información de conductor y vehículo cargada exitosamente");
+                Log.d(TAG, "  - Conductor: " + conductorNombre);
+                Log.d(TAG, "  - Vehículo: " + placaVehiculo + " - " + modeloVehiculo);
+                Log.d(TAG, "  - Capacidad: " + capacidadVehiculo);
+
+                // ✅ Actualizar capacidad disponible en UI
+                int capacidadDisponible = seatManager.getCapacidadDisponible();
+                tvCapacidadDispo.setText("Capacidad disponible: " + capacidadDisponible);
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "Error cargando información del conductor/vehículo: " + error);
+                Toast.makeText(CrearReservasActivity.this,
+                        "Error cargando información del vehículo: " + error,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // ============================================================
     // Métodos de SeatSelectionListener
     // ============================================================
 
@@ -458,7 +525,6 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
     public void onSeatSelected(int seatNumber) {
         Log.d(TAG, "✅ Asiento " + seatNumber + " seleccionado");
 
-        // ✅ MEJORADO: Usar métodos del SeatManager para obtener información
         int capacidadTotal = seatManager.getCapacidadTotal();
         int disponibles = seatManager.getCapacidadDisponible();
         Log.d(TAG, "  - Capacidad total: " + capacidadTotal);
@@ -580,207 +646,6 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
     }
 
     // ============================================================
-    // Métodos de conductor/vehículo (con mejoras para usar SeatManager)
-    // ============================================================
-
-    private void cargarInformacionVehiculoYConductor() {
-        Log.d(TAG, "Cargando información del vehículo y conductor...");
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("accion", "carga_info_vehiculo_conductor_inicio");
-        analyticsHelper.logEvent("carga_info_vehiculo_conductor_inicio", params);
-
-        buscarConductorPorHorario();
-    }
-
-    private void buscarConductorPorHorario() {
-        Log.d(TAG, "Buscando conductor para el horario: " + horarioId);
-
-        DatabaseReference conductoresRef = MyApp.getDatabaseReference("conductores");
-
-        conductoresRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                boolean conductorEncontrado = false;
-
-                for (DataSnapshot conductorSnapshot : snapshot.getChildren()) {
-                    if (conductorSnapshot.hasChild("horariosAsignados")) {
-                        DataSnapshot horariosAsignadosSnapshot = conductorSnapshot.child("horariosAsignados");
-
-                        for (DataSnapshot horarioAsignadoSnapshot : horariosAsignadosSnapshot.getChildren()) {
-                            String horarioAsignado = horarioAsignadoSnapshot.getValue(String.class);
-                            if (horarioId != null && horarioId.equals(horarioAsignado)) {
-                                conductorId = conductorSnapshot.getKey();
-                                Log.d(TAG, "Conductor encontrado: " + conductorId);
-
-                                Map<String, Object> params = new HashMap<>();
-                                params.put("conductor_encontrado", 1);
-                                analyticsHelper.logEvent("conductor_encontrado", params);
-
-                                cargarInformacionConductor(conductorId);
-                                conductorEncontrado = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (conductorEncontrado) break;
-                }
-
-                if (!conductorEncontrado) {
-                    Log.w(TAG, "No se encontró conductor para el horario " + horarioId);
-                    Map<String, Object> params = new HashMap<>();
-                    params.put("accion", "conductor_no_encontrado");
-                    analyticsHelper.logEvent("conductor_no_encontrado", params);
-
-                    runOnUiThread(() -> {
-                        conductorNombre = "------";
-                        conductorTelefono = "------";
-                        tvNombreConductor.setText(conductorNombre);
-                        tvVehiculoInfo.setText("Vehículo: ------");
-
-                        // ✅ MEJORADO: Actualizar capacidad usando SeatManager
-                        tvCapacidadInfo.setText("Capacidad: " + seatManager.getCapacidadTotal() + " asientos");
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                runOnUiThread(() -> {
-                    Log.e(TAG, "Error buscando conductor: " + error.getMessage());
-                    MyApp.logError(new Exception("Error buscando conductor: " + error.getMessage()));
-                    analyticsHelper.logError("busqueda_conductor", error.getMessage());
-
-                    conductorNombre = "------";
-                    conductorTelefono = "------";
-                    tvNombreConductor.setText(conductorNombre);
-                    tvVehiculoInfo.setText("Vehículo: ------");
-
-                    // ✅ MEJORADO: Actualizar capacidad usando SeatManager
-                    tvCapacidadInfo.setText("Capacidad: " + seatManager.getCapacidadTotal() + " asientos");
-                });
-            }
-        });
-    }
-
-    private void cargarInformacionConductor(String conductorId) {
-        Log.d(TAG, "Cargando información del conductor: " + conductorId);
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("accion", "carga_conductor_inicio");
-        analyticsHelper.logEvent("carga_conductor_inicio", params);
-
-        userService.loadDriverData(conductorId, new UserService.DriverDataCallback() {
-            @Override
-            public void onDriverDataLoaded(String nombre, String telefono, String placa, List<String> horariosAsignados) {
-                runOnUiThread(() -> {
-                    if (nombre != null && !nombre.isEmpty()) {
-                        conductorNombre = nombre;
-                        conductorTelefono = telefono != null ? telefono : "No disponible";
-                        placaVehiculo = placa != null ? placa : "No disponible";
-
-                        tvNombreConductor.setText(conductorNombre);
-                        analyticsHelper.logConductorCargado(conductorId, nombre, telefono);
-
-                        Log.d(TAG, "✓ Conductor cargado: " + conductorNombre);
-                        cargarInformacionVehiculo(conductorId);
-                    } else {
-                        establecerValoresPorDefectoConductor();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(String error) {
-                runOnUiThread(() -> {
-                    Log.e(TAG, "Error cargando datos del conductor: " + error);
-                    MyApp.logError(new Exception("Error cargando datos conductor: " + error));
-                    analyticsHelper.logError("carga_conductor", error);
-                    establecerValoresPorDefectoConductor();
-                });
-            }
-        });
-    }
-
-    private void cargarInformacionVehiculo(String conductorId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("accion", "carga_vehiculo_inicio");
-        analyticsHelper.logEvent("carga_vehiculo_inicio", params);
-
-        vehiculoService.obtenerVehiculoPorConductor(conductorId, new VehiculoService.VehiculoCallback() {
-            @Override
-            public void onVehiculoCargado(Vehiculo vehiculo) {
-                runOnUiThread(() -> {
-                    if (vehiculo != null) {
-                        modeloVehiculo = vehiculo.getModelo() != null ? vehiculo.getModelo() : "No disponible";
-                        placaVehiculo = vehiculo.getPlaca() != null ? vehiculo.getPlaca() : placaVehiculo;
-                        capacidadVehiculo = vehiculo.getCapacidad() > 0 ?
-                                vehiculo.getCapacidad() : seatManager.getCapacidadTotal();
-
-                        analyticsHelper.logVehiculoCargado(vehiculo, conductorId);
-
-                        String infoVehiculo = "Vehículo: " + placaVehiculo + " - " + modeloVehiculo;
-                        tvVehiculoInfo.setText(infoVehiculo);
-
-                        // ✅ MEJORADO: Si el vehículo tiene capacidad diferente, podemos reconfigurar los asientos
-                        if (capacidadVehiculo != seatManager.getCapacidadTotal()) {
-                            Log.w(TAG, "⚠️ Capacidad del vehículo (" + capacidadVehiculo +
-                                    ") difiere de la configuración actual (" +
-                                    seatManager.getCapacidadTotal() + ")");
-                        }
-
-                        tvCapacidadInfo.setText("Capacidad: " + capacidadVehiculo + " asientos");
-
-                        Log.d(TAG, "✓ Vehículo cargado: " + infoVehiculo);
-                    } else {
-                        // ✅ MEJORADO: Usar capacidad del SeatManager por defecto
-                        capacidadVehiculo = seatManager.getCapacidadTotal();
-                        String infoVehiculo = "Vehículo: " + placaVehiculo + " - " + modeloVehiculo;
-                        tvVehiculoInfo.setText(infoVehiculo);
-                        tvCapacidadInfo.setText("Capacidad: " + capacidadVehiculo + " asientos");
-
-                        Map<String, Object> params = new HashMap<>();
-                        params.put("accion", "vehiculo_no_encontrado");
-                        analyticsHelper.logEvent("vehiculo_no_encontrado", params);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(String error) {
-                runOnUiThread(() -> {
-                    Log.e(TAG, "Error cargando vehículo: " + error);
-                    MyApp.logError(new Exception("Error cargando vehículo: " + error));
-                    analyticsHelper.logError("carga_vehiculo", error);
-
-                    // ✅ MEJORADO: Usar capacidad del SeatManager por defecto
-                    capacidadVehiculo = seatManager.getCapacidadTotal();
-                    String infoVehiculo = "Vehículo: " + placaVehiculo + " - " + modeloVehiculo;
-                    tvVehiculoInfo.setText(infoVehiculo);
-                    tvCapacidadInfo.setText("Capacidad: " + capacidadVehiculo + " asientos");
-                });
-            }
-        });
-    }
-
-    private void establecerValoresPorDefectoConductor() {
-        conductorNombre = "------";
-        conductorTelefono = "------";
-        placaVehiculo = "------";
-        modeloVehiculo = "------";
-
-        tvNombreConductor.setText(conductorNombre);
-        tvVehiculoInfo.setText("Vehículo: ------");
-
-        // ✅ MEJORADO: Usar capacidad del SeatManager por defecto
-        tvCapacidadInfo.setText("Capacidad: " + seatManager.getCapacidadTotal() + " asientos");
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("accion", "valores_por_defecto_conductor");
-        analyticsHelper.logEvent("valores_por_defecto_conductor", params);
-    }
-
-    // ============================================================
     // Métodos del ciclo de vida
     // ============================================================
 
@@ -795,8 +660,15 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
         if (rutaSeleccionada != null) {
             outState.putString("rutaSeleccionada", rutaSeleccionada);
         }
-        outState.putString("conductorNombre", conductorNombre);
-        outState.putString("conductorTelefono", conductorTelefono);
+
+        // ✅ Guardar datos del DriverVehicleManager
+        if (driverVehicleManager != null) {
+            outState.putString("conductorNombre", driverVehicleManager.getConductorNombre());
+            outState.putString("conductorTelefono", driverVehicleManager.getConductorTelefono());
+        } else {
+            outState.putString("conductorNombre", conductorNombre);
+            outState.putString("conductorTelefono", conductorTelefono);
+        }
 
         if (expandableSectionManager != null) {
             outState.putBoolean("isInfoExpanded", expandableSectionManager.isExpanded());
