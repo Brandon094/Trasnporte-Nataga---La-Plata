@@ -21,7 +21,7 @@
             app:titleTextColor="@color/text_on_primary"
             app:navigationIcon="@drawable/ic_arrow_back"
             app:navigationContentDescription="@string/volver"
-        style="@style/Widget.MaterialComponents.Toolbar.Primary" />
+            style="@style/Widget.MaterialComponents.Toolbar.Primary" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp">
 
-            <!-- SECCIÓN DE INFORMACIÓN DEL VIAJE SELECCIONADO -->
+            <!-- SECCIÓN DE INFORMACIÓN DEL VIAJE SELECCIONADO (PLEGABLE) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/infoViajeCardView"
                 android:layout_width="match_parent"
@@ -50,179 +50,282 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tu Viaje Seleccionado"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textStyle="bold"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginBottom="16dp" />
-
-                    <!-- Información de Ruta -->
-                    <LinearLayout
+                    <!-- HEADER PLEGABLE - SIEMPRE VISIBLE -->
+                    <RelativeLayout
+                        android:id="@+id/headerInfo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
+                        android:padding="16dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_route"
-                            android:tint="?attr/colorPrimary"
-                            android:layout_marginEnd="12dp" />
-
+                        <!-- Título e ícono a la izquierda -->
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:id="@+id/titleContainer"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:id="@+id/iconExpandCollapse"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_expand_more"
+                                android:tint="?attr/colorPrimary"
+                                android:layout_marginEnd="12dp" />
 
                             <TextView
-                                android:id="@+id/tvRutaSeleccionada"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="---- → ----"
-                                android:textAppearance="?attr/textAppearanceSubtitle1"
+                                android:text="@string/infoReserva"
+                                android:textAppearance="?attr/textAppearanceHeadline6"
                                 android:textStyle="bold" />
+                        </LinearLayout>
 
-                            <TextView
-                                android:id="@+id/tvDescripcionRuta"
+                        <!-- Información resumida (visible cuando está colapsado) -->
+                        <LinearLayout
+                            android:id="@+id/resumenInfo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/titleContainer"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
+
+                            <!-- Columna de iconos -->
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Tiempo estimado: -- min"
-                                android:textAppearance="?attr/textAppearanceBody2"
-                                android:textColor="?android:attr/textColorSecondary" />
-                        </LinearLayout>
-                    </LinearLayout>
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:layout_marginEnd="8dp">
 
-                    <!-- Información de Horario -->
+                                <ImageView
+                                    android:layout_width="12dp"
+                                    android:layout_height="12dp"
+                                    android:src="@drawable/ic_route"
+                                    android:tint="@color/primary_500" />
+
+                                <ImageView
+                                    android:layout_width="12dp"
+                                    android:layout_height="12dp"
+                                    android:src="@drawable/ic_time"
+                                    android:tint="@color/primary_500"
+                                    android:layout_marginTop="4dp" />
+
+                            </LinearLayout>
+
+                            <!-- Columna de texto -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="end">
+
+                                <TextView
+                                    android:id="@+id/tvRutaResumen"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/hora"
+                                    android:textAppearance="?attr/textAppearanceBody2"
+                                    android:textStyle="bold"
+                                    android:maxLines="1"
+                                    android:ellipsize="end" />
+
+                                <TextView
+                                    android:id="@+id/tvHorarioResumen"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/hora"
+                                    android:textAppearance="?attr/textAppearanceCaption"
+                                    android:maxLines="1"
+                                    android:ellipsize="end" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                    <!-- CONTENIDO PLEGABLE (inicialmente visible) -->
                     <LinearLayout
+                        android:id="@+id/contenidoExpandible"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
+                        android:orientation="vertical"
+                        android:padding="20dp"
+                        android:paddingTop="0dp">
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_schedule"
-                            android:tint="?attr/colorPrimary"
-                            android:layout_marginEnd="12dp" />
-
+                        <!-- Información de Ruta -->
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="12dp">
 
-                            <TextView
-                                android:id="@+id/tvHorarioSeleccionado"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="--:-- --"
-                                android:textAppearance="?attr/textAppearanceSubtitle1"
-                                android:textStyle="bold" />
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_route"
+                                android:tint="?attr/colorPrimary"
+                                android:layout_marginEnd="12dp" />
 
-                            <TextView
-                                android:id="@+id/tvFechaViaje"
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="hoy, DD de MM del AAAA"
-                                android:textAppearance="?attr/textAppearanceBody2"
-                                android:textColor="?android:attr/textColorSecondary" />
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvRutaSeleccionada"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/cargando"
+                                    android:textAppearance="?attr/textAppearanceSubtitle1"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvDescripcionRuta"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/cargando"
+                                    android:textAppearance="?attr/textAppearanceBody2"
+                                    android:textColor="?android:attr/textColorSecondary" />
+                            </LinearLayout>
                         </LinearLayout>
-                    </LinearLayout>
 
-                    <!-- Información del Vehículo y Conductor -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_bus"
-                            android:tint="?attr/colorPrimary"
-                            android:layout_marginEnd="12dp" />
-
+                        <!-- Información de Horario -->
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="12dp">
 
-                            <TextView
-                                android:id="@+id/tvVehiculoInfo"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Vehículo: ----- - ------ ---"
-                                android:textStyle="bold"
-                                android:textAppearance="?attr/textAppearanceBody2" />
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_schedule"
+                                android:tint="?attr/colorPrimary"
+                                android:layout_marginEnd="12dp" />
 
-                            <TextView
-                                android:id="@+id/tvCapacidadInfo"
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="Capacidad: -- asientos"
-                                android:textAppearance="?attr/textAppearanceBody2"
-                                android:textColor="?android:attr/textColorSecondary" />
-                            <TextView
-                                android:id="@+id/tvCapacidadDispo"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Capacidad disponible: --"
-                                android:textAppearance="?attr/textAppearanceBody2"
-                                android:textColor="?android:attr/textColorSecondary" />
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvHorarioSeleccionado"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/hora"
+                                    android:textAppearance="?attr/textAppearanceSubtitle1"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvFechaViaje"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/cargando"
+                                    android:textAppearance="?attr/textAppearanceBody2"
+                                    android:textColor="?android:attr/textColorSecondary" />
+                            </LinearLayout>
                         </LinearLayout>
-                    </LinearLayout>
 
-                    <!-- Información del Conductor -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_driver"
-                            android:tint="?attr/colorPrimary"
-                            android:layout_marginEnd="12dp" />
-
+                        <!-- Información del Vehículo -->
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="12dp">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Conductor:"
-                                android:textAppearance="?attr/textAppearanceSubtitle2"
-                                android:textStyle="bold" />
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_bus"
+                                android:tint="?attr/colorPrimary"
+                                android:layout_marginEnd="12dp" />
 
-                            <TextView
-                                android:id="@+id/tvNombreConductor"
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="-------"
-                                android:textAppearance="?attr/textAppearanceBody2"
-                                android:textColor="?android:attr/textColorSecondary" />
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvVehiculoInfo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/cargando"
+                                    android:textStyle="bold"
+                                    android:textAppearance="?attr/textAppearanceBody2" />
+
+                                <TextView
+                                    android:id="@+id/tvCapacidadInfo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/cargando"
+                                    android:textAppearance="?attr/textAppearanceBody2"
+                                    android:textColor="?android:attr/textColorSecondary" />
+
+                                <TextView
+                                    android:id="@+id/tvCapacidadDispo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/cargando"
+                                    android:textAppearance="?attr/textAppearanceBody2"
+                                    android:textColor="?android:attr/textColorSecondary" />
+                            </LinearLayout>
                         </LinearLayout>
-                    </LinearLayout>
 
+                        <!-- Información del Conductor -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_driver"
+                                android:tint="?attr/colorPrimary"
+                                android:layout_marginEnd="12dp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/conductor"
+                                    android:textAppearance="?attr/textAppearanceSubtitle2"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvNombreConductor"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/cargando"
+                                    android:textAppearance="?attr/textAppearanceBody2"
+                                    android:textColor="?android:attr/textColorSecondary" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -257,7 +360,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Selecciona tu asiento preferido"
+                        android:text="@string/seleccionaAsiento"
                         android:textAppearance="?attr/textAppearanceBody2"
                         android:textColor="@color/black" />
                 </LinearLayout>
@@ -284,7 +387,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Cabina"
+                        android:text="@string/asientosCabina"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textStyle="bold"
                         android:layout_marginBottom="16dp" />
@@ -388,7 +491,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Parte Trasera"
+                        android:text="@string/asientosAtras"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textStyle="bold"
                         android:layout_marginBottom="16dp" />
@@ -534,7 +637,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Disponible"
+                            android:text="@string/disponible"
                             android:layout_marginStart="8dp"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -554,7 +657,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Seleccionado"
+                            android:text="@string/seleccionado"
                             android:layout_marginStart="8dp"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -574,7 +677,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Ocupado"
+                            android:text="@string/ocupado"
                             android:layout_marginStart="8dp"
                             android:textSize="12sp" />
                     </LinearLayout>
