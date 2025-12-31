@@ -1,12 +1,10 @@
 package com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.createReservation;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -17,6 +15,8 @@ import android.widget.Toast;
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.confirmReservation.ConfirmarReservaActivity;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
+import com.chopcode.trasnportenataga_laplata.managers.analytics.ReservationAnalyticsHelper;
+import com.chopcode.trasnportenataga_laplata.managers.seats.SeatManager;
 import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.managers.ui.ExpandableSectionManager;
 import com.chopcode.trasnportenataga_laplata.models.Usuario;
@@ -25,7 +25,6 @@ import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaServic
 import com.chopcode.trasnportenataga_laplata.services.user.UserService;
 import com.chopcode.trasnportenataga_laplata.services.reservations.VehiculoService;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -46,27 +45,30 @@ import java.util.Set;
  * Actividad para la gestión de reservas de asientos en un transporte.
  * Permite seleccionar una ruta, visualizar los asientos disponibles y confirmar la reserva.
  */
-public class CrearReservasActivity extends AppCompatActivity {
-    /** Iconos de los asientos */
-    private static final int VECTOR_ASIENTO_DISPONIBLE = R.drawable.asiento_disponible;
-    private static final int VECTOR_ASIENTO_SELECCIONADO = R.drawable.asiento_seleccionado;
-    private static final int VECTOR_ASIENTO_OCUPADO = R.drawable.asiento_ocupado;
+public class CrearReservasActivity extends AppCompatActivity implements SeatManager.SeatSelectionListener {
+
+    // Constantes
+    private static final String TAG = "CrearReservas";
+
+    // UI Elements
     private Button btnConfirmar;
     private Button btnCancelar;
     private MaterialToolbar topAppBar;
-    private Integer asientoSeleccionado = null;
+
+    // Data from intent
     private String rutaSeleccionada, horarioId, horarioHora;
+
+    // Services
     private ReservaService reservaService;
     private VehiculoService vehiculoService;
     private UserService userService;
-    private AuthManager authManager; // ✅ AGREGADO: AuthManager
-    private Map<Integer, MaterialButton> mapaAsientos = new HashMap<>();
+    private AuthManager authManager;
 
     // Views de información del viaje
     private TextView tvRutaSeleccionada, tvDescripcionRuta, tvHorarioSeleccionado, tvFechaViaje;
     private TextView tvVehiculoInfo, tvCapacidadInfo, tvCapacidadDispo, tvNombreConductor;
 
-    // ✅ AGREGADO: Views para sección plegable
+    // Views para sección plegable
     private ExpandableSectionManager expandableSectionManager;
     private RelativeLayout headerInfo;
     private LinearLayout contenidoExpandible;
@@ -75,16 +77,12 @@ public class CrearReservasActivity extends AppCompatActivity {
     private TextView tvRutaResumen;
     private TextView tvHorarioResumen;
 
-    // Informacion del vehiculo - VARIABLES CORREGIDAS
+    // Informacion del vehiculo
     private String placaVehiculo = "Cargando...";
     private String modeloVehiculo = "Cargando...";
-    private Integer capacidadVehiculo = CAPACIDAD_TOTAL;
+    private Integer capacidadVehiculo;
 
-    // Constantes
-    private static final String TAG = "CrearReservas";
-    private static final int CAPACIDAD_TOTAL = 14;
-
-    // Agregar estas variables para almacenar información del conductor
+    // Información del conductor
     private String conductorNombre = "Cargando...";
     private String conductorTelefono = "Cargando...";
     private String conductorId;
@@ -94,182 +92,93 @@ public class CrearReservasActivity extends AppCompatActivity {
     private String usuarioTelefono;
     private String usuarioId;
 
-    /**
-     * Método que se ejecuta al crear la actividad. Inicializa la UI y carga datos previos.
-     * @param savedInstanceState Estado guardado de la actividad en caso de recreación.
-     */
+    // Managers
+    private ReservationAnalyticsHelper analyticsHelper;
+    private SeatManager seatManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ✅ Registrar evento analítico de inicio de pantalla
-        registrarEventoAnalitico("pantalla_crear_reservas_inicio", null, null);
+        // Inicializar analytics helper
+        analyticsHelper = new ReservationAnalyticsHelper("CrearReservas");
+        analyticsHelper.logPantallaInicio();
 
         setContentView(R.layout.activity_crear_reservas);
 
-        // Obtener los datos desde la actividad anterior
-        Intent intent = getIntent();
-        if (intent != null) {
-            rutaSeleccionada = intent.getStringExtra("rutaSeleccionada");
-            horarioId = intent.getStringExtra("horarioId");
-            horarioHora = intent.getStringExtra("horarioHora");
+        // ✅ MEJORADO: Inicializar SeatManager con capacidad automática
+        seatManager = new SeatManager(this, analyticsHelper);
+        seatManager.setSeatSelectionListener(this);
 
-            // ✅ AGREGAR: Recibir datos del usuario desde el Intent
-            usuarioId = intent.getStringExtra("usuarioId");
-            usuarioNombre = intent.getStringExtra("usuarioNombre");
-            usuarioTelefono = intent.getStringExtra("usuarioTelefono");
-
-            // ✅ Registrar evento de datos recibidos
-            registrarEventoAnalitico("datos_recibidos_intent",
-                    rutaSeleccionada != null ? 1 : 0,
-                    horarioId != null ? 1 : 0);
-
-            // DEBUG: Verificar qué datos llegan
-            Log.d(TAG, "📥 DATOS RECIBIDOS DESDE HORARIO FRAGMENT:");
-            Log.d(TAG, "  - Ruta: " + rutaSeleccionada);
-            Log.d(TAG, "  - Horario ID: " + horarioId);
-            Log.d(TAG, "  - Horario Hora: " + horarioHora);
-            Log.d(TAG, "  - Usuario ID: " + usuarioId);
-            Log.d(TAG, "  - Usuario Nombre: " + usuarioNombre);
-            Log.d(TAG, "  - Usuario Teléfono: " + usuarioTelefono);
-        }
+        // Obtener datos del intent
+        obtenerDatosDelIntent();
 
         // Inicializar servicios
         reservaService = new ReservaService();
         vehiculoService = new VehiculoService();
         userService = new UserService();
-        authManager = AuthManager.getInstance(); // ✅ INICIALIZADO: AuthManager
+        authManager = AuthManager.getInstance();
 
         // Referencias a la UI
         inicializarViews();
 
-        // Configurar la toolbar y botones de navegación
+        // Configurar navegación
         configurarNavegacion();
 
         // Configurar información básica
         configurarInformacionBasica();
 
-        // ✅ AGREGAR: Cargar usuario si no llegó del Intent usando MyApp
+        // Cargar usuario si no llegó del Intent
         if (usuarioNombre == null || usuarioId == null) {
-            Log.w(TAG, "⚠️ DATOS DE USUARIO NO RECIBIDOS, CARGANDO DESDE FIREBASE...");
             cargarUsuarioAutenticado();
         } else {
-            Log.d(TAG, "✅ DATOS DE USUARIO RECIBIDOS CORRECTAMENTE VIA INTENT");
-            // ✅ Registrar evento de usuario cargado desde intent
-            registrarUsuarioCargadoAnalitico();
+            analyticsHelper.logUsuarioCargado(usuarioNombre, usuarioTelefono);
         }
 
+        // Restaurar estado si existe
         if (savedInstanceState != null) {
-            asientoSeleccionado = savedInstanceState.getInt("asientoSeleccionado", -1);
-            if (asientoSeleccionado == -1) asientoSeleccionado = null;
-            rutaSeleccionada = savedInstanceState.getString("rutaSeleccionada");
-            conductorNombre = savedInstanceState.getString("conductorNombre", "Cargando...");
-
-            // ✅ AGREGAR: Restaurar estado de la sección plegable
-            boolean isInfoExpanded = savedInstanceState.getBoolean("isInfoExpanded", true);
-            if (expandableSectionManager != null) {
-                expandableSectionManager.restoreState(isInfoExpanded);
-            }
-
-            // Restaurar datos del usuario
-            if (usuarioNombre == null) {
-                usuarioNombre = savedInstanceState.getString("usuarioNombre");
-                usuarioTelefono = savedInstanceState.getString("usuarioTelefono");
-                usuarioId = savedInstanceState.getString("usuarioId");
-            }
+            restaurarEstado(savedInstanceState);
         }
 
-        // Configurar asientos directamente con el horario recibido
-        if (horarioId != null) {
-            // Cargar información del vehículo y conductor
-            cargarInformacionVehiculoYConductor();
+        // ✅ MEJORADO: Configurar asientos automáticamente usando el método optimizado
+        configurarSeleccionAsientos();
 
-            configurarSeleccionAsientos();
+        // Cargar información del vehículo y conductor si tenemos horario
+        if (horarioId != null) {
+            cargarInformacionVehiculoYConductor();
             cargarAsientosDesdeFirebase(horarioId);
         } else {
-            // ✅ Registrar evento de error
-            registrarEventoAnalitico("error_sin_horario_id", null, null);
-
-            Toast.makeText(this, "Error: No se recibió información del horario", Toast.LENGTH_SHORT).show();
-            finish();
+            mostrarErrorSinHorario();
         }
 
-        // Accion del boton de confirmacion
+        // Configurar botón confirmar
         btnConfirmar.setOnClickListener(v -> {
-            // ✅ Registrar evento de interacción
-            registrarEventoAnalitico("click_boton_confirmar", null, null);
+            analyticsHelper.logClickBoton("confirmar");
             validacionesReserva();
         });
     }
 
-    // ✅ CORREGIDO: Método para cargar usuario desde Firebase (fallback) usando MyApp
-    private void cargarUsuarioAutenticado() {
-        // ✅ Usar MyApp para obtener el ID del usuario
-        String userId = MyApp.getCurrentUserId();
-        if (userId == null) {
-            Log.e(TAG, "No se pudo obtener el ID del usuario autenticado usando MyApp");
+    private void obtenerDatosDelIntent() {
+        Intent intent = getIntent();
+        if (intent != null) {
+            rutaSeleccionada = intent.getStringExtra("rutaSeleccionada");
+            horarioId = intent.getStringExtra("horarioId");
+            horarioHora = intent.getStringExtra("horarioHora");
+            usuarioId = intent.getStringExtra("usuarioId");
+            usuarioNombre = intent.getStringExtra("usuarioNombre");
+            usuarioTelefono = intent.getStringExtra("usuarioTelefono");
 
-            // ✅ Registrar evento de error
-            registrarEventoAnalitico("error_userid_null", null, null);
+            analyticsHelper.logDatosRecibidos(rutaSeleccionada != null, horarioId != null);
 
-            establecerUsuarioPorDefecto();
-            return;
+            Log.d(TAG, "📥 DATOS RECIBIDOS:");
+            Log.d(TAG, "  - Ruta: " + rutaSeleccionada);
+            Log.d(TAG, "  - Horario ID: " + horarioId);
+            Log.d(TAG, "  - Horario Hora: " + horarioHora);
+            Log.d(TAG, "  - Usuario ID: " + usuarioId);
+            Log.d(TAG, "  - Usuario Nombre: " + usuarioNombre);
         }
-
-        // ✅ Registrar evento de inicio de carga
-        registrarEventoAnalitico("carga_usuario_inicio", null, null);
-
-        userService.loadUserData(userId, new UserService.UserDataCallback() {
-            @Override
-            public void onUserDataLoaded(Usuario usuario) {
-                if (usuario != null) {
-                    usuarioNombre = usuario.getNombre();
-                    usuarioTelefono = usuario.getTelefono();
-                    usuarioId = usuario.getId();
-
-                    // ✅ Registrar evento de carga exitosa
-                    registrarUsuarioCargadoAnalitico();
-
-                    Log.d(TAG, "Usuario cargado desde Firebase: " + usuarioNombre + ", Tel: " + usuarioTelefono);
-                } else {
-                    Log.e(TAG, "Usuario es null");
-
-                    // ✅ Registrar evento de error
-                    registrarEventoAnalitico("error_usuario_null", null, null);
-
-                    establecerUsuarioPorDefecto();
-                }
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                Log.e(TAG, "Error cargando usuario: " + errorMessage);
-
-                // ✅ Usar MyApp para logging de errores
-                MyApp.logError(new Exception("Error cargando usuario crear reservas: " + errorMessage));
-
-                // ✅ Registrar evento de error
-                registrarEventoAnalitico("error_carga_usuario", null, null);
-
-                establecerUsuarioPorDefecto();
-            }
-        });
     }
 
-    // ✅ AGREGADO: Método para establecer valores por defecto del usuario
-    private void establecerUsuarioPorDefecto() {
-        usuarioNombre = "Usuario";
-        usuarioTelefono = "No disponible";
-
-        // ✅ Registrar evento de valores por defecto
-        registrarEventoAnalitico("usuario_por_defecto", null, null);
-
-        Log.w(TAG, "Usando valores por defecto para el usuario");
-    }
-
-    /**
-     * Inicializar las views de la sección de información del viaje
-     */
     private void inicializarViews() {
         tvRutaSeleccionada = findViewById(R.id.tvRutaSeleccionada);
         tvDescripcionRuta = findViewById(R.id.tvDescripcionRuta);
@@ -283,7 +192,7 @@ public class CrearReservasActivity extends AppCompatActivity {
         btnCancelar = findViewById(R.id.buttonCancelar);
         topAppBar = findViewById(R.id.topAppBar);
 
-        // ✅ AGREGADO: Inicializar vistas para sección plegable
+        // Inicializar vistas para sección plegable
         headerInfo = findViewById(R.id.headerInfo);
         contenidoExpandible = findViewById(R.id.contenidoExpandible);
         resumenInfo = findViewById(R.id.resumenInfo);
@@ -291,13 +200,9 @@ public class CrearReservasActivity extends AppCompatActivity {
         tvRutaResumen = findViewById(R.id.tvRutaResumen);
         tvHorarioResumen = findViewById(R.id.tvHorarioResumen);
 
-        // ✅ AGREGADO: Inicializar el ExpandableSectionManager
         initializeExpandableSection();
     }
 
-    /**
-     * ✅ AGREGADO: Inicializar el manager de sección expandible
-     */
     private void initializeExpandableSection() {
         expandableSectionManager = new ExpandableSectionManager(
                 this,
@@ -308,85 +213,60 @@ public class CrearReservasActivity extends AppCompatActivity {
                 tvRutaResumen,
                 tvHorarioResumen
         );
-
-        // Configurar información para analytics
         expandableSectionManager.setAnalyticsInfo("CrearReservas", "info_viaje");
     }
 
-    /**
-     * Configurar la toolbar y botones de navegación
-     */
     private void configurarNavegacion() {
-        // Configurar la toolbar como action bar
         setSupportActionBar(topAppBar);
-
-        // Habilitar flecha de navegación
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
-        // Configurar click listener para la flecha de navegación
         topAppBar.setNavigationOnClickListener(v -> {
-            // ✅ Registrar evento de navegación
-            registrarEventoAnalitico("click_navegacion_atras", null, null);
+            analyticsHelper.logClickBoton("navegacion_atras");
             volverAtras();
         });
 
-        // Configurar botón cancelar
         btnCancelar.setOnClickListener(v -> {
-            // ✅ Registrar evento de interacción
-            registrarEventoAnalitico("click_boton_cancelar", null, null);
+            analyticsHelper.logClickBoton("cancelar");
             volverAtras();
         });
     }
 
-    /**
-     * Método para manejar la acción de volver atrás
-     */
     private void volverAtras() {
-        if (asientoSeleccionado != null) {
-            // ✅ Registrar evento de cancelación con asiento seleccionado
-            registrarEventoAnalitico("dialogo_cancelar_asiento", asientoSeleccionado, null);
+        if (seatManager.hasAsientoSeleccionado()) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("asiento", seatManager.getAsientoSeleccionado());
+            analyticsHelper.logEvent("dialogo_cancelar_asiento", params);
 
-            // Mostrar diálogo de confirmación si ya se seleccionó un asiento
             new android.app.AlertDialog.Builder(this)
                     .setTitle("Cancelar selección")
                     .setMessage("¿Estás seguro de que quieres cancelar la selección de asiento?")
                     .setPositiveButton("Sí", (dialog, which) -> {
-                        // ✅ Registrar evento de confirmación de cancelación
-                        registrarEventoAnalitico("cancelacion_asiento_confirmada", asientoSeleccionado, null);
+                        analyticsHelper.logEvent("cancelacion_asiento_confirmada", params);
                         finish();
                     })
                     .setNegativeButton("No", (dialog, which) -> {
-                        // ✅ Registrar evento de cancelación rechazada
-                        registrarEventoAnalitico("cancelacion_asiento_rechazada", asientoSeleccionado, null);
+                        analyticsHelper.logEvent("cancelacion_asiento_rechazada", params);
                         dialog.dismiss();
                     })
                     .show();
         } else {
-            // ✅ Registrar evento de navegación simple
-            registrarEventoAnalitico("navegacion_atras_simple", null, null);
-
-            // Si no hay asiento seleccionado, simplemente volver
+            Map<String, Object> params = new HashMap<>();
+            params.put("accion", "navegacion_atras_simple");
+            analyticsHelper.logEvent("navegacion_atras_simple", params);
             finish();
         }
     }
 
-    /**
-     * Configurar información básica del viaje
-     */
     private void configurarInformacionBasica() {
-        // Configurar ruta
         if (rutaSeleccionada != null) {
             tvRutaSeleccionada.setText(rutaSeleccionada);
-
-            // ✅ AGREGADO: Actualizar también el resumen
             if (expandableSectionManager != null) {
                 expandableSectionManager.updateSummaryInfo(rutaSeleccionada, null);
             }
 
-            // Establecer descripción de la ruta según la dirección
             String descripcionRuta = "Ruta directa - Tiempo estimado: ";
             if (rutaSeleccionada.contains("Natagá -> La Plata")) {
                 descripcionRuta += "60 min";
@@ -396,394 +276,111 @@ public class CrearReservasActivity extends AppCompatActivity {
             tvDescripcionRuta.setText(descripcionRuta);
         }
 
-        // Configurar horario
         if (horarioHora != null) {
             tvHorarioSeleccionado.setText(horarioHora);
-
-            // ✅ AGREGADO: Actualizar también el resumen
             if (expandableSectionManager != null) {
                 expandableSectionManager.updateSummaryInfo(null, horarioHora);
             }
         }
 
-        // Configurar fecha del viaje (considerando si el horario ya pasó hoy)
         String fechaViaje = obtenerFechaDelViaje();
         tvFechaViaje.setText(fechaViaje);
 
-        // Configurar información por defecto del vehículo
+        // ✅ MEJORADO: Usar la capacidad del SeatManager
+        int capacidadTotal = seatManager.getNumeroTotalAsientos();
         tvVehiculoInfo.setText("Vehículo: Cargando...");
-        tvCapacidadInfo.setText("Capacidad: " + CAPACIDAD_TOTAL + " asientos");
-        tvCapacidadDispo.setText("Capacidad disponible: " + CAPACIDAD_TOTAL);
+        tvCapacidadInfo.setText("Capacidad: " + capacidadTotal + " asientos");
+        tvCapacidadDispo.setText("Capacidad disponible: " + capacidadTotal);
         tvNombreConductor.setText(conductorNombre);
     }
 
-    /**
-     * Obtener la fecha del viaje basándose en el horario seleccionado y la hora actual
-     * Si el horario seleccionado es en la mañana pero la hora actual es más tarde,
-     * entonces el viaje es para el día siguiente
-     */
-    private String obtenerFechaDelViaje() {
-        Calendar calendar = Calendar.getInstance();
-        Calendar ahora = Calendar.getInstance();
-
-        if (horarioHora != null && esHorarioEnElPasado(horarioHora, ahora)) {
-            // Si el horario seleccionado ya pasó hoy, usar el día siguiente
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
-            Log.d(TAG, "Horario en el pasado detectado: " + horarioHora +
-                    " - Hora actual: " + obtenerHoraActualFormateada() +
-                    " - Usando fecha del día siguiente");
-        } else {
-            Log.d(TAG, "Horario futuro detectado: " + horarioHora +
-                    " - Hora actual: " + obtenerHoraActualFormateada() +
-                    " - Usando fecha actual");
+    private void cargarUsuarioAutenticado() {
+        String userId = MyApp.getCurrentUserId();
+        if (userId == null) {
+            Log.e(TAG, "No se pudo obtener el ID del usuario");
+            analyticsHelper.logError("userid_null", "ID de usuario es null");
+            establecerUsuarioPorDefecto();
+            return;
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM 'del' yyyy", new Locale("es", "ES"));
-        String fecha = sdf.format(calendar.getTime());
+        Map<String, Object> params = new HashMap<>();
+        params.put("accion", "carga_usuario_inicio");
+        analyticsHelper.logEvent("carga_usuario_inicio", params);
 
-        // Capitalizar primera letra
-        return fecha.substring(0, 1).toUpperCase() + fecha.substring(1);
-    }
-
-    /**
-     * Determina si un horario seleccionado ya pasó en el día de hoy
-     * @param horarioSeleccionado Hora en formato String (ej: "6:15 AM", "10:30 PM")
-     * @param ahora Calendar con la hora actual
-     * @return true si el horario seleccionado ya pasó hoy
-     */
-    private boolean esHorarioEnElPasado(String horarioSeleccionado, Calendar ahora) {
-        try {
-            // Parsear el horario seleccionado
-            SimpleDateFormat formato12h = new SimpleDateFormat("h:mm a", Locale.US);
-            Date horaSeleccionadaDate = formato12h.parse(horarioSeleccionado);
-
-            if (horaSeleccionadaDate != null) {
-                Calendar calSeleccionado = Calendar.getInstance();
-                calSeleccionado.setTime(horaSeleccionadaDate);
-
-                // Obtener hora y minutos del horario seleccionado
-                int horaSeleccionada = calSeleccionado.get(Calendar.HOUR);
-                int minutosSeleccionados = calSeleccionado.get(Calendar.MINUTE);
-                int amPmSeleccionado = calSeleccionado.get(Calendar.AM_PM);
-
-                // Obtener hora y minutos actuales
-                int horaActual = ahora.get(Calendar.HOUR);
-                int minutosActuales = ahora.get(Calendar.MINUTE);
-                int amPmActual = ahora.get(Calendar.AM_PM);
-
-                // Convertir a formato 24 horas para comparación más fácil
-                int horaSeleccionada24 = convertirA24Horas(horaSeleccionada, amPmSeleccionado);
-                int horaActual24 = convertirA24Horas(horaActual, amPmActual);
-
-                Log.d(TAG, "Comparando horarios - Seleccionado: " + horaSeleccionada24 + ":" + minutosSeleccionados +
-                        " - Actual: " + horaActual24 + ":" + minutosActuales);
-
-                // Comparar horas y minutos
-                if (horaSeleccionada24 < horaActual24) {
-                    return true; // La hora seleccionada ya pasó hoy
-                } else if (horaSeleccionada24 == horaActual24) {
-                    return minutosSeleccionados <= minutosActuales; // Misma hora, comparar minutos
-                }
-
-                return false; // La hora seleccionada es futura hoy
-            }
-        } catch (ParseException e) {
-            Log.e(TAG, "Error al parsear horario: " + horarioSeleccionado, e);
-
-            // ✅ Usar MyApp para logging de errores
-            MyApp.logError(e);
-
-            // Fallback: lógica simple basada en texto
-            return esHorarioEnElPasadoSimple(horarioSeleccionado);
-        }
-
-        return false;
-    }
-
-    /**
-     * Convierte hora en formato 12h a 24h
-     */
-    private int convertirA24Horas(int hora12, int amPm) {
-        if (amPm == Calendar.PM && hora12 != 12) {
-            return hora12 + 12;
-        } else if (amPm == Calendar.AM && hora12 == 12) {
-            return 0; // 12 AM = 0 horas
-        }
-        return hora12;
-    }
-
-    /**
-     * Lógica simple de fallback para determinar si un horario ya pasó
-     */
-    private boolean esHorarioEnElPasadoSimple(String horario) {
-        if (horario == null) return false;
-
-        Calendar ahora = Calendar.getInstance();
-        int horaActual24 = ahora.get(Calendar.HOUR_OF_DAY);
-        int minutoActual = ahora.get(Calendar.MINUTE);
-
-        String horarioUpper = horario.toUpperCase();
-
-        try {
-            // Extraer hora y minutos del string
-            String[] partes = horario.split(":");
-            if (partes.length >= 2) {
-                int horaSeleccionada = Integer.parseInt(partes[0].trim());
-                String[] minutosYAmPm = partes[1].split(" ");
-                int minutosSeleccionados = Integer.parseInt(minutosYAmPm[0].trim());
-
-                // Convertir a 24 horas
-                if (horarioUpper.contains("PM") && horaSeleccionada != 12) {
-                    horaSeleccionada += 12;
-                } else if (horarioUpper.contains("AM") && horaSeleccionada == 12) {
-                    horaSeleccionada = 0;
-                }
-
-                // Comparar
-                if (horaSeleccionada < horaActual24) {
-                    return true;
-                } else if (horaSeleccionada == horaActual24) {
-                    return minutosSeleccionados <= minutoActual;
-                }
-            }
-        } catch (NumberFormatException e) {
-            Log.e(TAG, "Error en fallback parser para: " + horario);
-            MyApp.logError(e);
-        }
-
-        return false;
-    }
-
-    /**
-     * Obtener la hora actual formateada para logging
-     */
-    private String obtenerHoraActualFormateada() {
-        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
-        return sdf.format(new Date());
-    }
-
-    /**
-     * Cargar información del vehículo y conductor desde Firebase - MÉTODO MEJORADO
-     */
-    private void cargarInformacionVehiculoYConductor() {
-        Log.d(TAG, "Cargando información del vehículo y conductor...");
-
-        // ✅ Registrar evento de inicio de carga
-        registrarEventoAnalitico("carga_info_vehiculo_conductor_inicio", null, null);
-
-        // Buscar conductor por horario (esto también cargará la info del vehículo)
-        buscarConductorPorHorario();
-    }
-
-    /**
-     * Buscar conductor asignado a este horario específico usando MyApp
-     */
-    private void buscarConductorPorHorario() {
-        Log.d(TAG, "Buscando conductor para el horario: " + horarioId);
-
-        // ✅ Usar MyApp para obtener referencia a la base de datos
-        DatabaseReference conductoresRef = MyApp.getDatabaseReference("conductores");
-
-        conductoresRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        userService.loadUserData(userId, new UserService.UserDataCallback() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                boolean conductorEncontrado = false;
-
-                for (DataSnapshot conductorSnapshot : snapshot.getChildren()) {
-                    // Verificar si este conductor tiene el horario asignado
-                    if (conductorSnapshot.hasChild("horariosAsignados")) {
-                        DataSnapshot horariosAsignadosSnapshot = conductorSnapshot.child("horariosAsignados");
-
-                        // Iterar sobre los horarios asignados
-                        for (DataSnapshot horarioAsignadoSnapshot : horariosAsignadosSnapshot.getChildren()) {
-                            String horarioAsignado = horarioAsignadoSnapshot.getValue(String.class);
-                            if (horarioId != null && horarioId.equals(horarioAsignado)) {
-                                // Este conductor está asignado a este horario
-                                conductorId = conductorSnapshot.getKey();
-                                Log.d(TAG, "Conductor encontrado: " + conductorId + " para horario: " + horarioId);
-
-                                // ✅ Registrar evento de conductor encontrado
-                                registrarEventoAnalitico("conductor_encontrado", 1, null);
-
-                                // Cargar información completa del conductor y vehículo
-                                cargarInformacionConductor(conductorId);
-                                conductorEncontrado = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (conductorEncontrado) break;
-                }
-
-                // Si no se encontró conductor específico
-                if (!conductorEncontrado) {
-                    Log.w(TAG, "No se encontró conductor para el horario " + horarioId);
-
-                    // ✅ Registrar evento de conductor no encontrado
-                    registrarEventoAnalitico("conductor_no_encontrado", null, null);
-
-                    runOnUiThread(() -> {
-                        conductorNombre = "------";
-                        conductorTelefono = "------";
-                        tvNombreConductor.setText(conductorNombre);
-                        tvVehiculoInfo.setText("Vehículo: ------");
-                    });
+            public void onUserDataLoaded(Usuario usuario) {
+                if (usuario != null) {
+                    usuarioNombre = usuario.getNombre();
+                    usuarioTelefono = usuario.getTelefono();
+                    usuarioId = usuario.getId();
+                    analyticsHelper.logUsuarioCargado(usuarioNombre, usuarioTelefono);
+                } else {
+                    Log.e(TAG, "Usuario es null");
+                    analyticsHelper.logError("usuario_null", "Usuario es null");
+                    establecerUsuarioPorDefecto();
                 }
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                runOnUiThread(() -> {
-                    Log.e(TAG, "Error buscando conductor por horario: " + error.getMessage());
-
-                    // ✅ Usar MyApp para logging de errores
-                    MyApp.logError(new Exception("Error buscando conductor: " + error.getMessage()));
-
-                    // ✅ Registrar evento de error
-                    registrarEventoAnalitico("error_busqueda_conductor", null, null);
-
-                    conductorNombre = "------";
-                    conductorTelefono = "------";
-                    tvNombreConductor.setText(conductorNombre);
-                    tvVehiculoInfo.setText("Vehículo: ------");
-                });
+            public void onError(String errorMessage) {
+                Log.e(TAG, "Error cargando usuario: " + errorMessage);
+                MyApp.logError(new Exception("Error cargando usuario: " + errorMessage));
+                analyticsHelper.logError("carga_usuario", errorMessage);
+                establecerUsuarioPorDefecto();
             }
         });
     }
 
-    /**
-     * Cargar información del conductor desde el nodo "conductores" - MÉTODO MEJORADO
-     */
-    private void cargarInformacionConductor(String conductorId) {
-        Log.d(TAG, "Cargando información del conductor: " + conductorId);
-
-        // ✅ Registrar evento de inicio de carga de conductor
-        registrarEventoAnalitico("carga_conductor_inicio", null, null);
-
-        userService.loadDriverData(conductorId, new UserService.DriverDataCallback() {
-            @Override
-            public void onDriverDataLoaded(String nombre, String telefono, String placa, List<String> horariosAsignados) {
-                runOnUiThread(() -> {
-                    if (nombre != null && !nombre.isEmpty()) {
-                        conductorNombre = nombre;
-                        conductorTelefono = telefono != null ? telefono : "No disponible";
-                        placaVehiculo = placa != null ? placa : "No disponible";
-
-                        tvNombreConductor.setText(conductorNombre);
-
-                        // ✅ Registrar evento de conductor cargado
-                        registrarConductorCargadoAnalitico(nombre, telefono);
-
-                        Log.d(TAG, "✓ Información del conductor cargada: " + conductorNombre + ", Tel: " + conductorTelefono);
-
-                        // Ahora cargar información detallada del vehículo
-                        cargarInformacionVehiculo(conductorId);
-                    } else {
-                        establecerValoresPorDefecto();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(String error) {
-                runOnUiThread(() -> {
-                    Log.e(TAG, "Error cargando datos del conductor: " + error);
-
-                    // ✅ Usar MyApp para logging de errores
-                    MyApp.logError(new Exception("Error cargando datos conductor: " + error));
-
-                    // ✅ Registrar evento de error
-                    registrarEventoAnalitico("error_carga_conductor", null, null);
-
-                    establecerValoresPorDefecto();
-                });
-            }
-        });
+    private void establecerUsuarioPorDefecto() {
+        usuarioNombre = "Usuario";
+        usuarioTelefono = "No disponible";
+        Map<String, Object> params = new HashMap<>();
+        params.put("accion", "usuario_por_defecto");
+        analyticsHelper.logEvent("usuario_por_defecto", params);
+        Log.w(TAG, "Usando valores por defecto para el usuario");
     }
 
-    /**
-     * Cargar información detallada del vehículo - MÉTODO NUEVO
-     */
-    private void cargarInformacionVehiculo(String conductorId) {
-        // ✅ Registrar evento de inicio de carga de vehículo
-        registrarEventoAnalitico("carga_vehiculo_inicio", null, null);
+    private void restaurarEstado(Bundle savedInstanceState) {
+        int savedAsiento = savedInstanceState.getInt("asientoSeleccionado", -1);
+        if (savedAsiento != -1) {
+            seatManager.setAsientoSeleccionado(savedAsiento);
+        }
 
-        vehiculoService.obtenerVehiculoPorConductor(conductorId, new VehiculoService.VehiculoCallback() {
-            @Override
-            public void onVehiculoCargado(Vehiculo vehiculo) {
-                runOnUiThread(() -> {
-                    if (vehiculo != null) {
-                        modeloVehiculo = vehiculo.getModelo() != null ? vehiculo.getModelo() : "No disponible";
-                        placaVehiculo = vehiculo.getPlaca() != null ? vehiculo.getPlaca() : placaVehiculo;
-                        capacidadVehiculo = vehiculo.getCapacidad() > 0 ?
-                                vehiculo.getCapacidad() : CAPACIDAD_TOTAL;
+        rutaSeleccionada = savedInstanceState.getString("rutaSeleccionada");
+        conductorNombre = savedInstanceState.getString("conductorNombre", "Cargando...");
 
-                        // ✅ Registrar evento de vehículo cargado
-                        registrarVehiculoCargadoAnalitico(vehiculo);
+        boolean isInfoExpanded = savedInstanceState.getBoolean("isInfoExpanded", true);
+        if (expandableSectionManager != null) {
+            expandableSectionManager.restoreState(isInfoExpanded);
+        }
 
-                        // Actualizar UI con información del vehículo
-                        String infoVehiculo = "Vehículo: " + placaVehiculo + " - " + modeloVehiculo;
-                        tvVehiculoInfo.setText(infoVehiculo);
-                        tvCapacidadInfo.setText("Capacidad: " + capacidadVehiculo + " asientos");
-
-                        Log.d(TAG, "✓ Información del vehículo cargada: " + infoVehiculo + ", Capacidad: " + capacidadVehiculo);
-                    } else {
-                        // Usar información básica si no se encuentra vehículo específico
-                        String infoVehiculo = "Vehículo: " + placaVehiculo + " - " + modeloVehiculo;
-                        tvVehiculoInfo.setText(infoVehiculo);
-                        tvCapacidadInfo.setText("Capacidad: " + CAPACIDAD_TOTAL + " asientos");
-
-                        // ✅ Registrar evento de vehículo no encontrado
-                        registrarEventoAnalitico("vehiculo_no_encontrado", null, null);
-
-                        Log.w(TAG, "No se encontró información detallada del vehículo, usando datos básicos");
-                    }
-                });
-            }
-
-            @Override
-            public void onError(String error) {
-                runOnUiThread(() -> {
-                    Log.e(TAG, "Error cargando vehículo: " + error);
-
-                    // ✅ Usar MyApp para logging de errores
-                    MyApp.logError(new Exception("Error cargando vehículo: " + error));
-
-                    // ✅ Registrar evento de error
-                    registrarEventoAnalitico("error_carga_vehiculo", null, null);
-
-                    // Usar información básica en caso de error
-                    String infoVehiculo = "Vehículo: " + placaVehiculo + " - " + modeloVehiculo;
-                    tvVehiculoInfo.setText(infoVehiculo);
-                    tvCapacidadInfo.setText("Capacidad: " + CAPACIDAD_TOTAL + " asientos");
-                });
-            }
-        });
+        if (usuarioNombre == null) {
+            usuarioNombre = savedInstanceState.getString("usuarioNombre");
+            usuarioTelefono = savedInstanceState.getString("usuarioTelefono");
+            usuarioId = savedInstanceState.getString("usuarioId");
+        }
     }
 
-    // Método auxiliar para establecer valores por defecto
-    private void establecerValoresPorDefecto() {
-        conductorNombre = "------";
-        conductorTelefono = "------";
-        placaVehiculo = "------";
-        modeloVehiculo = "------";
+    private void configurarSeleccionAsientos() {
+        // ✅ MEJORADO: Usar el método automático del SeatManager
+        // En lugar de definir manualmente los IDs, usamos el método configurarAsientos() sin parámetros
+        seatManager.configurarAsientos();
 
-        tvNombreConductor.setText(conductorNombre);
-        tvVehiculoInfo.setText("Vehículo: ------");
-        tvCapacidadInfo.setText("Capacidad: " + CAPACIDAD_TOTAL + " asientos");
+        // ✅ O puedes usar la versión que obtiene los IDs automáticamente:
+        // seatManager.configurarAsientos(SeatManager.getBotonesAsientosIds());
 
-        // ✅ Registrar evento de valores por defecto
-        registrarEventoAnalitico("valores_por_defecto_conductor", null, null);
+        // ✅ INFORMACIÓN ÚTIL: También puedes obtener la capacidad total
+        int capacidadTotal = seatManager.getNumeroTotalAsientos();
+        Log.d(TAG, "✅ Asientos configurados automáticamente. Capacidad total: " + capacidadTotal);
     }
 
-    /**
-     * Carga la disponibilidad de los asientos desde Firebase y actualiza la UI.
-     */
     private void cargarAsientosDesdeFirebase(String horarioId) {
         if (rutaSeleccionada == null) return;
 
-        // ✅ Registrar evento de inicio de carga de asientos
-        registrarEventoAnalitico("carga_asientos_inicio", null, null);
+        Map<String, Object> params = new HashMap<>();
+        params.put("accion", "carga_asientos_inicio");
+        analyticsHelper.logEvent("carga_asientos_inicio", params);
 
         reservaService.obtenerAsientosOcupados(horarioId, new ReservaService.AsientosCallback() {
             @Override
@@ -793,140 +390,75 @@ public class CrearReservasActivity extends AppCompatActivity {
                     ocupados.add(asiento);
                 }
 
-                // ✅ Registrar evento de asientos cargados
-                registrarAsientosCargadosAnalitico(ocupados.size(), CAPACIDAD_TOTAL);
+                // ✅ MEJORADO: Obtener capacidad total del SeatManager
+                int capacidadTotal = seatManager.getCapacidadTotal();
+                seatManager.actualizarEstadoAsientos(ocupados, capacidadTotal);
 
-                // Actualizar capacidad disponible
-                int capacidadDisponible = CAPACIDAD_TOTAL - ocupados.size();
+                // ✅ MEJORADO: Usar métodos del SeatManager para obtener información
+                int capacidadDisponible = seatManager.getCapacidadDisponible();
                 tvCapacidadDispo.setText("Capacidad disponible: " + capacidadDisponible);
 
-                for (Map.Entry<Integer, MaterialButton> entry : mapaAsientos.entrySet()) {
-                    int numAsiento = entry.getKey();
-                    MaterialButton btn = entry.getValue();
-
-                    if (ocupados.contains(numAsiento)) {
-                        btn.setIcon(ContextCompat.getDrawable(CrearReservasActivity.this,
-                                VECTOR_ASIENTO_OCUPADO));
-                        btn.setEnabled(false);
-                    } else {
-                        btn.setIcon(ContextCompat.getDrawable(CrearReservasActivity.this,
-                                VECTOR_ASIENTO_DISPONIBLE));
-                        btn.setEnabled(true);
-
-                        btn.setOnClickListener(v -> {
-                            if (asientoSeleccionado != null && mapaAsientos.containsKey(asientoSeleccionado)) {
-                                mapaAsientos.get(asientoSeleccionado).setIcon(ContextCompat.getDrawable(CrearReservasActivity.this, VECTOR_ASIENTO_DISPONIBLE));
-                            }
-
-                            asientoSeleccionado = numAsiento;
-                            btn.setIcon(ContextCompat.getDrawable(CrearReservasActivity.this,
-                                    VECTOR_ASIENTO_SELECCIONADO));
-
-                            // ✅ AGREGADO: Colapsar automáticamente la sección de información
-                            if (expandableSectionManager != null && expandableSectionManager.isExpanded()) {
-                                expandableSectionManager.collapseSection();
-                            }
-
-                            // ✅ Registrar evento de selección de asiento
-                            registrarEventoAnalitico("asiento_seleccionado", numAsiento, null);
-
-                            Toast.makeText(CrearReservasActivity.this,
-                                    "Asiento seleccionado: " + asientoSeleccionado, Toast.LENGTH_SHORT).show();
-                        });
-                    }
-                }
+                Log.d(TAG, "✅ Estado actualizado - Ocupados: " + ocupados.size() +
+                        ", Disponibles: " + capacidadDisponible);
             }
 
             @Override
             public void onError(String error) {
-                Toast.makeText(CrearReservasActivity.this, "Error al obtener disponibilidad: " + error,
-                        Toast.LENGTH_SHORT).show();
-
-                // ✅ Usar MyApp para logging de errores
+                Toast.makeText(CrearReservasActivity.this,
+                        "Error al obtener disponibilidad: " + error, Toast.LENGTH_SHORT).show();
                 MyApp.logError(new Exception("Error obteniendo asientos: " + error));
-
-                // ✅ Registrar evento de error
-                registrarEventoAnalitico("error_carga_asientos", null, null);
+                analyticsHelper.logError("carga_asientos", error);
             }
         });
     }
 
-    /**
-     * Configura la selección de asientos y gestiona la lógica de clic en cada uno.
-     */
-    private void configurarSeleccionAsientos() {
-        int[] botonesAsientos = {
-                R.id.btnAsiento1, R.id.btnAsiento2, R.id.btnAsiento3, R.id.btnAsiento4,
-                R.id.btnAsiento5, R.id.btnAsiento6, R.id.btnAsiento7, R.id.btnAsiento8,
-                R.id.btnAsiento9, R.id.btnAsiento10, R.id.btnAsiento11, R.id.btnAsiento12,
-                R.id.btnAsiento13
-        };
-
-        for (int i = 0; i < botonesAsientos.length; i++) {
-            MaterialButton btnAsiento = findViewById(botonesAsientos[i]);
-            int numeroAsiento = i + 1;
-            btnAsiento.setTag(numeroAsiento);
-            btnAsiento.setVisibility(View.VISIBLE);
-
-            // IMPORTANTE: Remover el tint del icono
-            btnAsiento.setIconTint(null);
-
-            mapaAsientos.put(numeroAsiento, btnAsiento);
-        }
-
-        // ✅ Registrar evento de configuración de asientos
-        registrarEventoAnalitico("asientos_configurados", botonesAsientos.length, null);
-    }
-
-    /**
-     * Valida que el usuario haya seleccionado una ruta y un asiento antes de continuar.
-     */
     private void validacionesReserva() {
         if (rutaSeleccionada == null) {
             Toast.makeText(this, "Error: No hay ruta seleccionada", Toast.LENGTH_SHORT).show();
-
-            // ✅ Registrar evento de validación fallida
-            registrarEventoAnalitico("validacion_fallida_sin_ruta", null, null);
-
+            analyticsHelper.logValidacionFallida("sin_ruta");
             return;
         }
-        if (asientoSeleccionado == null) {
+
+        if (!seatManager.hasAsientoSeleccionado()) {
             Toast.makeText(this, "Selecciona un asiento", Toast.LENGTH_SHORT).show();
-
-            // ✅ Registrar evento de validación fallida
-            registrarEventoAnalitico("validacion_fallida_sin_asiento", null, null);
-
+            analyticsHelper.logValidacionFallida("sin_asiento");
             return;
         }
 
-        // ✅ Registrar evento de validación exitosa
-        registrarEventoAnalitico("validacion_exitosa_crear_reserva", asientoSeleccionado, null);
-
+        analyticsHelper.logValidacionExitosa(seatManager.getAsientoSeleccionado(), rutaSeleccionada);
         enviarConfirmarReserva();
     }
 
-    /**
-     * Enviar la informacion a la interfaz de confirmarReserva - MÉTODO MEJORADO
-     */
     private void enviarConfirmarReserva() {
-        Intent confirmarReserva = new Intent(CrearReservasActivity.this, ConfirmarReservaActivity.class);
+        Intent confirmarReserva = new Intent(this, ConfirmarReservaActivity.class);
 
-        // DEBUG: Verificar qué datos vamos a enviar
         Log.d(TAG, "📤 ENVIANDO DATOS A CONFIRMAR RESERVA:");
-        Log.d(TAG, "  - Usuario Nombre: " + usuarioNombre);
-        Log.d(TAG, "  - Usuario Teléfono: " + usuarioTelefono);
-        Log.d(TAG, "  - Usuario ID: " + usuarioId);
+        Log.d(TAG, "  - Asiento: " + seatManager.getAsientoSeleccionado());
 
-        // ✅ Registrar evento de envío a confirmar reserva
-        registrarEventoAnalitico("envio_a_confirmar_reserva", asientoSeleccionado, null);
-        registrarDetallesReservaAnalitico();
+        Map<String, Object> params = new HashMap<>();
+        params.put("asiento", seatManager.getAsientoSeleccionado());
+        params.put("accion", "envio_a_confirmar_reserva");
+        analyticsHelper.logEvent("envio_a_confirmar_reserva", params);
+
+        Map<String, Object> detallesParams = new HashMap<>();
+        detallesParams.put("asiento", seatManager.getAsientoSeleccionado());
+        detallesParams.put("ruta", rutaSeleccionada != null ? rutaSeleccionada : "N/A");
+        detallesParams.put("horario", horarioHora != null ? horarioHora : "N/A");
+        detallesParams.put("conductor_nombre", conductorNombre);
+        detallesParams.put("vehiculo_placa", placaVehiculo);
+        analyticsHelper.logEvent("detalles_reserva_crear", detallesParams);
 
         // Información básica del viaje
-        confirmarReserva.putExtra("asientoSeleccionado", asientoSeleccionado);
+        confirmarReserva.putExtra("asientoSeleccionado", seatManager.getAsientoSeleccionado());
         confirmarReserva.putExtra("rutaSelecionada", rutaSeleccionada);
         confirmarReserva.putExtra("horarioId", horarioId);
         confirmarReserva.putExtra("horarioHora", horarioHora);
         confirmarReserva.putExtra("fechaViaje", obtenerFechaDelViaje());
+
+        // ✅ MEJORADO: Enviar información de capacidad desde el SeatManager
+        confirmarReserva.putExtra("capacidadTotal", seatManager.getCapacidadTotal());
+        confirmarReserva.putExtra("capacidadDisponible", seatManager.getCapacidadDisponible());
+        confirmarReserva.putExtra("asientosOcupados", seatManager.getAsientosOcupadosCount());
 
         // Información del conductor
         confirmarReserva.putExtra("conductorNombre", conductorNombre);
@@ -943,52 +475,379 @@ public class CrearReservasActivity extends AppCompatActivity {
         confirmarReserva.putExtra("usuarioTelefono", usuarioTelefono);
         confirmarReserva.putExtra("usuarioId", usuarioId);
 
-        // Información adicional del viaje
+        // Información adicional
         String[] partesRuta = rutaSeleccionada.split(" -> ");
         if (partesRuta.length == 2) {
             confirmarReserva.putExtra("origen", partesRuta[0].trim());
             confirmarReserva.putExtra("destino", partesRuta[1].trim());
         }
 
-        confirmarReserva.putExtra("precio", 12000.0); // Precio fijo por ahora
+        confirmarReserva.putExtra("precio", 12000.0);
         confirmarReserva.putExtra("tiempoEstimado",
                 rutaSeleccionada.contains("Natagá -> La Plata") ? "60 min" : "55 min");
-
-        Log.d(TAG, "Enviando datos a ConfirmarReserva - Conductor: " + conductorNombre +
-                ", Vehículo: " + placaVehiculo + " - " + modeloVehiculo +
-                ", Usuario: " + usuarioNombre);
 
         startActivity(confirmarReserva);
     }
 
-    /**
-     * Manejar el botón físico de back
-     */
-    @Override
-    public void onBackPressed() {
-        // ✅ Registrar evento de botón físico back
-        registrarEventoAnalitico("boton_back_fisico", null, null);
-        volverAtras();
+    private void mostrarErrorSinHorario() {
+        analyticsHelper.logError("sin_horario_id", "No se recibió información del horario");
+        Toast.makeText(this, "Error: No se recibió información del horario", Toast.LENGTH_SHORT).show();
+        finish();
     }
+
+    // ============================================================
+    // Métodos de SeatSelectionListener
+    // ============================================================
+
+    @Override
+    public void onSeatSelected(int seatNumber) {
+        Log.d(TAG, "✅ Asiento " + seatNumber + " seleccionado");
+
+        // ✅ MEJORADO: Usar métodos del SeatManager para obtener información
+        int capacidadTotal = seatManager.getCapacidadTotal();
+        int disponibles = seatManager.getCapacidadDisponible();
+        Log.d(TAG, "  - Capacidad total: " + capacidadTotal);
+        Log.d(TAG, "  - Disponibles: " + disponibles);
+    }
+
+    @Override
+    public void onSeatDeselected(int seatNumber) {
+        Log.d(TAG, "✅ Asiento " + seatNumber + " deseleccionado");
+    }
+
+    @Override
+    public void onExpandableSectionRequestedToCollapse() {
+        if (expandableSectionManager != null && expandableSectionManager.isExpanded()) {
+            expandableSectionManager.collapseSection();
+        }
+    }
+
+    // ============================================================
+    // Métodos de fecha/hora (sin cambios)
+    // ============================================================
+
+    private String obtenerFechaDelViaje() {
+        Calendar calendar = Calendar.getInstance();
+        Calendar ahora = Calendar.getInstance();
+
+        if (horarioHora != null && esHorarioEnElPasado(horarioHora, ahora)) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            Log.d(TAG, "Horario en el pasado detectado: " + horarioHora);
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM 'del' yyyy", new Locale("es", "ES"));
+        String fecha = sdf.format(calendar.getTime());
+        return fecha.substring(0, 1).toUpperCase() + fecha.substring(1);
+    }
+
+    private boolean esHorarioEnElPasado(String horarioSeleccionado, Calendar ahora) {
+        try {
+            SimpleDateFormat formato12h = new SimpleDateFormat("h:mm a", Locale.US);
+            Date horaSeleccionadaDate = formato12h.parse(horarioSeleccionado);
+
+            if (horaSeleccionadaDate != null) {
+                Calendar calSeleccionado = Calendar.getInstance();
+                calSeleccionado.setTime(horaSeleccionadaDate);
+
+                int horaSeleccionada = calSeleccionado.get(Calendar.HOUR);
+                int minutosSeleccionados = calSeleccionado.get(Calendar.MINUTE);
+                int amPmSeleccionado = calSeleccionado.get(Calendar.AM_PM);
+
+                int horaActual = ahora.get(Calendar.HOUR);
+                int minutosActuales = ahora.get(Calendar.MINUTE);
+                int amPmActual = ahora.get(Calendar.AM_PM);
+
+                int horaSeleccionada24 = convertirA24Horas(horaSeleccionada, amPmSeleccionado);
+                int horaActual24 = convertirA24Horas(horaActual, amPmActual);
+
+                if (horaSeleccionada24 < horaActual24) {
+                    return true;
+                } else if (horaSeleccionada24 == horaActual24) {
+                    return minutosSeleccionados <= minutosActuales;
+                }
+                return false;
+            }
+        } catch (ParseException e) {
+            Log.e(TAG, "Error al parsear horario: " + horarioSeleccionado, e);
+            MyApp.logError(e);
+            return esHorarioEnElPasadoSimple(horarioSeleccionado);
+        }
+        return false;
+    }
+
+    private int convertirA24Horas(int hora12, int amPm) {
+        if (amPm == Calendar.PM && hora12 != 12) {
+            return hora12 + 12;
+        } else if (amPm == Calendar.AM && hora12 == 12) {
+            return 0;
+        }
+        return hora12;
+    }
+
+    private boolean esHorarioEnElPasadoSimple(String horario) {
+        if (horario == null) return false;
+
+        Calendar ahora = Calendar.getInstance();
+        int horaActual24 = ahora.get(Calendar.HOUR_OF_DAY);
+        int minutoActual = ahora.get(Calendar.MINUTE);
+
+        String horarioUpper = horario.toUpperCase();
+
+        try {
+            String[] partes = horario.split(":");
+            if (partes.length >= 2) {
+                int horaSeleccionada = Integer.parseInt(partes[0].trim());
+                String[] minutosYAmPm = partes[1].split(" ");
+                int minutosSeleccionados = Integer.parseInt(minutosYAmPm[0].trim());
+
+                if (horarioUpper.contains("PM") && horaSeleccionada != 12) {
+                    horaSeleccionada += 12;
+                } else if (horarioUpper.contains("AM") && horaSeleccionada == 12) {
+                    horaSeleccionada = 0;
+                }
+
+                if (horaSeleccionada < horaActual24) {
+                    return true;
+                } else if (horaSeleccionada == horaActual24) {
+                    return minutosSeleccionados <= minutoActual;
+                }
+            }
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "Error en fallback parser para: " + horario);
+            MyApp.logError(e);
+        }
+        return false;
+    }
+
+    private String obtenerHoraActualFormateada() {
+        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
+        return sdf.format(new Date());
+    }
+
+    // ============================================================
+    // Métodos de conductor/vehículo (con mejoras para usar SeatManager)
+    // ============================================================
+
+    private void cargarInformacionVehiculoYConductor() {
+        Log.d(TAG, "Cargando información del vehículo y conductor...");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("accion", "carga_info_vehiculo_conductor_inicio");
+        analyticsHelper.logEvent("carga_info_vehiculo_conductor_inicio", params);
+
+        buscarConductorPorHorario();
+    }
+
+    private void buscarConductorPorHorario() {
+        Log.d(TAG, "Buscando conductor para el horario: " + horarioId);
+
+        DatabaseReference conductoresRef = MyApp.getDatabaseReference("conductores");
+
+        conductoresRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                boolean conductorEncontrado = false;
+
+                for (DataSnapshot conductorSnapshot : snapshot.getChildren()) {
+                    if (conductorSnapshot.hasChild("horariosAsignados")) {
+                        DataSnapshot horariosAsignadosSnapshot = conductorSnapshot.child("horariosAsignados");
+
+                        for (DataSnapshot horarioAsignadoSnapshot : horariosAsignadosSnapshot.getChildren()) {
+                            String horarioAsignado = horarioAsignadoSnapshot.getValue(String.class);
+                            if (horarioId != null && horarioId.equals(horarioAsignado)) {
+                                conductorId = conductorSnapshot.getKey();
+                                Log.d(TAG, "Conductor encontrado: " + conductorId);
+
+                                Map<String, Object> params = new HashMap<>();
+                                params.put("conductor_encontrado", 1);
+                                analyticsHelper.logEvent("conductor_encontrado", params);
+
+                                cargarInformacionConductor(conductorId);
+                                conductorEncontrado = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (conductorEncontrado) break;
+                }
+
+                if (!conductorEncontrado) {
+                    Log.w(TAG, "No se encontró conductor para el horario " + horarioId);
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("accion", "conductor_no_encontrado");
+                    analyticsHelper.logEvent("conductor_no_encontrado", params);
+
+                    runOnUiThread(() -> {
+                        conductorNombre = "------";
+                        conductorTelefono = "------";
+                        tvNombreConductor.setText(conductorNombre);
+                        tvVehiculoInfo.setText("Vehículo: ------");
+
+                        // ✅ MEJORADO: Actualizar capacidad usando SeatManager
+                        tvCapacidadInfo.setText("Capacidad: " + seatManager.getCapacidadTotal() + " asientos");
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                runOnUiThread(() -> {
+                    Log.e(TAG, "Error buscando conductor: " + error.getMessage());
+                    MyApp.logError(new Exception("Error buscando conductor: " + error.getMessage()));
+                    analyticsHelper.logError("busqueda_conductor", error.getMessage());
+
+                    conductorNombre = "------";
+                    conductorTelefono = "------";
+                    tvNombreConductor.setText(conductorNombre);
+                    tvVehiculoInfo.setText("Vehículo: ------");
+
+                    // ✅ MEJORADO: Actualizar capacidad usando SeatManager
+                    tvCapacidadInfo.setText("Capacidad: " + seatManager.getCapacidadTotal() + " asientos");
+                });
+            }
+        });
+    }
+
+    private void cargarInformacionConductor(String conductorId) {
+        Log.d(TAG, "Cargando información del conductor: " + conductorId);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("accion", "carga_conductor_inicio");
+        analyticsHelper.logEvent("carga_conductor_inicio", params);
+
+        userService.loadDriverData(conductorId, new UserService.DriverDataCallback() {
+            @Override
+            public void onDriverDataLoaded(String nombre, String telefono, String placa, List<String> horariosAsignados) {
+                runOnUiThread(() -> {
+                    if (nombre != null && !nombre.isEmpty()) {
+                        conductorNombre = nombre;
+                        conductorTelefono = telefono != null ? telefono : "No disponible";
+                        placaVehiculo = placa != null ? placa : "No disponible";
+
+                        tvNombreConductor.setText(conductorNombre);
+                        analyticsHelper.logConductorCargado(conductorId, nombre, telefono);
+
+                        Log.d(TAG, "✓ Conductor cargado: " + conductorNombre);
+                        cargarInformacionVehiculo(conductorId);
+                    } else {
+                        establecerValoresPorDefectoConductor();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                runOnUiThread(() -> {
+                    Log.e(TAG, "Error cargando datos del conductor: " + error);
+                    MyApp.logError(new Exception("Error cargando datos conductor: " + error));
+                    analyticsHelper.logError("carga_conductor", error);
+                    establecerValoresPorDefectoConductor();
+                });
+            }
+        });
+    }
+
+    private void cargarInformacionVehiculo(String conductorId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("accion", "carga_vehiculo_inicio");
+        analyticsHelper.logEvent("carga_vehiculo_inicio", params);
+
+        vehiculoService.obtenerVehiculoPorConductor(conductorId, new VehiculoService.VehiculoCallback() {
+            @Override
+            public void onVehiculoCargado(Vehiculo vehiculo) {
+                runOnUiThread(() -> {
+                    if (vehiculo != null) {
+                        modeloVehiculo = vehiculo.getModelo() != null ? vehiculo.getModelo() : "No disponible";
+                        placaVehiculo = vehiculo.getPlaca() != null ? vehiculo.getPlaca() : placaVehiculo;
+                        capacidadVehiculo = vehiculo.getCapacidad() > 0 ?
+                                vehiculo.getCapacidad() : seatManager.getCapacidadTotal();
+
+                        analyticsHelper.logVehiculoCargado(vehiculo, conductorId);
+
+                        String infoVehiculo = "Vehículo: " + placaVehiculo + " - " + modeloVehiculo;
+                        tvVehiculoInfo.setText(infoVehiculo);
+
+                        // ✅ MEJORADO: Si el vehículo tiene capacidad diferente, podemos reconfigurar los asientos
+                        if (capacidadVehiculo != seatManager.getCapacidadTotal()) {
+                            Log.w(TAG, "⚠️ Capacidad del vehículo (" + capacidadVehiculo +
+                                    ") difiere de la configuración actual (" +
+                                    seatManager.getCapacidadTotal() + ")");
+                            // Aquí podrías añadir lógica para manejar diferentes capacidades si es necesario
+                        }
+
+                        tvCapacidadInfo.setText("Capacidad: " + capacidadVehiculo + " asientos");
+
+                        Log.d(TAG, "✓ Vehículo cargado: " + infoVehiculo);
+                    } else {
+                        // ✅ MEJORADO: Usar capacidad del SeatManager por defecto
+                        capacidadVehiculo = seatManager.getCapacidadTotal();
+                        String infoVehiculo = "Vehículo: " + placaVehiculo + " - " + modeloVehiculo;
+                        tvVehiculoInfo.setText(infoVehiculo);
+                        tvCapacidadInfo.setText("Capacidad: " + capacidadVehiculo + " asientos");
+
+                        Map<String, Object> params = new HashMap<>();
+                        params.put("accion", "vehiculo_no_encontrado");
+                        analyticsHelper.logEvent("vehiculo_no_encontrado", params);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                runOnUiThread(() -> {
+                    Log.e(TAG, "Error cargando vehículo: " + error);
+                    MyApp.logError(new Exception("Error cargando vehículo: " + error));
+                    analyticsHelper.logError("carga_vehiculo", error);
+
+                    // ✅ MEJORADO: Usar capacidad del SeatManager por defecto
+                    capacidadVehiculo = seatManager.getCapacidadTotal();
+                    String infoVehiculo = "Vehículo: " + placaVehiculo + " - " + modeloVehiculo;
+                    tvVehiculoInfo.setText(infoVehiculo);
+                    tvCapacidadInfo.setText("Capacidad: " + capacidadVehiculo + " asientos");
+                });
+            }
+        });
+    }
+
+    private void establecerValoresPorDefectoConductor() {
+        conductorNombre = "------";
+        conductorTelefono = "------";
+        placaVehiculo = "------";
+        modeloVehiculo = "------";
+
+        tvNombreConductor.setText(conductorNombre);
+        tvVehiculoInfo.setText("Vehículo: ------");
+
+        // ✅ MEJORADO: Usar capacidad del SeatManager por defecto
+        tvCapacidadInfo.setText("Capacidad: " + seatManager.getCapacidadTotal() + " asientos");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("accion", "valores_por_defecto_conductor");
+        analyticsHelper.logEvent("valores_por_defecto_conductor", params);
+    }
+
+    // ============================================================
+    // Métodos del ciclo de vida
+    // ============================================================
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (asientoSeleccionado != null) {
-            outState.putInt("asientoSeleccionado", asientoSeleccionado);
+
+        if (seatManager.hasAsientoSeleccionado()) {
+            outState.putInt("asientoSeleccionado", seatManager.getAsientoSeleccionado());
         }
+
         if (rutaSeleccionada != null) {
             outState.putString("rutaSeleccionada", rutaSeleccionada);
         }
         outState.putString("conductorNombre", conductorNombre);
         outState.putString("conductorTelefono", conductorTelefono);
 
-        // ✅ AGREGAR: Guardar estado de la sección expandible
         if (expandableSectionManager != null) {
             outState.putBoolean("isInfoExpanded", expandableSectionManager.isExpanded());
         }
 
-        // ✅ AGREGAR: Guardar datos del usuario
         if (usuarioNombre != null) outState.putString("usuarioNombre", usuarioNombre);
         if (usuarioTelefono != null) outState.putString("usuarioTelefono", usuarioTelefono);
         if (usuarioId != null) outState.putString("usuarioId", usuarioId);
@@ -997,153 +856,35 @@ public class CrearReservasActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "📱 onResume - Actividad en primer plano");
-
-        // ✅ Registrar evento analítico de resumen
-        registrarEventoAnalitico("pantalla_crear_reservas_resume", null, null);
+        Log.d(TAG, "📱 onResume");
+        Map<String, Object> params = new HashMap<>();
+        params.put("accion", "pantalla_crear_reservas_resume");
+        analyticsHelper.logEvent("pantalla_crear_reservas_resume", params);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "📱 onDestroy - Actividad destruida");
+        Log.d(TAG, "📱 onDestroy");
 
-        // ✅ Registrar evento de destrucción
-        registrarEventoAnalitico("pantalla_crear_reservas_destroy", null, null);
+        Map<String, Object> params = new HashMap<>();
+        params.put("accion", "pantalla_crear_reservas_destroy");
+        analyticsHelper.logEvent("pantalla_crear_reservas_destroy", params);
 
-        // ✅ AGREGAR: Limpiar el manager
+        if (seatManager != null) {
+            seatManager.cleanup();
+        }
+
         if (expandableSectionManager != null) {
             expandableSectionManager.cleanup();
         }
     }
 
-    /**
-     * ✅ MÉTODO AUXILIAR: Registrar eventos analíticos usando MyApp
-     */
-    private void registrarEventoAnalitico(String evento, Integer asiento, Integer count2) {
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("user_id", MyApp.getCurrentUserId());
-            params.put("pantalla", "CrearReservas");
-
-            if (asiento != null) {
-                params.put("asiento", asiento);
-            }
-            if (count2 != null) {
-                params.put("count2", count2);
-            }
-
-            params.put("ruta", rutaSeleccionada != null ? rutaSeleccionada : "N/A");
-            params.put("horario", horarioHora != null ? horarioHora : "N/A");
-            params.put("timestamp", System.currentTimeMillis());
-
-            MyApp.logEvent(evento, params);
-            Log.d(TAG, "📊 Evento analítico registrado: " + evento);
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando evento analítico: " + e.getMessage());
-        }
-    }
-
-    /**
-     * ✅ MÉTODO AUXILIAR: Registrar usuario cargado usando MyApp
-     */
-    private void registrarUsuarioCargadoAnalitico() {
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("user_id", MyApp.getCurrentUserId());
-            params.put("user_nombre", usuarioNombre != null ? usuarioNombre : "N/A");
-            params.put("user_telefono", usuarioTelefono != null ? usuarioTelefono : "N/A");
-            params.put("timestamp", System.currentTimeMillis());
-            params.put("pantalla", "CrearReservas");
-
-            MyApp.logEvent("usuario_cargado_crear_reserva", params);
-            Log.d(TAG, "📊 Usuario cargado registrado en analytics");
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando usuario cargado: " + e.getMessage());
-        }
-    }
-
-    /**
-     * ✅ MÉTODO AUXILIAR: Registrar conductor cargado usando MyApp
-     */
-    private void registrarConductorCargadoAnalitico(String nombre, String telefono) {
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("user_id", MyApp.getCurrentUserId());
-            params.put("conductor_id", conductorId);
-            params.put("conductor_nombre", nombre);
-            params.put("conductor_telefono", telefono != null ? telefono : "N/A");
-            params.put("timestamp", System.currentTimeMillis());
-            params.put("pantalla", "CrearReservas");
-
-            MyApp.logEvent("conductor_cargado_crear_reserva", params);
-            Log.d(TAG, "📊 Conductor cargado registrado en analytics");
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando conductor cargado: " + e.getMessage());
-        }
-    }
-
-    /**
-     * ✅ MÉTODO AUXILIAR: Registrar vehículo cargado usando MyApp
-     */
-    private void registrarVehiculoCargadoAnalitico(Vehiculo vehiculo) {
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("user_id", MyApp.getCurrentUserId());
-            params.put("conductor_id", conductorId);
-            params.put("vehiculo_placa", vehiculo.getPlaca() != null ? vehiculo.getPlaca() : "N/A");
-            params.put("vehiculo_modelo", vehiculo.getModelo() != null ? vehiculo.getModelo() : "N/A");
-            params.put("vehiculo_capacidad", vehiculo.getCapacidad());
-            params.put("timestamp", System.currentTimeMillis());
-            params.put("pantalla", "CrearReservas");
-
-            MyApp.logEvent("vehiculo_cargado_crear_reserva", params);
-            Log.d(TAG, "📊 Vehículo cargado registrado en analytics");
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando vehículo cargado: " + e.getMessage());
-        }
-    }
-
-    /**
-     * ✅ MÉTODO AUXILIAR: Registrar asientos cargados usando MyApp
-     */
-    private void registrarAsientosCargadosAnalitico(int asientosOcupados, int capacidadTotal) {
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("user_id", MyApp.getCurrentUserId());
-            params.put("asientos_ocupados", asientosOcupados);
-            params.put("capacidad_total", capacidadTotal);
-            params.put("asientos_disponibles", capacidadTotal - asientosOcupados);
-            params.put("horario", horarioHora != null ? horarioHora : "N/A");
-            params.put("timestamp", System.currentTimeMillis());
-            params.put("pantalla", "CrearReservas");
-
-            MyApp.logEvent("asientos_cargados_crear_reserva", params);
-            Log.d(TAG, "📊 Asientos cargados registrado en analytics");
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando asientos cargados: " + e.getMessage());
-        }
-    }
-
-    /**
-     * ✅ MÉTODO AUXILIAR: Registrar detalles de reserva usando MyApp
-     */
-    private void registrarDetallesReservaAnalitico() {
-        try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("user_id", MyApp.getCurrentUserId());
-            params.put("asiento", asientoSeleccionado);
-            params.put("ruta", rutaSeleccionada != null ? rutaSeleccionada : "N/A");
-            params.put("horario", horarioHora != null ? horarioHora : "N/A");
-            params.put("conductor_nombre", conductorNombre);
-            params.put("vehiculo_placa", placaVehiculo);
-            params.put("timestamp", System.currentTimeMillis());
-            params.put("pantalla", "CrearReservas");
-
-            MyApp.logEvent("detalles_reserva_crear", params);
-            Log.d(TAG, "📊 Detalles de reserva registrados en analytics");
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error registrando detalles de reserva: " + e.getMessage());
-        }
+    @Override
+    public void onBackPressed() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("accion", "boton_back_fisico");
+        analyticsHelper.logEvent("boton_back_fisico", params);
+        volverAtras();
     }
 }
