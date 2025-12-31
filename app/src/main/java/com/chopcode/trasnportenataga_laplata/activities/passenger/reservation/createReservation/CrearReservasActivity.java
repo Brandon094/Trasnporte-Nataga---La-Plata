@@ -19,6 +19,8 @@ import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.analytics.ReservationAnalyticsHelper;
 import com.chopcode.trasnportenataga_laplata.managers.seats.SeatManager;
 import com.chopcode.trasnportenataga_laplata.managers.ui.ExpandableSectionManager;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.ReservationNavigationManager;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.ReservationStateManager;
 import com.chopcode.trasnportenataga_laplata.managers.reservations.dataprocessor.ReservationDataProcessor;
 import com.chopcode.trasnportenataga_laplata.managers.reservations.DriverVehicleManager;
 import com.chopcode.trasnportenataga_laplata.managers.reservations.ReservationUserManager;
@@ -77,7 +79,8 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
     private SeatManager seatManager;
     private ReservationDataProcessor reservationDataProcessor;
     private DriverVehicleManager driverVehicleManager;
-    private ReservationUserManager reservationUserManager; // ✅ NUEVO MANAGER
+    private ReservationUserManager reservationUserManager;
+    private ReservationNavigationManager reservationNavigationManager; // ✅ NUEVO MANAGER
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +92,7 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
 
         // ✅ Inicializar managers
         reservationDataProcessor = new ReservationDataProcessor(analyticsHelper);
-        reservationUserManager = new ReservationUserManager(analyticsHelper); // ✅ NUEVO
+        reservationUserManager = new ReservationUserManager(analyticsHelper);
 
         setContentView(R.layout.activity_crear_reservas);
 
@@ -99,6 +102,13 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
 
         // ✅ Inicializar DriverVehicleManager
         driverVehicleManager = new DriverVehicleManager(this, analyticsHelper, seatManager);
+
+        // ✅ Inicializar ReservationNavigationManager
+        reservationNavigationManager = new ReservationNavigationManager(
+                this,
+                analyticsHelper,
+                seatManager
+        );
 
         // Obtener datos del intent
         obtenerDatosDelIntent();
@@ -121,7 +131,7 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
         // ✅ REFACTORIZADO: Cargar usuario usando ReservationUserManager
         cargarUsuario();
 
-        // Restaurar estado si existe
+        // ✅ REFACTORIZADO: Restaurar estado usando ReservationStateManager
         if (savedInstanceState != null) {
             restaurarEstado(savedInstanceState);
         }
@@ -215,6 +225,7 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
+        // ✅ REFACTORIZADO: Usar ReservationNavigationManager para navegación
         topAppBar.setNavigationOnClickListener(v -> {
             analyticsHelper.logClickBoton("navegacion_atras");
             volverAtras();
@@ -226,30 +237,19 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
         });
     }
 
+    // ✅ REFACTORIZADO: Usando ReservationNavigationManager para volver atrás
     private void volverAtras() {
-        if (seatManager.hasAsientoSeleccionado()) {
-            Map<String, Object> params = new HashMap<>();
-            params.put("asiento", seatManager.getAsientoSeleccionado());
-            analyticsHelper.logEvent("dialogo_cancelar_asiento", params);
+        reservationNavigationManager.handleBackAction(new ReservationNavigationManager.NavigationCallback() {
+            @Override
+            public void onConfirmNavigation() {
+                finish();
+            }
 
-            new android.app.AlertDialog.Builder(this)
-                    .setTitle("Cancelar selección")
-                    .setMessage("¿Estás seguro de que quieres cancelar la selección de asiento?")
-                    .setPositiveButton("Sí", (dialog, which) -> {
-                        analyticsHelper.logEvent("cancelacion_asiento_confirmada", params);
-                        finish();
-                    })
-                    .setNegativeButton("No", (dialog, which) -> {
-                        analyticsHelper.logEvent("cancelacion_asiento_rechazada", params);
-                        dialog.dismiss();
-                    })
-                    .show();
-        } else {
-            Map<String, Object> params = new HashMap<>();
-            params.put("accion", "navegacion_atras_simple");
-            analyticsHelper.logEvent("navegacion_atras_simple", params);
-            finish();
-        }
+            @Override
+            public void onCancelNavigation() {
+                // El usuario canceló, no hacer nada
+            }
+        });
     }
 
     private void configurarInformacionBasica() {
@@ -306,16 +306,41 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
         }
     }
 
+    // ✅ REFACTORIZADO: Usando ReservationStateManager para restaurar estado
     private void restaurarEstado(Bundle savedInstanceState) {
-        int savedAsiento = savedInstanceState.getInt("asientoSeleccionado", -1);
-        if (savedAsiento != -1) {
-            seatManager.setAsientoSeleccionado(savedAsiento);
+        ReservationStateManager.RestoredState restoredState = ReservationStateManager.restoreState(
+                savedInstanceState,
+                seatManager,
+                expandableSectionManager
+        );
+
+        // Actualizar variables locales con el estado restaurado
+        if (restoredState.asientoSeleccionado != null) {
+            seatManager.setAsientoSeleccionado(restoredState.asientoSeleccionado);
         }
 
-        rutaSeleccionada = savedInstanceState.getString("rutaSeleccionada");
-        conductorNombre = savedInstanceState.getString("conductorNombre", "Cargando...");
+        if (restoredState.rutaSeleccionada != null) {
+            rutaSeleccionada = restoredState.rutaSeleccionada;
+        }
 
-        // ✅ Obtener datos del DriverVehicleManager si ya estaban cargados
+        if (restoredState.conductorNombre != null) {
+            conductorNombre = restoredState.conductorNombre;
+        }
+
+        if (restoredState.conductorTelefono != null) {
+            conductorTelefono = restoredState.conductorTelefono;
+        }
+
+        // ✅ Restaurar datos del usuario desde estado
+        if (restoredState.usuarioNombre != null) {
+            reservationUserManager.updateFromIntent(
+                    restoredState.usuarioId,
+                    restoredState.usuarioNombre,
+                    restoredState.usuarioTelefono
+            );
+        }
+
+        // ✅ Obtener datos adicionales del DriverVehicleManager si ya estaban cargados
         if (driverVehicleManager != null) {
             conductorNombre = driverVehicleManager.getConductorNombre();
             conductorTelefono = driverVehicleManager.getConductorTelefono();
@@ -325,19 +350,7 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
             conductorId = driverVehicleManager.getConductorId();
         }
 
-        boolean isInfoExpanded = savedInstanceState.getBoolean("isInfoExpanded", true);
-        if (expandableSectionManager != null) {
-            expandableSectionManager.restoreState(isInfoExpanded);
-        }
-
-        // ✅ Restaurar datos del usuario desde savedInstanceState
-        String savedUsuarioId = savedInstanceState.getString("usuarioId");
-        String savedUsuarioNombre = savedInstanceState.getString("usuarioNombre");
-        String savedUsuarioTelefono = savedInstanceState.getString("usuarioTelefono");
-
-        if (savedUsuarioNombre != null) {
-            reservationUserManager.updateFromIntent(savedUsuarioId, savedUsuarioNombre, savedUsuarioTelefono);
-        }
+        Log.d(TAG, "✅ Estado restaurado usando ReservationStateManager");
     }
 
     private void configurarSeleccionAsientos() {
@@ -520,31 +533,20 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (seatManager.hasAsientoSeleccionado()) {
-            outState.putInt("asientoSeleccionado", seatManager.getAsientoSeleccionado());
-        }
+        // ✅ REFACTORIZADO: Usar ReservationStateManager para guardar estado
+        ReservationStateManager.saveState(
+                outState,
+                seatManager,
+                rutaSeleccionada,
+                conductorNombre != null ? conductorNombre : "Cargando...",
+                conductorTelefono,
+                expandableSectionManager,
+                reservationUserManager.getUsuarioNombre(),
+                reservationUserManager.getUsuarioTelefono(),
+                reservationUserManager.getUsuarioId()
+        );
 
-        if (rutaSeleccionada != null) {
-            outState.putString("rutaSeleccionada", rutaSeleccionada);
-        }
-
-        // ✅ Guardar datos del DriverVehicleManager
-        if (driverVehicleManager != null) {
-            outState.putString("conductorNombre", driverVehicleManager.getConductorNombre());
-            outState.putString("conductorTelefono", driverVehicleManager.getConductorTelefono());
-        } else {
-            outState.putString("conductorNombre", conductorNombre);
-            outState.putString("conductorTelefono", conductorTelefono);
-        }
-
-        // ✅ Guardar datos del ReservationUserManager
-        outState.putString("usuarioId", reservationUserManager.getUsuarioId());
-        outState.putString("usuarioNombre", reservationUserManager.getUsuarioNombre());
-        outState.putString("usuarioTelefono", reservationUserManager.getUsuarioTelefono());
-
-        if (expandableSectionManager != null) {
-            outState.putBoolean("isInfoExpanded", expandableSectionManager.isExpanded());
-        }
+        Log.d(TAG, "✅ Estado guardado usando ReservationStateManager");
     }
 
     @Override
@@ -576,9 +578,8 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
 
     @Override
     public void onBackPressed() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("accion", "boton_back_fisico");
-        analyticsHelper.logEvent("boton_back_fisico", params);
+        // ✅ REFACTORIZADO: Usar ReservationNavigationManager para el botón físico back
+        reservationNavigationManager.logPhysicalBackButton();
         volverAtras();
     }
 }
