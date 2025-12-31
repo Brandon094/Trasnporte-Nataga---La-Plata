@@ -140,6 +140,11 @@ public class InicioUsuariosActivity extends AppCompatActivity implements
     public void onCountersLoaded(int reservasCount, int viajesCount) {
         runOnUiThread(() -> {
             uiManager.updateCounters(reservasCount, viajesCount);
+
+            // Mostrar notificación solo si hay cambios importantes
+            if (reservasCount > 0) {
+                Log.d(TAG, "📊 Contadores actualizados: " + reservasCount + " reservas activas");
+            }
         });
     }
 
@@ -147,6 +152,7 @@ public class InicioUsuariosActivity extends AppCompatActivity implements
     public void onCountersError(String error) {
         runOnUiThread(() -> {
             uiManager.updateCounters(0, 0);
+            Log.e(TAG, "❌ Error en contadores: " + error);
         });
     }
 
@@ -207,8 +213,36 @@ public class InicioUsuariosActivity extends AppCompatActivity implements
         analyticsHelper.logScreenResume();
 
         if (MyApp.isUserLoggedIn()) {
-            dashboardManager.loadUserData();
+            // Los contadores ya están en tiempo real, solo recargar si es necesario
             scheduleManager.loadSchedules();
+
+            // Opcional: forzar una actualización de datos del usuario
+            dashboardManager.refreshData();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "⏸️ onPause - Pausando actividad");
+        // Los listeners en tiempo real siguen activos en background
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "⏹️ onStop - Deteniendo actividad");
+        // Considerar si quieres mantener los listeners o no
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "🗑️ onDestroy - Destruyendo actividad");
+
+        // Limpiar recursos para evitar memory leaks
+        if (dashboardManager != null) {
+            dashboardManager.cleanup();
         }
     }
 

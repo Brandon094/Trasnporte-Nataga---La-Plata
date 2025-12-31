@@ -22,6 +22,10 @@ public class UserDashboardManager {
     private final DashboardAnalyticsHelper analyticsHelper;
     private final UserService userService;
 
+    // Database Reference para listeners en tiempo real
+    private DatabaseReference reservasRef;
+    private ValueEventListener reservasListener;
+
     // Callbacks
     public interface DashboardListener {
         void onUserDataLoaded(Usuario usuario);
@@ -66,8 +70,8 @@ public class UserDashboardManager {
                     listener.onUserDataLoaded(usuario);
                 }
 
-                // Cargar contadores después de tener los datos del usuario
-                loadUserCounters(userId);
+                // Configurar listener en tiempo real para contadores
+                setupRealTimeCounters(userId);
             }
 
             @Override
@@ -79,42 +83,62 @@ public class UserDashboardManager {
                     listener.onUserDataError(error);
                 }
 
-                // Intentar cargar contadores incluso si falla la carga del usuario
-                loadUserCounters(userId);
+                // Intentar configurar contadores incluso si falla la carga del usuario
+                String currentUserId = MyApp.getCurrentUserId();
+                if (currentUserId != null) {
+                    setupRealTimeCounters(currentUserId);
+                }
             }
         });
     }
 
-    private void loadUserCounters(String userId) {
-        Log.d(TAG, "📊 Cargando contadores para: " + userId);
+    private void setupRealTimeCounters(String userId) {
+        Log.d(TAG, "📊 Configurando contadores en tiempo real para: " + userId);
 
-        DatabaseReference reservasRef = MyApp.getDatabaseReference("reservas");
+        // Remover listener anterior si existe
+        removeRealTimeListeners();
 
+        reservasRef = MyApp.getDatabaseReference("reservas");
+
+        // Crear listener en tiempo real
+        reservasListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int reservasCount = contarReservasActivas(snapshot);
+                int viajesCount = contarViajesCompletados(snapshot);
+
+                Log.d(TAG, "🔄 Contadores actualizados en tiempo real: " +
+                        reservasCount + " reservas, " + viajesCount + " viajes");
+                analyticsHelper.logCountersLoaded(reservasCount, viajesCount);
+
+                if (listener != null) {
+                    listener.onCountersLoaded(reservasCount, viajesCount);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "❌ Error en listener tiempo real: " + error.getMessage());
+                analyticsHelper.logError("listener_tiempo_real", error.getMessage());
+
+                if (listener != null) {
+                    listener.onCountersError(error.getMessage());
+                }
+            }
+        };
+
+        // Agregar listener en tiempo real
         reservasRef.orderByChild("usuarioId").equalTo(userId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        int reservasCount = contarReservasActivas(snapshot);
-                        int viajesCount = contarViajesCompletados(snapshot);
+                .addValueEventListener(reservasListener);
 
-                        Log.d(TAG, "📈 Contadores calculados: " + reservasCount + " reservas, " + viajesCount + " viajes");
-                        analyticsHelper.logCountersLoaded(reservasCount, viajesCount);
+        Log.d(TAG, "✅ Listener en tiempo real configurado correctamente");
+    }
 
-                        if (listener != null) {
-                            listener.onCountersLoaded(reservasCount, viajesCount);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e(TAG, "❌ Error cargando contadores: " + error.getMessage());
-                        analyticsHelper.logError("carga_contadores", error.getMessage());
-
-                        if (listener != null) {
-                            listener.onCountersError(error.getMessage());
-                        }
-                    }
-                });
+    private void removeRealTimeListeners() {
+        if (reservasRef != null && reservasListener != null) {
+            reservasRef.removeEventListener(reservasListener);
+            Log.d(TAG, "🗑️ Listener en tiempo real removido");
+        }
     }
 
     private int contarReservasActivas(DataSnapshot snapshot) {
@@ -155,5 +179,10 @@ public class UserDashboardManager {
         Log.d(TAG, "🔄 Refrescando datos del dashboard");
         analyticsHelper.logRefresh();
         loadUserData();
+    }
+
+    public void cleanup() {
+        Log.d(TAG, "🧹 Limpiando recursos del dashboard manager");
+        removeRealTimeListeners();
     }
 }
