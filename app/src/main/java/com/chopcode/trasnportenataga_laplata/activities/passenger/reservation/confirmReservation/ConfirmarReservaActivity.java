@@ -17,123 +17,107 @@ import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.analytics.ReservationAnalyticsHelper;
 import com.chopcode.trasnportenataga_laplata.managers.reservations.ReservationUserManager;
 import com.chopcode.trasnportenataga_laplata.managers.reservations.confirmation.ConfirmationDataProcessor;
-import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.confirmation.ConfirmationUIManager;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.confirmation.ReservationConfirmationManager;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.confirmation.ConfirmationAnalyticsHelper;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.confirmation.ConfirmationDialogManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class ConfirmarReservaActivity extends AppCompatActivity {
+public class ConfirmarReservaActivity extends AppCompatActivity implements
+        ConfirmationUIManager.ConfirmationListener,
+        ReservationConfirmationManager.ConfirmationCallback,
+        ConfirmationDialogManager.DialogCallback {
 
     private static final String TAG = "ConfirmarReserva";
 
     // UI Elements
-    private TextView tvRuta, tvFechaHora, tvTiempoEstimado, tvPrecio, tvAsiento;
-    private TextView tvUsuario, tvTelefonoP, tvConductor, tvTelefonoC, tvPlaca;
-    private RadioGroup radioGroupPago;
-    private RadioButton radioEfectivo, radioTransferencia;
     private MaterialButton btnConfirmarReserva, btnCancelar;
     private MaterialToolbar topAppBar;
 
-    // Managers (usando los que ya tienes)
+    // Managers
     private ReservationAnalyticsHelper analyticsHelper;
     private ReservationUserManager userManager;
     private ConfirmationDataProcessor dataProcessor;
-
-    // Services
-    private ReservaService reservaService;
-    private Handler timeoutHandler;
+    private ConfirmationUIManager uiManager;
+    private ReservationConfirmationManager confirmationManager;
+    private ConfirmationAnalyticsHelper confirmationAnalytics;
+    private ConfirmationDialogManager dialogManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ✅ Inicializar managers REUTILIZADOS
+        // ✅ Inicializar analytics
         analyticsHelper = new ReservationAnalyticsHelper("ConfirmarReserva");
         analyticsHelper.logPantallaInicio();
 
-        userManager = new ReservationUserManager(analyticsHelper);
-        dataProcessor = new ConfirmationDataProcessor(analyticsHelper);
+        // ✅ Inicializar managers
+        initializeManagers();
 
         setContentView(R.layout.activity_confirmar_reserva);
-
-        // ✅ Inicializar servicios
-        reservaService = new ReservaService();
-        timeoutHandler = new Handler();
-
-        // ✅ Procesar datos del Intent
-        processIntentData();
 
         // ✅ Inicializar vistas
         initializeViews();
 
         // ✅ Configurar UI
         configureToolbar();
-        configureListeners();
+        configureUIManager();
         loadDataIntoUI();
     }
 
-    private void processIntentData() {
-        Intent intent = getIntent();
+    private void initializeManagers() {
+        // Inicializar managers existentes
+        userManager = new ReservationUserManager(analyticsHelper);
+        dataProcessor = new ConfirmationDataProcessor(analyticsHelper);
 
-        // ✅ Procesar datos del viaje
-        dataProcessor.processIntentData(intent);
+        // Inicializar nuevos managers
+        uiManager = new ConfirmationUIManager(dataProcessor, analyticsHelper);
+        confirmationManager = new ReservationConfirmationManager(this, analyticsHelper);
+        confirmationAnalytics = new ConfirmationAnalyticsHelper(analyticsHelper, dataProcessor);
+        dialogManager = new ConfirmationDialogManager(this, confirmationAnalytics);
 
-        // ✅ Actualizar userManager con datos del usuario (si vienen en el Intent)
-        String usuarioId = intent.getStringExtra("usuarioId");
-        String usuarioNombre = intent.getStringExtra("usuarioNombre");
-        String usuarioTelefono = intent.getStringExtra("usuarioTelefono");
-
-        if (usuarioNombre != null) {
-            userManager.updateFromIntent(usuarioId, usuarioNombre, usuarioTelefono);
-            Log.d(TAG, "✅ Datos de usuario actualizados desde Intent");
-        } else {
-            // Si no vienen en el Intent, cargar del usuario autenticado
-            loadAuthenticatedUser();
-        }
-    }
-
-    private void loadAuthenticatedUser() {
-        userManager.loadAuthenticatedUser(new ReservationUserManager.UserDataCallback() {
-            @Override
-            public void onUserDataLoaded(String usuarioId, String usuarioNombre, String usuarioTelefono) {
-                Log.d(TAG, "✅ Usuario cargado: " + usuarioNombre);
-            }
-
-            @Override
-            public void onError(String error) {
-                Log.e(TAG, "Error cargando usuario: " + error);
-            }
-        });
+        // Configurar callbacks
+        confirmationManager.setDataProcessor(dataProcessor);
+        confirmationManager.setConfirmationCallback(this);
     }
 
     private void initializeViews() {
         // Toolbar
         topAppBar = findViewById(R.id.topAppBar);
 
-        // Detalles del Viaje
-        tvRuta = findViewById(R.id.tvRuta);
-        tvFechaHora = findViewById(R.id.tvFechaHora);
-        tvAsiento = findViewById(R.id.tvAsiento);
-        tvTiempoEstimado = findViewById(R.id.tvTiempoEstimado);
-        tvPrecio = findViewById(R.id.tvPrecio);
-
-        // Información de Contacto
-        tvUsuario = findViewById(R.id.tvUsuario);
-        tvTelefonoP = findViewById(R.id.tvTelefonoP);
-        tvConductor = findViewById(R.id.tvConductor);
-        tvTelefonoC = findViewById(R.id.tvTelefonoC);
-        tvPlaca = findViewById(R.id.tvPlaca);
-
-        // Método de Pago
-        radioGroupPago = findViewById(R.id.radioGroupPago);
-        radioEfectivo = findViewById(R.id.radioEfectivo);
-        radioTransferencia = findViewById(R.id.radioTransferencia);
-
         // Botones
         btnConfirmarReserva = findViewById(R.id.btnConfirmarReserva);
         btnCancelar = findViewById(R.id.btnCancelar);
+
+        // Inicializar referencias de vistas para el UIManager
+        initializeViewReferences();
+    }
+
+    private void initializeViewReferences() {
+        // Obtener referencias de vistas
+        TextView tvRuta = findViewById(R.id.tvRuta);
+        TextView tvFechaHora = findViewById(R.id.tvFechaHora);
+        TextView tvTiempoEstimado = findViewById(R.id.tvTiempoEstimado);
+        TextView tvPrecio = findViewById(R.id.tvPrecio);
+        TextView tvAsiento = findViewById(R.id.tvAsiento);
+        TextView tvUsuario = findViewById(R.id.tvUsuario);
+        TextView tvTelefonoP = findViewById(R.id.tvTelefonoP);
+        TextView tvConductor = findViewById(R.id.tvConductor);
+        TextView tvTelefonoC = findViewById(R.id.tvTelefonoC);
+        TextView tvPlaca = findViewById(R.id.tvPlaca);
+        RadioGroup radioGroupPago = findViewById(R.id.radioGroupPago);
+        RadioButton radioEfectivo = findViewById(R.id.radioEfectivo);
+        RadioButton radioTransferencia = findViewById(R.id.radioTransferencia);
+
+        // Configurar UIManager con las vistas
+        uiManager.setViewReferences(
+                tvRuta, tvFechaHora, tvTiempoEstimado, tvPrecio, tvAsiento,
+                tvUsuario, tvTelefonoP, tvConductor, tvTelefonoC, tvPlaca,
+                radioGroupPago, radioEfectivo, radioTransferencia
+        );
+
+        uiManager.setConfirmationListener(this);
     }
 
     private void configureToolbar() {
@@ -144,88 +128,137 @@ public class ConfirmarReservaActivity extends AppCompatActivity {
         }
 
         topAppBar.setNavigationOnClickListener(v -> {
-            Map<String, Object> params = new HashMap<>();
-            params.put("accion", "navegacion_atras");
-            analyticsHelper.logEvent("click_boton", params);
+            confirmationAnalytics.logButtonClick("navegacion_atras");
             onBackPressed();
         });
     }
 
-    private void configureListeners() {
-        // Método de pago
-        radioGroupPago.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.radioEfectivo) {
-                dataProcessor.setMetodoPago("Efectivo");
-
-                // ✅ CORREGIDO: Usar Map en lugar de String
-                Map<String, Object> params = new HashMap<>();
-                params.put("tipo", "efectivo");
-                params.put("asiento", dataProcessor.getAsientoSeleccionado());
-                analyticsHelper.logEvent("metodo_pago_seleccionado", params);
-
-            } else if (checkedId == R.id.radioTransferencia) {
-                dataProcessor.setMetodoPago("Transferencia");
-
-                // ✅ CORREGIDO: Usar Map en lugar de String
-                Map<String, Object> params = new HashMap<>();
-                params.put("tipo", "transferencia");
-                params.put("asiento", dataProcessor.getAsientoSeleccionado());
-                analyticsHelper.logEvent("metodo_pago_seleccionado", params);
-            }
-        });
-
-        // Botón Confirmar
+    private void configureUIManager() {
+        // Configurar listeners de botones
         btnConfirmarReserva.setOnClickListener(v -> {
-            Map<String, Object> params = new HashMap<>();
-            params.put("accion", "confirmar_reserva");
-            params.put("asiento", dataProcessor.getAsientoSeleccionado());
-            analyticsHelper.logEvent("click_boton", params);
-
-            if (validateForm()) {
-                confirmReservation();
-            } else {
-                Toast.makeText(this, "Por favor selecciona un método de pago", Toast.LENGTH_SHORT).show();
-            }
+            confirmationAnalytics.logButtonClick("confirmar_reserva");
+            onConfirmButtonClicked();
         });
 
-        // Botón Cancelar
         btnCancelar.setOnClickListener(v -> {
-            Map<String, Object> params = new HashMap<>();
-            params.put("accion", "cancelar_reserva");
-            params.put("asiento", dataProcessor.getAsientoSeleccionado());
-            analyticsHelper.logEvent("click_boton", params);
-
-            showCancellationDialog();
+            confirmationAnalytics.logButtonClick("cancelar_reserva");
+            onCancelButtonClicked();
         });
+
+        // Configurar listeners del UI Manager
+        uiManager.setupListeners();
     }
 
     private void loadDataIntoUI() {
-        // Datos del viaje
-        tvRuta.setText(dataProcessor.getRutaSeleccionada());
+        // ✅ Procesar datos del Intent
+        processIntentData();
 
-        String fechaHoraCompleta = dataProcessor.getFechaViaje() + " - " + dataProcessor.getHorarioHora();
-        tvFechaHora.setText(fechaHoraCompleta);
+        // ✅ Cargar datos del usuario
+        loadAuthenticatedUser();
+    }
 
-        tvAsiento.setText("A" + dataProcessor.getAsientoSeleccionado());
-        tvTiempoEstimado.setText(dataProcessor.getTiempoEstimado());
+    private void processIntentData() {
+        Intent intent = getIntent();
+        dataProcessor.processIntentData(intent);
 
-        String precioFormateado = String.format("$%,d", (int) dataProcessor.getPrecio());
-        tvPrecio.setText(precioFormateado);
+        // ✅ Actualizar userManager con datos del usuario
+        String usuarioId = intent.getStringExtra("usuarioId");
+        String usuarioNombre = intent.getStringExtra("usuarioNombre");
+        String usuarioTelefono = intent.getStringExtra("usuarioTelefono");
 
-        // Datos del usuario
-        tvUsuario.setText(userManager.getUsuarioNombre());
-        tvTelefonoP.setText(userManager.getUsuarioTelefono());
+        if (usuarioNombre != null) {
+            userManager.updateFromIntent(usuarioId, usuarioNombre, usuarioTelefono);
+            Log.d(TAG, "✅ Datos de usuario actualizados desde Intent");
+            updateUIWithUserData();
+        }
+    }
 
-        // Datos del conductor
-        tvConductor.setText(dataProcessor.getConductorNombre());
-        tvTelefonoC.setText(dataProcessor.getConductorTelefono());
+    private void loadAuthenticatedUser() {
+        userManager.loadAuthenticatedUser(new ReservationUserManager.UserDataCallback() {
+            @Override
+            public void onUserDataLoaded(String usuarioId, String usuarioNombre, String usuarioTelefono) {
+                Log.d(TAG, "✅ Usuario cargado: " + usuarioNombre);
+                updateUIWithUserData();
+            }
 
-        String infoVehiculo = "Vehículo: " + dataProcessor.getVehiculoPlaca() +
-                " - " + dataProcessor.getVehiculoModelo();
-        tvPlaca.setText(infoVehiculo);
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "Error cargando usuario: " + error);
+                confirmationAnalytics.logError("carga_usuario", error);
+            }
+        });
+    }
 
-        // Método de pago por defecto
-        radioEfectivo.setChecked(true);
+    private void updateUIWithUserData() {
+        runOnUiThread(() -> {
+            uiManager.loadDataIntoUI(
+                    userManager.getUsuarioNombre(),
+                    userManager.getUsuarioTelefono()
+            );
+        });
+    }
+
+    // ✅ Implementación de ConfirmationUIManager.ConfirmationListener
+    @Override
+    public void onConfirmButtonClicked() {
+        if (validateForm()) {
+            confirmationManager.confirmReservation();
+        } else {
+            Toast.makeText(this, "Por favor selecciona un método de pago", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onCancelButtonClicked() {
+        dialogManager.showCancellationDialog(this);
+    }
+
+    @Override
+    public void onPaymentMethodChanged(String metodoPago) {
+        // Log adicional si es necesario
+        Log.d(TAG, "Método de pago cambiado a: " + metodoPago);
+    }
+
+    // ✅ Implementación de ReservationConfirmationManager.ConfirmationCallback
+    @Override
+    public void onConfirmationStarted() {
+        runOnUiThread(() -> {
+            btnConfirmarReserva.setEnabled(false);
+            btnConfirmarReserva.setText("Procesando...");
+        });
+    }
+
+    @Override
+    public void onConfirmationSuccess() {
+        confirmationAnalytics.logNavigation("InicioUsuariosActivity");
+        navigateToHome();
+    }
+
+    @Override
+    public void onConfirmationError(String error) {
+        runOnUiThread(() -> {
+            btnConfirmarReserva.setEnabled(true);
+            btnConfirmarReserva.setText("Confirmar Reserva");
+        });
+    }
+
+    @Override
+    public void onButtonStateChanged(boolean enabled, String text) {
+        runOnUiThread(() -> {
+            btnConfirmarReserva.setEnabled(enabled);
+            btnConfirmarReserva.setText(text);
+        });
+    }
+
+    // ✅ Implementación de ConfirmationDialogManager.DialogCallback
+    @Override
+    public void onPositiveAction() {
+        finish();
+    }
+
+    @Override
+    public void onNegativeAction() {
+        // Dialogo cerrado sin acción
     }
 
     private boolean validateForm() {
@@ -233,171 +266,39 @@ public class ConfirmarReservaActivity extends AppCompatActivity {
         boolean isValid = metodoPago != null && !metodoPago.isEmpty();
 
         if (isValid) {
-            // ✅ Usar el método correcto de analyticsHelper
-            Map<String, Object> params = new HashMap<>();
-            params.put("asiento", dataProcessor.getAsientoSeleccionado());
-            params.put("ruta", dataProcessor.getRutaSeleccionada());
-            params.put("metodo_pago", metodoPago);
-            analyticsHelper.logEvent("validacion_exitosa", params);
+            confirmationAnalytics.logValidationSuccess();
         } else {
-            // ✅ Usar logError en lugar de logValidacionFallida si no existe
-            Map<String, Object> params = new HashMap<>();
-            params.put("razon", "sin_metodo_pago");
-            analyticsHelper.logEvent("validacion_fallida", params);
+            confirmationAnalytics.logValidationFailed("sin_metodo_pago");
         }
 
         return isValid;
     }
 
-    private void showCancellationDialog() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("asiento", dataProcessor.getAsientoSeleccionado());
-        analyticsHelper.logEvent("dialogo_cancelacion_mostrado", params);
-
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("Cancelar reserva")
-                .setMessage("¿Estás seguro de que quieres cancelar la reserva?")
-                .setPositiveButton("Sí", (dialog, which) -> {
-                    Map<String, Object> confirmParams = new HashMap<>();
-                    confirmParams.put("asiento", dataProcessor.getAsientoSeleccionado());
-                    confirmParams.put("accion", "confirmada");
-                    analyticsHelper.logEvent("cancelacion_reserva", confirmParams);
-                    finish();
-                })
-                .setNegativeButton("No", (dialog, which) -> {
-                    Map<String, Object> cancelParams = new HashMap<>();
-                    cancelParams.put("asiento", dataProcessor.getAsientoSeleccionado());
-                    cancelParams.put("accion", "rechazada");
-                    analyticsHelper.logEvent("cancelacion_reserva", cancelParams);
-                    dialog.dismiss();
-                })
-                .show();
-    }
-
-    private void confirmReservation() {
-        String userId = MyApp.getCurrentUserId();
-        if (userId == null) {
-            Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
-
-            Map<String, Object> params = new HashMap<>();
-            params.put("error", "usuario_no_autenticado");
-            analyticsHelper.logEvent("error", params);
-
-            return;
-        }
-
-        btnConfirmarReserva.setEnabled(false);
-        btnConfirmarReserva.setText("Procesando...");
-
-        String estadoReserva = "Por confirmar";
-
-        // Timeout
-        Runnable timeoutRunnable = () -> {
-            runOnUiThread(() -> {
-                btnConfirmarReserva.setEnabled(true);
-                btnConfirmarReserva.setText("Confirmar Reserva");
-                Toast.makeText(this,
-                        "La operación está tardando más de lo esperado. Verifica tu conexión.",
-                        Toast.LENGTH_LONG).show();
-
-                Map<String, Object> params = new HashMap<>();
-                params.put("tipo", "timeout_registro_reserva");
-                analyticsHelper.logEvent("timeout", params);
-            });
-        };
-        timeoutHandler.postDelayed(timeoutRunnable, 15000);
-
-        reservaService.actualizarDisponibilidadAsientos(
-                this,
-                dataProcessor.getHorarioId(),
-                dataProcessor.getAsientoSeleccionado(),
-                dataProcessor.getOrigen(),
-                dataProcessor.getDestino(),
-                dataProcessor.getTiempoEstimado(),
-                dataProcessor.getMetodoPago(),
-                estadoReserva,
-                dataProcessor.getVehiculoPlaca(),
-                dataProcessor.getPrecio(),
-                dataProcessor.getConductorNombre(),
-                dataProcessor.getConductorTelefono(),
-                new ReservaService.ReservaCallback() {
-                    @Override
-                    public void onReservaExitosa() {
-                        timeoutHandler.removeCallbacks(timeoutRunnable);
-                        runOnUiThread(() -> {
-                            Toast.makeText(ConfirmarReservaActivity.this,
-                                    "✅ Reserva creada exitosamente", Toast.LENGTH_LONG).show();
-
-                            Map<String, Object> params = new HashMap<>();
-                            params.put("asiento", dataProcessor.getAsientoSeleccionado());
-                            params.put("ruta", dataProcessor.getRutaSeleccionada());
-                            params.put("conductor", dataProcessor.getConductorNombre());
-                            analyticsHelper.logEvent("reserva_exitosa", params);
-
-                            navigateToHome();
-                        });
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        timeoutHandler.removeCallbacks(timeoutRunnable);
-                        runOnUiThread(() -> {
-                            btnConfirmarReserva.setEnabled(true);
-                            btnConfirmarReserva.setText("Confirmar Reserva");
-
-                            MyApp.logError(new Exception("Error registrando reserva: " + error));
-
-                            Map<String, Object> params = new HashMap<>();
-                            params.put("error", error);
-                            params.put("asiento", dataProcessor.getAsientoSeleccionado());
-                            analyticsHelper.logEvent("error_registro_reserva", params);
-
-                            Toast.makeText(ConfirmarReservaActivity.this,
-                                    "❌ Error al confirmar reserva: " + error, Toast.LENGTH_LONG).show();
-                        });
-                    }
-                });
-    }
-
     private void navigateToHome() {
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("destino", "InicioUsuariosActivity");
-            analyticsHelper.logEvent("navegacion", params);
-
             Intent intent = new Intent(this, InicioUsuariosActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
         } catch (Exception e) {
             Log.e(TAG, "Error navegando a inicio: " + e.getMessage());
-
-            Map<String, Object> params = new HashMap<>();
-            params.put("error", e.getMessage());
-            analyticsHelper.logEvent("error_navegacion", params);
-
+            confirmationAnalytics.logError("navegacion", e.getMessage());
             finish();
         }
     }
 
     @Override
     public void onBackPressed() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("tipo", "boton_back_fisico");
-        analyticsHelper.logEvent("navegacion", params);
-
-        showCancellationDialog();
+        confirmationAnalytics.logNavigation("boton_back_fisico");
+        dialogManager.showCancellationDialog(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (timeoutHandler != null) {
-            timeoutHandler.removeCallbacksAndMessages(null);
+        if (confirmationManager != null) {
+            confirmationManager.cleanup();
         }
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("pantalla", "ConfirmarReserva");
-        analyticsHelper.logEvent("pantalla_destroy", params);
+        confirmationAnalytics.logScreenEvent("destroy");
     }
 }
