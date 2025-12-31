@@ -1,19 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- ==================== -->
-    <!-- STYLES PARA BOTONES DE ASIENTOS -->
+    <!-- STYLES PARA BOTONES DE ASIENTOS MEJORADOS -->
     <!-- ==================== -->
+
+    <!-- Estilo base para todos los botones de asiento -->
     <style name="AsientoButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:layout_width">70dp</item>
-        <item name="android:layout_height">70dp</item>
-        <item name="android:layout_margin">6dp</item>
-        <item name="cornerRadius">8dp</item>
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="cornerRadius">10dp</item>
+
+        <!-- Icono -->
         <item name="iconGravity">textStart</item>
-        <!-- IMPORTANTE: Deshabilitar el tint del icono -->
-        <item name="iconTint">@null</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconSize">24dp</item>
+        <item name="iconTint">@null</item> <!-- Importante: deshabilitar tint del icono -->
+
+        <!-- Colores base -->
+        <item name="backgroundTint">@color/white</item>
         <item name="strokeColor">@color/outline</item>
-        <item name="strokeWidth">1dp</item>
-        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="strokeWidth">1.5dp</item>
+
+        <!-- Efectos y estados -->
+        <item name="rippleColor">@color/ripple_success</item>
+        <item name="android:stateListAnimator">@animator/asiento_button_state_animator</item>
+
+        <!-- Elevación sutil -->
+        <item name="elevation">1dp</item>
+        <item name="android:outlineAmbientShadowColor">@color/shadow</item>
+        <item name="android:outlineSpotShadowColor">@color/shadow</item>
+    </style>
+
+    <!-- Estilo para asiento disponible -->
+    <style name="AsientoButtonStyle.Disponible">
+        <!-- Hereda todo de AsientoButtonStyle -->
+    </style>
+
+    <!-- Estilo para asiento seleccionado -->
+    <style name="AsientoButtonStyle.Seleccionado" parent="AsientoButtonStyle">
+        <item name="strokeColor">@color/primary_500</item>
+        <item name="strokeWidth">2.5dp</item>
+        <item name="backgroundTint">@color/primary_50</item>
+        <item name="rippleColor">@color/ripple_primary</item>
+        <item name="elevation">2dp</item>
+    </style>
+
+    <!-- Estilo para asiento ocupado -->
+    <style name="AsientoButtonStyle.Ocupado" parent="AsientoButtonStyle">
+        <item name="strokeColor">@color/neutral_400</item>
+        <item name="backgroundTint">@color/neutral_100</item>
+        <item name="rippleColor">@color/ripple_color</item>
+        <item name="android:enabled">false</item>
+    </style>
+
+    <!-- Estilo para asiento de conductor -->
+    <style name="AsientoButtonStyle.Conductor" parent="AsientoButtonStyle.Ocupado">
+        <item name="backgroundTint">@color/surface_2</item>
+        <item name="strokeColor">@color/neutral_500</item>
+        <item name="strokeWidth">1.5dp</item>
     </style>
 
     <!-- ==================== -->
@@ -157,5 +204,21 @@
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:background">?attr/colorOutline</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.CardTopRounded" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">12dp</item>
+        <item name="cornerSizeTopRight">12dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.CardBottomRounded" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomLeft">12dp</item>
+        <item name="cornerSizeBottomRight">12dp</item>
     </style>
 </resources>
