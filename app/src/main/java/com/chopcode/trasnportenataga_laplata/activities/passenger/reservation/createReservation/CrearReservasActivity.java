@@ -18,29 +18,16 @@ import com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.co
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.analytics.ReservationAnalyticsHelper;
 import com.chopcode.trasnportenataga_laplata.managers.seats.SeatManager;
-import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.managers.ui.ExpandableSectionManager;
 import com.chopcode.trasnportenataga_laplata.managers.reservations.dataprocessor.ReservationDataProcessor;
 import com.chopcode.trasnportenataga_laplata.managers.reservations.DriverVehicleManager;
-import com.chopcode.trasnportenataga_laplata.models.Usuario;
-import com.chopcode.trasnportenataga_laplata.models.Vehiculo;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.ReservationUserManager;
 import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
 import com.chopcode.trasnportenataga_laplata.services.user.UserService;
-import com.chopcode.trasnportenataga_laplata.services.reservations.VehiculoService;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,7 +50,6 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
 
     // Services
     private ReservaService reservaService;
-    private UserService userService;
 
     // Views de información del viaje
     private TextView tvRutaSeleccionada, tvDescripcionRuta, tvHorarioSeleccionado, tvFechaViaje;
@@ -86,16 +72,12 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
     private String modeloVehiculo;
     private Integer capacidadVehiculo;
 
-    // Datos del usuario autenticado
-    private String usuarioNombre;
-    private String usuarioTelefono;
-    private String usuarioId;
-
     // Managers
     private ReservationAnalyticsHelper analyticsHelper;
     private SeatManager seatManager;
     private ReservationDataProcessor reservationDataProcessor;
     private DriverVehicleManager driverVehicleManager;
+    private ReservationUserManager reservationUserManager; // ✅ NUEVO MANAGER
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +89,7 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
 
         // ✅ Inicializar managers
         reservationDataProcessor = new ReservationDataProcessor(analyticsHelper);
+        reservationUserManager = new ReservationUserManager(analyticsHelper); // ✅ NUEVO
 
         setContentView(R.layout.activity_crear_reservas);
 
@@ -122,7 +105,6 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
 
         // Inicializar servicios
         reservaService = new ReservaService();
-        userService = new UserService();
 
         // Referencias a la UI
         inicializarViews();
@@ -136,12 +118,8 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
         // Configurar información básica
         configurarInformacionBasica();
 
-        // Cargar usuario si no llegó del Intent
-        if (usuarioNombre == null || usuarioId == null) {
-            cargarUsuarioAutenticado();
-        } else {
-            analyticsHelper.logUsuarioCargado(usuarioNombre, usuarioTelefono);
-        }
+        // ✅ REFACTORIZADO: Cargar usuario usando ReservationUserManager
+        cargarUsuario();
 
         // Restaurar estado si existe
         if (savedInstanceState != null) {
@@ -172,9 +150,16 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
             rutaSeleccionada = intent.getStringExtra("rutaSeleccionada");
             horarioId = intent.getStringExtra("horarioId");
             horarioHora = intent.getStringExtra("horarioHora");
-            usuarioId = intent.getStringExtra("usuarioId");
-            usuarioNombre = intent.getStringExtra("usuarioNombre");
-            usuarioTelefono = intent.getStringExtra("usuarioTelefono");
+
+            // ✅ REFACTORIZADO: Usar ReservationUserManager para actualizar desde intent
+            String usuarioId = intent.getStringExtra("usuarioId");
+            String usuarioNombre = intent.getStringExtra("usuarioNombre");
+            String usuarioTelefono = intent.getStringExtra("usuarioTelefono");
+
+            if (usuarioId != null || usuarioNombre != null) {
+                reservationUserManager.updateFromIntent(usuarioId, usuarioNombre, usuarioTelefono);
+                Log.d(TAG, "✅ Datos del usuario actualizados desde Intent");
+            }
 
             analyticsHelper.logDatosRecibidos(rutaSeleccionada != null, horarioId != null);
 
@@ -182,8 +167,7 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
             Log.d(TAG, "  - Ruta: " + rutaSeleccionada);
             Log.d(TAG, "  - Horario ID: " + horarioId);
             Log.d(TAG, "  - Horario Hora: " + horarioHora);
-            Log.d(TAG, "  - Usuario ID: " + usuarioId);
-            Log.d(TAG, "  - Usuario Nombre: " + usuarioNombre);
+            Log.d(TAG, "  - Usuario: " + reservationUserManager.getUserSummary());
         }
     }
 
@@ -300,51 +284,26 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
         tvNombreConductor.setText("Cargando...");
     }
 
-    private void cargarUsuarioAutenticado() {
-        String userId = MyApp.getCurrentUserId();
-        if (userId == null) {
-            Log.e(TAG, "No se pudo obtener el ID del usuario");
-            analyticsHelper.logError("userid_null", "ID de usuario es null");
-            establecerUsuarioPorDefecto();
-            return;
-        }
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("accion", "carga_usuario_inicio");
-        analyticsHelper.logEvent("carga_usuario_inicio", params);
-
-        userService.loadUserData(userId, new UserService.UserDataCallback() {
-            @Override
-            public void onUserDataLoaded(Usuario usuario) {
-                if (usuario != null) {
-                    usuarioNombre = usuario.getNombre();
-                    usuarioTelefono = usuario.getTelefono();
-                    usuarioId = usuario.getId();
-                    analyticsHelper.logUsuarioCargado(usuarioNombre, usuarioTelefono);
-                } else {
-                    Log.e(TAG, "Usuario es null");
-                    analyticsHelper.logError("usuario_null", "Usuario es null");
-                    establecerUsuarioPorDefecto();
+    /**
+     * ✅ REFACTORIZADO: Usar ReservationUserManager para cargar usuario
+     */
+    private void cargarUsuario() {
+        if (!reservationUserManager.hasUserData()) {
+            Log.d(TAG, "No hay datos de usuario, cargando desde Firebase...");
+            reservationUserManager.loadAuthenticatedUser(new ReservationUserManager.UserDataCallback() {
+                @Override
+                public void onUserDataLoaded(String usuarioId, String usuarioNombre, String usuarioTelefono) {
+                    Log.d(TAG, "✅ Usuario cargado exitosamente: " + usuarioNombre);
                 }
-            }
 
-            @Override
-            public void onError(String errorMessage) {
-                Log.e(TAG, "Error cargando usuario: " + errorMessage);
-                MyApp.logError(new Exception("Error cargando usuario: " + errorMessage));
-                analyticsHelper.logError("carga_usuario", errorMessage);
-                establecerUsuarioPorDefecto();
-            }
-        });
-    }
-
-    private void establecerUsuarioPorDefecto() {
-        usuarioNombre = "Usuario";
-        usuarioTelefono = "No disponible";
-        Map<String, Object> params = new HashMap<>();
-        params.put("accion", "usuario_por_defecto");
-        analyticsHelper.logEvent("usuario_por_defecto", params);
-        Log.w(TAG, "Usando valores por defecto para el usuario");
+                @Override
+                public void onError(String error) {
+                    Log.e(TAG, "Error cargando usuario: " + error);
+                }
+            });
+        } else {
+            Log.d(TAG, "✅ Usuario ya cargado desde Intent: " + reservationUserManager.getUsuarioNombre());
+        }
     }
 
     private void restaurarEstado(Bundle savedInstanceState) {
@@ -371,10 +330,13 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
             expandableSectionManager.restoreState(isInfoExpanded);
         }
 
-        if (usuarioNombre == null) {
-            usuarioNombre = savedInstanceState.getString("usuarioNombre");
-            usuarioTelefono = savedInstanceState.getString("usuarioTelefono");
-            usuarioId = savedInstanceState.getString("usuarioId");
+        // ✅ Restaurar datos del usuario desde savedInstanceState
+        String savedUsuarioId = savedInstanceState.getString("usuarioId");
+        String savedUsuarioNombre = savedInstanceState.getString("usuarioNombre");
+        String savedUsuarioTelefono = savedInstanceState.getString("usuarioTelefono");
+
+        if (savedUsuarioNombre != null) {
+            reservationUserManager.updateFromIntent(savedUsuarioId, savedUsuarioNombre, savedUsuarioTelefono);
         }
     }
 
@@ -432,6 +394,11 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
 
         // ✅ REFACTORIZADO: Usar ReservationDateUtils para obtener fecha
         String fechaViaje = ReservationDateUtils.obtenerFechaDelViaje(horarioHora);
+
+        // ✅ REFACTORIZADO: Usar ReservationUserManager para obtener datos del usuario
+        String usuarioId = reservationUserManager.getUsuarioId();
+        String usuarioNombre = reservationUserManager.getUsuarioNombre();
+        String usuarioTelefono = reservationUserManager.getUsuarioTelefono();
 
         Intent intent = reservationDataProcessor.prepareReservationConfirmation(
                 this,
@@ -570,13 +537,14 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
             outState.putString("conductorTelefono", conductorTelefono);
         }
 
+        // ✅ Guardar datos del ReservationUserManager
+        outState.putString("usuarioId", reservationUserManager.getUsuarioId());
+        outState.putString("usuarioNombre", reservationUserManager.getUsuarioNombre());
+        outState.putString("usuarioTelefono", reservationUserManager.getUsuarioTelefono());
+
         if (expandableSectionManager != null) {
             outState.putBoolean("isInfoExpanded", expandableSectionManager.isExpanded());
         }
-
-        if (usuarioNombre != null) outState.putString("usuarioNombre", usuarioNombre);
-        if (usuarioTelefono != null) outState.putString("usuarioTelefono", usuarioTelefono);
-        if (usuarioId != null) outState.putString("usuarioId", usuarioId);
     }
 
     @Override
