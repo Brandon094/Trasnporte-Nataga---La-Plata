@@ -2,17 +2,23 @@ package com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.c
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.chopcode.trasnportenataga_laplata.R;
 import com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.confirmReservation.ConfirmarReserva;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
+import com.chopcode.trasnportenataga_laplata.managers.ui.ExpandableSectionManager;
 import com.chopcode.trasnportenataga_laplata.models.Usuario;
 import com.chopcode.trasnportenataga_laplata.models.Vehiculo;
 import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
@@ -59,6 +65,15 @@ public class CrearReservas extends AppCompatActivity {
     // Views de información del viaje
     private TextView tvRutaSeleccionada, tvDescripcionRuta, tvHorarioSeleccionado, tvFechaViaje;
     private TextView tvVehiculoInfo, tvCapacidadInfo, tvCapacidadDispo, tvNombreConductor;
+
+    // ✅ AGREGADO: Views para sección plegable
+    private ExpandableSectionManager expandableSectionManager;
+    private RelativeLayout headerInfo;
+    private LinearLayout contenidoExpandible;
+    private LinearLayout resumenInfo;
+    private ImageView iconExpandCollapse;
+    private TextView tvRutaResumen;
+    private TextView tvHorarioResumen;
 
     // Informacion del vehiculo - VARIABLES CORREGIDAS
     private String placaVehiculo = "Cargando...";
@@ -149,6 +164,12 @@ public class CrearReservas extends AppCompatActivity {
             if (asientoSeleccionado == -1) asientoSeleccionado = null;
             rutaSeleccionada = savedInstanceState.getString("rutaSeleccionada");
             conductorNombre = savedInstanceState.getString("conductorNombre", "Cargando...");
+
+            // ✅ AGREGAR: Restaurar estado de la sección plegable
+            boolean isInfoExpanded = savedInstanceState.getBoolean("isInfoExpanded", true);
+            if (expandableSectionManager != null) {
+                expandableSectionManager.restoreState(isInfoExpanded);
+            }
 
             // Restaurar datos del usuario
             if (usuarioNombre == null) {
@@ -261,6 +282,35 @@ public class CrearReservas extends AppCompatActivity {
         btnConfirmar = findViewById(R.id.buttonConfirmar);
         btnCancelar = findViewById(R.id.buttonCancelar);
         topAppBar = findViewById(R.id.topAppBar);
+
+        // ✅ AGREGADO: Inicializar vistas para sección plegable
+        headerInfo = findViewById(R.id.headerInfo);
+        contenidoExpandible = findViewById(R.id.contenidoExpandible);
+        resumenInfo = findViewById(R.id.resumenInfo);
+        iconExpandCollapse = findViewById(R.id.iconExpandCollapse);
+        tvRutaResumen = findViewById(R.id.tvRutaResumen);
+        tvHorarioResumen = findViewById(R.id.tvHorarioResumen);
+
+        // ✅ AGREGADO: Inicializar el ExpandableSectionManager
+        initializeExpandableSection();
+    }
+
+    /**
+     * ✅ AGREGADO: Inicializar el manager de sección expandible
+     */
+    private void initializeExpandableSection() {
+        expandableSectionManager = new ExpandableSectionManager(
+                this,
+                headerInfo,
+                contenidoExpandible,
+                resumenInfo,
+                iconExpandCollapse,
+                tvRutaResumen,
+                tvHorarioResumen
+        );
+
+        // Configurar información para analytics
+        expandableSectionManager.setAnalyticsInfo("CrearReservas", "info_viaje");
     }
 
     /**
@@ -331,6 +381,11 @@ public class CrearReservas extends AppCompatActivity {
         if (rutaSeleccionada != null) {
             tvRutaSeleccionada.setText(rutaSeleccionada);
 
+            // ✅ AGREGADO: Actualizar también el resumen
+            if (expandableSectionManager != null) {
+                expandableSectionManager.updateSummaryInfo(rutaSeleccionada, null);
+            }
+
             // Establecer descripción de la ruta según la dirección
             String descripcionRuta = "Ruta directa - Tiempo estimado: ";
             if (rutaSeleccionada.contains("Natagá -> La Plata")) {
@@ -344,6 +399,11 @@ public class CrearReservas extends AppCompatActivity {
         // Configurar horario
         if (horarioHora != null) {
             tvHorarioSeleccionado.setText(horarioHora);
+
+            // ✅ AGREGADO: Actualizar también el resumen
+            if (expandableSectionManager != null) {
+                expandableSectionManager.updateSummaryInfo(null, horarioHora);
+            }
         }
 
         // Configurar fecha del viaje (considerando si el horario ya pasó hoy)
@@ -762,6 +822,11 @@ public class CrearReservas extends AppCompatActivity {
                             btn.setIcon(ContextCompat.getDrawable(CrearReservas.this,
                                     VECTOR_ASIENTO_SELECCIONADO));
 
+                            // ✅ AGREGADO: Colapsar automáticamente la sección de información
+                            if (expandableSectionManager != null && expandableSectionManager.isExpanded()) {
+                                expandableSectionManager.collapseSection();
+                            }
+
                             // ✅ Registrar evento de selección de asiento
                             registrarEventoAnalitico("asiento_seleccionado", numAsiento, null);
 
@@ -918,6 +983,11 @@ public class CrearReservas extends AppCompatActivity {
         outState.putString("conductorNombre", conductorNombre);
         outState.putString("conductorTelefono", conductorTelefono);
 
+        // ✅ AGREGAR: Guardar estado de la sección expandible
+        if (expandableSectionManager != null) {
+            outState.putBoolean("isInfoExpanded", expandableSectionManager.isExpanded());
+        }
+
         // ✅ AGREGAR: Guardar datos del usuario
         if (usuarioNombre != null) outState.putString("usuarioNombre", usuarioNombre);
         if (usuarioTelefono != null) outState.putString("usuarioTelefono", usuarioTelefono);
@@ -940,6 +1010,11 @@ public class CrearReservas extends AppCompatActivity {
 
         // ✅ Registrar evento de destrucción
         registrarEventoAnalitico("pantalla_crear_reservas_destroy", null, null);
+
+        // ✅ AGREGAR: Limpiar el manager
+        if (expandableSectionManager != null) {
+            expandableSectionManager.cleanup();
+        }
     }
 
     /**
