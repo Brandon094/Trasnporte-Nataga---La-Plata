@@ -21,7 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-public class EditarPerfilConductor extends AppCompatActivity {
+public class EditarPerfilConductorActivity extends AppCompatActivity {
 
     // Tag para logs
     private static final String TAG = "EditarPerfilConductor";
@@ -117,7 +117,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
             public void onDriverCheckComplete(boolean isDriver) {
                 if (!isDriver) {
                     Log.w(TAG, "⚠️ El usuario no está registrado como conductor");
-                    Toast.makeText(EditarPerfilConductor.this,
+                    Toast.makeText(EditarPerfilConductorActivity.this,
                             "El usuario no está registrado como conductor", Toast.LENGTH_LONG).show();
                     finish();
                     return;
@@ -131,7 +131,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 Log.e(TAG, "❌ Error verificando conductor: " + error);
-                Toast.makeText(EditarPerfilConductor.this,
+                Toast.makeText(EditarPerfilConductorActivity.this,
                         "Error verificando conductor: " + error, Toast.LENGTH_LONG).show();
                 finish();
             }
@@ -176,7 +176,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
                     }
                 } else {
                     Log.e(TAG, "❌ No se encontraron datos del conductor en Firebase");
-                    Toast.makeText(EditarPerfilConductor.this,
+                    Toast.makeText(EditarPerfilConductorActivity.this,
                             "No se encontraron datos del conductor", Toast.LENGTH_LONG).show();
                 }
             }
@@ -184,7 +184,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError error) {
                 Log.e(TAG, "❌ Error cargando datos del conductor: " + error.getMessage());
-                Toast.makeText(EditarPerfilConductor.this,
+                Toast.makeText(EditarPerfilConductorActivity.this,
                         "Error cargando datos del conductor: " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -215,7 +215,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError error) {
                 Log.e(TAG, "❌ Error cargando datos del vehículo: " + error.getMessage());
-                Toast.makeText(EditarPerfilConductor.this,
+                Toast.makeText(EditarPerfilConductorActivity.this,
                         "Error cargando datos del vehículo: " + error.getMessage(), Toast.LENGTH_LONG).show();
                 inicializarCamposVehiculoVacios();
             }
@@ -394,7 +394,7 @@ public class EditarPerfilConductor extends AppCompatActivity {
                 Log.e(TAG, "❌ Error actualizando vehículo: " + error);
                 btnGuardarCambios.setEnabled(true);
                 btnGuardarCambios.setText("Guardar");
-                Toast.makeText(EditarPerfilConductor.this,
+                Toast.makeText(EditarPerfilConductorActivity.this,
                         "Error al guardar vehículo: " + error, Toast.LENGTH_LONG).show();
             }
         });

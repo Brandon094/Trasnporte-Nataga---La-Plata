@@ -18,7 +18,7 @@ import com.chopcode.trasnportenataga_laplata.services.user.UserService;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EditarPerfil extends AppCompatActivity {
+public class EditarPerfilActivity extends AppCompatActivity {
 
     private Button btnGuardar, btnCancelar;
     private EditText etNombre, etTelefono, etCorreo;
@@ -176,7 +176,7 @@ public class EditarPerfil extends AppCompatActivity {
                         registrarEventoAnalitico("actualizacion_perfil_exitosa", null, null);
 
                         runOnUiThread(() -> {
-                            Toast.makeText(EditarPerfil.this, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EditarPerfilActivity.this, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "✅ Mostrando toast de éxito");
 
                             // ✅ Registrar evento de finalización
@@ -197,7 +197,7 @@ public class EditarPerfil extends AppCompatActivity {
                         registrarEventoAnalitico("actualizacion_perfil_error", null, null);
 
                         runOnUiThread(() -> {
-                            Toast.makeText(EditarPerfil.this, "Error al actualizar: " + error, Toast.LENGTH_LONG).show();
+                            Toast.makeText(EditarPerfilActivity.this, "Error al actualizar: " + error, Toast.LENGTH_LONG).show();
                             Log.e(TAG, "❌ Mostrando toast de error al usuario");
                         });
                     }
@@ -270,7 +270,7 @@ public class EditarPerfil extends AppCompatActivity {
                 registrarEventoAnalitico("carga_datos_usuario_editar_error", null, null);
 
                 runOnUiThread(() -> {
-                    Toast.makeText(EditarPerfil.this, "Error al cargar datos: " + error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditarPerfilActivity.this, "Error al cargar datos: " + error, Toast.LENGTH_SHORT).show();
 
                     // Mostrar datos por defecto en caso de error
                     tvNombreActual.setText("Nombre actual: No disponible");

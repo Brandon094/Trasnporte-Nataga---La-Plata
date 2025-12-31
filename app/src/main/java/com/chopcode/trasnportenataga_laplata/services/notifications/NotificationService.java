@@ -12,13 +12,11 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
-import com.chopcode.trasnportenataga_laplata.activities.common.InicioDeSesion;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.chopcode.trasnportenataga_laplata.activities.common.InicioDeSesionActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.chopcode.trasnportenataga_laplata.R;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationService extends FirebaseMessagingService {
@@ -136,7 +134,7 @@ public class NotificationService extends FirebaseMessagingService {
             Log.d(TAG, "🎯 Creando notificación: " + title);
 
             // Intent para cuando se hace clic en la notificación
-            Intent intent = new Intent(this, InicioDeSesion.class);
+            Intent intent = new Intent(this, InicioDeSesionActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             // Add data to intent

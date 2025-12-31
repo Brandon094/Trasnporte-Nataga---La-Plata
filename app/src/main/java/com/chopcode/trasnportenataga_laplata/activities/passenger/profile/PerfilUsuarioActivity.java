@@ -10,9 +10,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.activities.passenger.editProfile.EditarPerfil;
-import com.chopcode.trasnportenataga_laplata.activities.passenger.history.HistorialReservas;
-import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuarios;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.editProfile.EditarPerfilActivity;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.history.HistorialReservasActivity;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuariosActivity;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Usuario;
@@ -22,7 +22,7 @@ import com.google.android.material.card.MaterialCardView;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PerfilUsuario extends AppCompatActivity {
+public class PerfilUsuarioActivity extends AppCompatActivity {
     private TextView tvNombre, tvCorreo, tvTelefono;
     private MaterialCardView cardEditarPerfil, cardHistorialReservas, cardVolverInicio, cardCerrarSesion;
     private AuthManager authManager;
@@ -188,7 +188,7 @@ public class PerfilUsuario extends AppCompatActivity {
         // ✅ Registrar evento de navegación
         registrarEventoAnalitico("navegar_volver_inicio", null, null);
 
-        Intent intent = new Intent(this, InicioUsuarios.class);
+        Intent intent = new Intent(this, InicioUsuariosActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
@@ -203,7 +203,7 @@ public class PerfilUsuario extends AppCompatActivity {
         // ✅ Registrar evento de navegación
         registrarEventoAnalitico("navegar_editar_perfil", null, null);
 
-        Intent intent = new Intent(this, EditarPerfil.class);
+        Intent intent = new Intent(this, EditarPerfilActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         Log.d(TAG, "✅ Navegación a EditarPerfil completada");
@@ -216,7 +216,7 @@ public class PerfilUsuario extends AppCompatActivity {
         // ✅ Registrar evento de navegación
         registrarEventoAnalitico("navegar_historial_reservas", null, null);
 
-        Intent intent = new Intent(this, HistorialReservas.class);
+        Intent intent = new Intent(this, HistorialReservasActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         Log.d(TAG, "✅ Navegación a HistorialReservas completada");
@@ -325,7 +325,7 @@ public class PerfilUsuario extends AppCompatActivity {
                 registrarEventoAnalitico("error_carga_datos_usuario", null, null);
 
                 runOnUiThread(() -> {
-                    Toast.makeText(PerfilUsuario.this, "Error cargando datos: " + error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PerfilUsuarioActivity.this, "Error cargando datos: " + error, Toast.LENGTH_SHORT).show();
 
                     // Mostrar datos por defecto en caso de error
                     tvNombre.setText("Usuario");

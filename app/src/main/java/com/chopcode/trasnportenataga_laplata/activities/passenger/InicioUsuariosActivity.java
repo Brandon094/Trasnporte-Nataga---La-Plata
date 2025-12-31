@@ -11,8 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.activities.passenger.editProfile.EditarPerfil;
-import com.chopcode.trasnportenataga_laplata.activities.passenger.profile.PerfilUsuario;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.editProfile.EditarPerfilActivity;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.profile.PerfilUsuarioActivity;
 import com.chopcode.trasnportenataga_laplata.adapters.horarios.HorarioPagerAdapter;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InicioUsuarios extends AppCompatActivity {
+public class InicioUsuariosActivity extends AppCompatActivity {
 
     // Services y Managers
     private HorarioService horarioService;
@@ -128,7 +128,7 @@ public class InicioUsuarios extends AppCompatActivity {
                 // ✅ Registrar evento analítico de navegación
                 registrarEventoAnalitico("navegar_perfil_usuario_toolbar", null, null);
 
-                Intent intent = new Intent(InicioUsuarios.this, PerfilUsuario.class);
+                Intent intent = new Intent(InicioUsuariosActivity.this, PerfilUsuarioActivity.class);
                 startActivity(intent);
                 return true;
             }
@@ -174,7 +174,7 @@ public class InicioUsuarios extends AppCompatActivity {
 
             if (validarLogIn()) {
                 Log.d(TAG, "👤 Navegando a EditarPerfil");
-                Intent intent = new Intent(InicioUsuarios.this, EditarPerfil.class);
+                Intent intent = new Intent(InicioUsuariosActivity.this, EditarPerfilActivity.class);
                 startActivity(intent);
             } else {
                 Log.w(TAG, "⚠️ Usuario no logeado - no se puede editar perfil");
@@ -423,7 +423,7 @@ public class InicioUsuarios extends AppCompatActivity {
                             MyApp.logError(new Exception("pagerAdapter es null en InicioUsuarios"));
                         }
 
-                        Toast.makeText(InicioUsuarios.this,
+                        Toast.makeText(InicioUsuariosActivity.this,
                                 "Horarios actualizados: " + (listaNataga.size() + listaLaPlata.size()) + " total",
                                 Toast.LENGTH_SHORT).show();
 
@@ -442,7 +442,7 @@ public class InicioUsuarios extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(InicioUsuarios.this, "Error al cargar horarios: " + error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(InicioUsuariosActivity.this, "Error al cargar horarios: " + error, Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "❌ Error mostrado al usuario");
                     }
                 });

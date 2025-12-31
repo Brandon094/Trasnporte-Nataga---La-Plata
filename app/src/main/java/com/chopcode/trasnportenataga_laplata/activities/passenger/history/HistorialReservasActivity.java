@@ -26,7 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class HistorialReservas extends AppCompatActivity {
+public class HistorialReservasActivity extends AppCompatActivity {
 
     // ✅ NUEVO: Tag para logs
     private static final String TAG = "HistorialReservas";

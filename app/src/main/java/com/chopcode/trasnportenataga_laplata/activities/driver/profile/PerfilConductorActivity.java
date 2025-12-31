@@ -10,9 +10,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.activities.driver.history.HistorialConductor;
-import com.chopcode.trasnportenataga_laplata.activities.driver.InicioConductor;
-import com.chopcode.trasnportenataga_laplata.activities.driver.editProfile.EditarPerfilConductor;
+import com.chopcode.trasnportenataga_laplata.activities.driver.history.HistorialConductorActivity;
+import com.chopcode.trasnportenataga_laplata.activities.driver.InicioConductorActivity;
+import com.chopcode.trasnportenataga_laplata.activities.driver.editProfile.EditarPerfilConductorActivity;
 import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Vehiculo;
 import com.chopcode.trasnportenataga_laplata.services.user.UserService;
@@ -21,7 +21,7 @@ import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
-public class PerfilConductor extends AppCompatActivity {
+public class PerfilConductorActivity extends AppCompatActivity {
     private TextView tvConductor, tvEmail, tvTelefono, tvPlaca, tvModVehiculo, tvCapacidad, tvAnioVehiculo;
     private MaterialCardView cardEditarPerfil, cardHistorialViajes, cardDisponibilidad, cardCerrarSesion;
     private UserService userService;
@@ -112,7 +112,7 @@ public class PerfilConductor extends AppCompatActivity {
             public void onError(String error) {
                 runOnUiThread(() -> {
                     Log.e("PerfilConductor", "Error cargando conductor: " + error);
-                    Toast.makeText(PerfilConductor.this, "Error al cargar datos del conductor", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PerfilConductorActivity.this, "Error al cargar datos del conductor", Toast.LENGTH_SHORT).show();
                     // Intentar cargar solo datos básicos del usuario como fallback
                     cargarSoloDatosUsuario(userId);
                 });
@@ -308,7 +308,7 @@ public class PerfilConductor extends AppCompatActivity {
      * Método para ir a la edición del perfil
      */
     public void irEditarPerfil(){
-        Intent intent = new Intent(PerfilConductor.this, EditarPerfilConductor.class);
+        Intent intent = new Intent(PerfilConductorActivity.this, EditarPerfilConductorActivity.class);
         startActivity(intent);
     }
 
@@ -316,7 +316,7 @@ public class PerfilConductor extends AppCompatActivity {
      * Método para ir al historial de viajes
      */
     public void irHistorialViajes(){
-        Intent intent = new Intent(PerfilConductor.this, HistorialConductor.class);
+        Intent intent = new Intent(PerfilConductorActivity.this, HistorialConductorActivity.class);
         startActivity(intent);
     }
 
@@ -324,7 +324,7 @@ public class PerfilConductor extends AppCompatActivity {
      * Método para ir al inicio del conductor
      */
     public void irInicioConductor(){
-        Intent intent = new Intent(PerfilConductor.this, InicioConductor.class);
+        Intent intent = new Intent(PerfilConductorActivity.this, InicioConductorActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();

@@ -15,7 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.confirmReservation.ConfirmarReserva;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.confirmReservation.ConfirmarReservaActivity;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.managers.ui.ExpandableSectionManager;
@@ -46,7 +46,7 @@ import java.util.Set;
  * Actividad para la gestión de reservas de asientos en un transporte.
  * Permite seleccionar una ruta, visualizar los asientos disponibles y confirmar la reserva.
  */
-public class CrearReservas extends AppCompatActivity {
+public class CrearReservasActivity extends AppCompatActivity {
     /** Iconos de los asientos */
     private static final int VECTOR_ASIENTO_DISPONIBLE = R.drawable.asiento_disponible;
     private static final int VECTOR_ASIENTO_SELECCIONADO = R.drawable.asiento_seleccionado;
@@ -805,21 +805,21 @@ public class CrearReservas extends AppCompatActivity {
                     MaterialButton btn = entry.getValue();
 
                     if (ocupados.contains(numAsiento)) {
-                        btn.setIcon(ContextCompat.getDrawable(CrearReservas.this,
+                        btn.setIcon(ContextCompat.getDrawable(CrearReservasActivity.this,
                                 VECTOR_ASIENTO_OCUPADO));
                         btn.setEnabled(false);
                     } else {
-                        btn.setIcon(ContextCompat.getDrawable(CrearReservas.this,
+                        btn.setIcon(ContextCompat.getDrawable(CrearReservasActivity.this,
                                 VECTOR_ASIENTO_DISPONIBLE));
                         btn.setEnabled(true);
 
                         btn.setOnClickListener(v -> {
                             if (asientoSeleccionado != null && mapaAsientos.containsKey(asientoSeleccionado)) {
-                                mapaAsientos.get(asientoSeleccionado).setIcon(ContextCompat.getDrawable(CrearReservas.this, VECTOR_ASIENTO_DISPONIBLE));
+                                mapaAsientos.get(asientoSeleccionado).setIcon(ContextCompat.getDrawable(CrearReservasActivity.this, VECTOR_ASIENTO_DISPONIBLE));
                             }
 
                             asientoSeleccionado = numAsiento;
-                            btn.setIcon(ContextCompat.getDrawable(CrearReservas.this,
+                            btn.setIcon(ContextCompat.getDrawable(CrearReservasActivity.this,
                                     VECTOR_ASIENTO_SELECCIONADO));
 
                             // ✅ AGREGADO: Colapsar automáticamente la sección de información
@@ -830,7 +830,7 @@ public class CrearReservas extends AppCompatActivity {
                             // ✅ Registrar evento de selección de asiento
                             registrarEventoAnalitico("asiento_seleccionado", numAsiento, null);
 
-                            Toast.makeText(CrearReservas.this,
+                            Toast.makeText(CrearReservasActivity.this,
                                     "Asiento seleccionado: " + asientoSeleccionado, Toast.LENGTH_SHORT).show();
                         });
                     }
@@ -839,7 +839,7 @@ public class CrearReservas extends AppCompatActivity {
 
             @Override
             public void onError(String error) {
-                Toast.makeText(CrearReservas.this, "Error al obtener disponibilidad: " + error,
+                Toast.makeText(CrearReservasActivity.this, "Error al obtener disponibilidad: " + error,
                         Toast.LENGTH_SHORT).show();
 
                 // ✅ Usar MyApp para logging de errores
@@ -909,7 +909,7 @@ public class CrearReservas extends AppCompatActivity {
      * Enviar la informacion a la interfaz de confirmarReserva - MÉTODO MEJORADO
      */
     private void enviarConfirmarReserva() {
-        Intent confirmarReserva = new Intent(CrearReservas.this, ConfirmarReserva.class);
+        Intent confirmarReserva = new Intent(CrearReservasActivity.this, ConfirmarReservaActivity.class);
 
         // DEBUG: Verificar qué datos vamos a enviar
         Log.d(TAG, "📤 ENVIANDO DATOS A CONFIRMAR RESERVA:");

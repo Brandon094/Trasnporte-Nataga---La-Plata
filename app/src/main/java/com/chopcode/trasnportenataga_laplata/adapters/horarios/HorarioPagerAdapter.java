@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuarios;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuariosActivity;
 import com.chopcode.trasnportenataga_laplata.fragments.HorarioFragment;
 import com.chopcode.trasnportenataga_laplata.models.Horario;
 import com.chopcode.trasnportenataga_laplata.models.Usuario;
@@ -20,9 +20,9 @@ public class HorarioPagerAdapter extends FragmentStateAdapter {
     private List<Horario> listaNataga;
     private List<Horario> listaLaPlata;
     private List<HorarioFragment> fragments = new ArrayList<>();
-    private InicioUsuarios actividadPadre;
+    private InicioUsuariosActivity actividadPadre;
 
-    public HorarioPagerAdapter(@NonNull InicioUsuarios fragmentActivity,
+    public HorarioPagerAdapter(@NonNull InicioUsuariosActivity fragmentActivity,
                                List<Horario> listaNataga,
                                List<Horario> listaLaPlata) {
         super(fragmentActivity);

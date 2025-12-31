@@ -22,7 +22,7 @@ import com.google.firebase.database.DatabaseReference; // ✅ NUEVO IMPORT
 import java.util.HashMap; // ✅ NUEVO IMPORT
 import java.util.Map; // ✅ NUEVO IMPORT
 
-public class RegistroUsuarios extends AppCompatActivity {
+public class RegistroUsuariosActivity extends AppCompatActivity {
 
     // ✅ TAG para logs
     private static final String TAG = "RegistroUsuarios";
@@ -78,7 +78,7 @@ public class RegistroUsuarios extends AppCompatActivity {
             params.put("action", "click_iniciar_sesion");
             MyApp.logEvent("navigation_event", params);
 
-            startActivity(new Intent(RegistroUsuarios.this, InicioDeSesion.class));
+            startActivity(new Intent(RegistroUsuariosActivity.this, InicioDeSesionActivity.class));
             finish(); // Cierra la pantalla de registro para que no vuelva atrás
         });
 
@@ -207,7 +207,7 @@ public class RegistroUsuarios extends AppCompatActivity {
                         MyApp.logError(new Exception("Usuario null después de registro exitoso"));
                     }
 
-                    Toast.makeText(RegistroUsuarios.this, "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegistroUsuariosActivity.this, "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "🚀 Redirigiendo a pantalla de inicio de sesión");
 
                     // ✅ REGISTRAR NAVEGACIÓN
@@ -216,7 +216,7 @@ public class RegistroUsuarios extends AppCompatActivity {
                     navParams.put("to", "InicioDeSesion");
                     MyApp.logEvent("screen_transition", navParams);
 
-                    startActivity(new Intent(RegistroUsuarios.this, InicioDeSesion.class));
+                    startActivity(new Intent(RegistroUsuariosActivity.this, InicioDeSesionActivity.class));
                     finish();
                 });
             }
@@ -239,7 +239,7 @@ public class RegistroUsuarios extends AppCompatActivity {
                     buttonRegistrar.setText("Registrarse");
                     Log.d(TAG, "✅ Botón de registro reestablecido después del error");
 
-                    Toast.makeText(RegistroUsuarios.this, "Error: " + error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegistroUsuariosActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
                 });
             }
         });

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.passenger.InicioUsuarios">
+    tools:context=".activities.passenger.InicioUsuariosActivity">
 
     <!-- AppBar con efecto de scroll -->
     <com.google.android.material.appbar.AppBarLayout

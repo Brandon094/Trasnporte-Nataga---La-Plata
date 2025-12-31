@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.activities.driver.profile.PerfilConductor;
+import com.chopcode.trasnportenataga_laplata.activities.driver.profile.PerfilConductorActivity;
 import com.chopcode.trasnportenataga_laplata.adapters.reservas.ReservaAdapter;
 import com.chopcode.trasnportenataga_laplata.adapters.rutas.RutaAdapter;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
@@ -35,7 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class InicioConductor extends AppCompatActivity {
+public class InicioConductorActivity extends AppCompatActivity {
     private static final String TAG = "InicioConductor";
 
     // Views principales
@@ -361,7 +361,7 @@ public class InicioConductor extends AppCompatActivity {
         viewModel.getErrorLiveData().observe(this, error -> {
             if (error != null && !error.isEmpty()) {
                 Log.e(TAG, "❌ Error observado: " + error);
-                Toast.makeText(InicioConductor.this,
+                Toast.makeText(InicioConductorActivity.this,
                         getString(R.string.error_carga_estadisticas), Toast.LENGTH_SHORT).show();
             }
         });
@@ -565,7 +565,7 @@ public class InicioConductor extends AppCompatActivity {
         Log.d(TAG, "👤 Navegando a perfil de conductor");
 
         if (authManager.isUserLoggedIn()) {
-            startActivity(new Intent(this, PerfilConductor.class));
+            startActivity(new Intent(this, PerfilConductorActivity.class));
             Log.d(TAG, "✅ Intent iniciado para PerfilConductor");
         } else {
             Log.w(TAG, "⚠️ Usuario no logeado - no se puede navegar al perfil");

@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.chopcode.trasnportenataga_laplata.activities.common.InicioDeSesion;
+import com.chopcode.trasnportenataga_laplata.activities.common.InicioDeSesionActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -72,7 +72,7 @@ public class AuthManager {
         Log.d(TAG, "   - Context: " + context.getClass().getSimpleName());
 
         try {
-            Intent intent = new Intent(context, InicioDeSesion.class);
+            Intent intent = new Intent(context, InicioDeSesionActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             Log.d(TAG, "✅ Intent creado - flags: NEW_TASK | CLEAR_TASK");
 

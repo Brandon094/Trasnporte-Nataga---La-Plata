@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:padding="24dp"
     android:background="@color/background"
-    tools:context=".activities.common.InicioDeSesion">
+    tools:context=".activities.common.InicioDeSesionActivity">
 
     <!-- Título con ícono -->
     <LinearLayout

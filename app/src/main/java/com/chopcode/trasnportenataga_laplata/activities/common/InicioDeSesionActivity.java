@@ -20,9 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.activities.driver.InicioConductor;
-import com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.createReservation.CrearReservas;
-import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuarios;
+import com.chopcode.trasnportenataga_laplata.activities.driver.InicioConductorActivity;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.createReservation.CrearReservasActivity;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuariosActivity;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.notificactions.NotificationManager;
 import com.chopcode.trasnportenataga_laplata.managers.permissions.PermissionManager;
@@ -36,7 +36,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-public class InicioDeSesion extends AppCompatActivity {
+public class InicioDeSesionActivity extends AppCompatActivity {
 
     private EditText editTextUsuario, editTextPassword;
     private Button buttonIngresar;
@@ -129,7 +129,7 @@ public class InicioDeSesion extends AppCompatActivity {
         if (olvidasteContraseña != null) {
             olvidasteContraseña.setOnClickListener(v -> {
                 Log.d(TAG, "🔑 Usuario solicitó recuperar contraseña");
-                Toast.makeText(InicioDeSesion.this, "Función en desarrollo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(InicioDeSesionActivity.this, "Función en desarrollo", Toast.LENGTH_SHORT).show();
                 // Aquí puedes implementar la recuperación de contraseña
             });
         }
@@ -197,7 +197,7 @@ public class InicioDeSesion extends AppCompatActivity {
 
             if (correo.isEmpty() || password.isEmpty()) {
                 Log.w(TAG, "⚠️ Campos vacíos - mostrando toast");
-                Toast.makeText(InicioDeSesion.this, "Ingresa correo y contraseña", Toast.LENGTH_SHORT).show();
+                Toast.makeText(InicioDeSesionActivity.this, "Ingresa correo y contraseña", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -238,7 +238,7 @@ public class InicioDeSesion extends AppCompatActivity {
                     // ✅ REHABILITAR BOTÓN EN CASO DE ERROR
                     buttonIngresar.setEnabled(true);
                     buttonIngresar.setText("Ingresar");
-                    Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(InicioDeSesionActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
                 }
             });
         });
@@ -279,7 +279,7 @@ public class InicioDeSesion extends AppCompatActivity {
                 public void onLoginFailure(String error) {
                     Log.e(TAG, "❌ Error en login con Google: " + error);
                     btnGoogleSignIn.setEnabled(true);
-                    Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(InicioDeSesionActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
                 }
             });
         });
@@ -294,7 +294,7 @@ public class InicioDeSesion extends AppCompatActivity {
         if (buttonRegistro != null) {
             buttonRegistro.setOnClickListener(v -> {
                 Log.d(TAG, "📝 Navegando a RegistroUsuarios");
-                Intent intent = new Intent(InicioDeSesion.this, RegistroUsuarios.class);
+                Intent intent = new Intent(InicioDeSesionActivity.this, RegistroUsuariosActivity.class);
                 startActivity(intent);
             });
         } else {
@@ -336,7 +336,7 @@ public class InicioDeSesion extends AppCompatActivity {
                 public void onLoginFailure(String error) {
                     Log.e(TAG, "❌ Error en Google Sign-In (ActivityResult): " + error);
                     btnGoogleSignIn.setEnabled(true);
-                    Toast.makeText(InicioDeSesion.this, "Error: " + error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(InicioDeSesionActivity.this, "Error: " + error, Toast.LENGTH_LONG).show();
                 }
             });
         } else {
@@ -679,12 +679,12 @@ public class InicioDeSesion extends AppCompatActivity {
         if (volverAReserva) {
             // Si vino de intentar reservar, llevarlo directamente a reservas
             Log.d(TAG, "🎫 Redirigiendo a CrearReservas (volver a reserva)");
-            Intent intent = new Intent(InicioDeSesion.this, CrearReservas.class);
+            Intent intent = new Intent(InicioDeSesionActivity.this, CrearReservasActivity.class);
             startActivity(intent);
         } else {
             // Caso normal: ir a la pantalla principal
             Log.d(TAG, "🏠 Redirigiendo a InicioUsuarios (caso normal)");
-            Intent intent = new Intent(InicioDeSesion.this, InicioUsuarios.class);
+            Intent intent = new Intent(InicioDeSesionActivity.this, InicioUsuariosActivity.class);
             startActivity(intent);
         }
         Log.d(TAG, "🔚 Finalizando actividad de login");
@@ -695,7 +695,7 @@ public class InicioDeSesion extends AppCompatActivity {
         Log.d(TAG, "🎯 Ejecutando irAInicioConductor");
         Log.d(TAG, "🚗 Redirigiendo a InicioConductor");
 
-        Intent intent = new Intent(InicioDeSesion.this, InicioConductor.class);
+        Intent intent = new Intent(InicioDeSesionActivity.this, InicioConductorActivity.class);
         startActivity(intent);
         Log.d(TAG, "🔚 Finalizando actividad de login (conductor)");
         finish();

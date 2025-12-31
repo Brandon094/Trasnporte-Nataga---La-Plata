@@ -12,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuarios;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.InicioUsuariosActivity;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.managers.notificactions.NotificationManager;
@@ -23,7 +23,7 @@ import com.google.android.material.button.MaterialButton;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ConfirmarReserva extends AppCompatActivity {
+public class ConfirmarReservaActivity extends AppCompatActivity {
 
     // TextViews de la nueva interfaz
     private TextView tvRuta, tvFechaHora, tvTiempoEstimado, tvPrecio, tvAsiento;
@@ -403,7 +403,7 @@ public class ConfirmarReserva extends AppCompatActivity {
                         if (!isFinishing()) {
                             btnConfirmarReserva.setEnabled(true);
                             btnConfirmarReserva.setText("Confirmar Reserva");
-                            Toast.makeText(ConfirmarReserva.this,
+                            Toast.makeText(ConfirmarReservaActivity.this,
                                     "La operación está tardando más de lo esperado. Verifica tu conexión.",
                                     Toast.LENGTH_LONG).show();
                         }
@@ -426,7 +426,7 @@ public class ConfirmarReserva extends AppCompatActivity {
 
                         runOnUiThread(() -> {
                             if (!isFinishing()) {
-                                Toast.makeText(ConfirmarReserva.this, "✅ Reserva creada exitosamente", Toast.LENGTH_LONG).show();
+                                Toast.makeText(ConfirmarReservaActivity.this, "✅ Reserva creada exitosamente", Toast.LENGTH_LONG).show();
 
                                 // ✅ Registrar evento de reserva exitosa
                                 registrarEventoAnalitico("reserva_registrada_exitosa", asientoSeleccionado, null);
@@ -460,7 +460,7 @@ public class ConfirmarReserva extends AppCompatActivity {
                                 // ✅ Registrar evento de error
                                 registrarEventoAnalitico("error_registro_reserva", asientoSeleccionado, null);
 
-                                Toast.makeText(ConfirmarReserva.this, "❌ Error al confirmar reserva: " + error, Toast.LENGTH_LONG).show();
+                                Toast.makeText(ConfirmarReservaActivity.this, "❌ Error al confirmar reserva: " + error, Toast.LENGTH_LONG).show();
                             }
                         });
                     }
@@ -532,7 +532,7 @@ public class ConfirmarReserva extends AppCompatActivity {
                                 // ✅ Registrar evento de notificación exitosa
                                 registrarEventoAnalitico("notificacion_conductor_exitosa", asientoSeleccionado, null);
 
-                                Toast.makeText(ConfirmarReserva.this, "✅ Reserva confirmada y notificación enviada", Toast.LENGTH_LONG).show();
+                                Toast.makeText(ConfirmarReservaActivity.this, "✅ Reserva confirmada y notificación enviada", Toast.LENGTH_LONG).show();
                                 navegarAInicioUsuarios();
                             }
                         });
@@ -570,7 +570,7 @@ public class ConfirmarReserva extends AppCompatActivity {
         registrarEventoAnalitico("navegacion_inicio_usuarios", asientoSeleccionado, null);
 
         try {
-            Intent intent = new Intent(ConfirmarReserva.this, InicioUsuarios.class);
+            Intent intent = new Intent(ConfirmarReservaActivity.this, InicioUsuariosActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();

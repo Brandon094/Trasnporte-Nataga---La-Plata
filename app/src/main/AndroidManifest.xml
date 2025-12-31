@@ -45,7 +45,7 @@
 
         <!-- 🔹 ACTIVIDAD PRINCIPAL - Punto de entrada de la aplicación -->
         <activity
-            android:name=".activities.common.InicioDeSesion"
+            android:name=".activities.common.InicioDeSesionActivity"
             android:exported="true"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar">
             <intent-filter>
@@ -66,59 +66,59 @@
 
         <!-- 🔹 ACTIVIDADES DE LA APLICACIÓN -->
         <activity
-            android:name=".activities.passenger.reservation.confirmReservation.ConfirmarReserva"
+            android:name=".activities.passenger.reservation.confirmReservation.ConfirmarReservaActivity"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.passenger.reservation.createReservation.CrearReservas"
+            android:name=".activities.passenger.reservation.createReservation.CrearReservasActivity"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.passenger.editProfile.EditarPerfil"
+            android:name=".activities.passenger.editProfile.EditarPerfilActivity"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.driver.editProfile.EditarPerfilConductor"
+            android:name=".activities.driver.editProfile.EditarPerfilConductorActivity"
             android:exported="false"
             android:label="Editar Perfil Conductor"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.driver.history.HistorialConductor"
+            android:name=".activities.driver.history.HistorialConductorActivity"
             android:exported="false"
             android:label="@string/historial_reservas"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.passenger.history.HistorialReservas"
+            android:name=".activities.passenger.history.HistorialReservasActivity"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.driver.InicioConductor"
+            android:name=".activities.driver.InicioConductorActivity"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.passenger.InicioUsuarios"
+            android:name=".activities.passenger.InicioUsuariosActivity"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.driver.profile.PerfilConductor"
+            android:name=".activities.driver.profile.PerfilConductorActivity"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.passenger.profile.PerfilUsuario"
+            android:name=".activities.passenger.profile.PerfilUsuarioActivity"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 
         <activity
-            android:name=".activities.common.RegistroUsuarios"
+            android:name=".activities.common.RegistroUsuariosActivity"
             android:exported="false"
             android:theme="@style/Theme.TrasnporteNatagaLaPlata.NoActionBar" />
 

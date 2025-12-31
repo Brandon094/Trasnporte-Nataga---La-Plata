@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chopcode.trasnportenataga_laplata.R;
-import com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.createReservation.CrearReservas;
+import com.chopcode.trasnportenataga_laplata.activities.passenger.reservation.createReservation.CrearReservasActivity;
 import com.chopcode.trasnportenataga_laplata.adapters.horarios.HorarioAdapter;
 import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Horario;
@@ -180,7 +180,7 @@ public class HorarioFragment extends Fragment implements HorarioAdapter.OnReserv
         Log.d(TAG, "🔄 Navegando a actividad CrearReservas");
 
         try {
-            Intent intent = new Intent(getActivity(), CrearReservas.class);
+            Intent intent = new Intent(getActivity(), CrearReservasActivity.class);
             intent.putExtra("horarioId", horario.getId());
             intent.putExtra("horarioHora", horario.getHora());
             intent.putExtra("rutaSeleccionada", titulo); // Usamos el título como ruta

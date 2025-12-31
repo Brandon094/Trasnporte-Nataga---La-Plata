@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class HistorialConductor extends AppCompatActivity {
+public class HistorialConductorActivity extends AppCompatActivity {
 
     // Views
     private Toolbar toolbar;
@@ -138,7 +138,7 @@ public class HistorialConductor extends AppCompatActivity {
             @Override
             public void onVerDetallesClick(Reserva reserva) {
                 // Navegar a pantalla de detalles
-                Toast.makeText(HistorialConductor.this,
+                Toast.makeText(HistorialConductorActivity.this,
                         "Ver detalles de: " + reserva.getNombre(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -174,7 +174,7 @@ public class HistorialConductor extends AppCompatActivity {
                     actualizarUI();
 
                     if (reservas.isEmpty()) {
-                        Toast.makeText(HistorialConductor.this,
+                        Toast.makeText(HistorialConductorActivity.this,
                                 "No hay reservas en tu historial", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -184,7 +184,7 @@ public class HistorialConductor extends AppCompatActivity {
             public void onError(String error) {
                 runOnUiThread(() -> {
                     mostrarLoading(false);
-                    Toast.makeText(HistorialConductor.this,
+                    Toast.makeText(HistorialConductorActivity.this,
                             "Error al cargar historial: " + error, Toast.LENGTH_SHORT).show();
                     mostrarEmptyState();
                 });
