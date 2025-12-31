@@ -19,6 +19,7 @@ import com.chopcode.trasnportenataga_laplata.managers.analytics.ReservationAnaly
 import com.chopcode.trasnportenataga_laplata.managers.seats.SeatManager;
 import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.managers.ui.ExpandableSectionManager;
+import com.chopcode.trasnportenataga_laplata.managers.reservations.dataprocessor.ReservationDataProcessor; // ✅ NUEVO IMPORT
 import com.chopcode.trasnportenataga_laplata.models.Usuario;
 import com.chopcode.trasnportenataga_laplata.models.Vehiculo;
 import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
@@ -95,6 +96,7 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
     // Managers
     private ReservationAnalyticsHelper analyticsHelper;
     private SeatManager seatManager;
+    private ReservationDataProcessor reservationDataProcessor; // ✅ NUEVO
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +105,9 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
         // Inicializar analytics helper
         analyticsHelper = new ReservationAnalyticsHelper("CrearReservas");
         analyticsHelper.logPantallaInicio();
+
+        // ✅ NUEVO: Inicializar ReservationDataProcessor
+        reservationDataProcessor = new ReservationDataProcessor(analyticsHelper);
 
         setContentView(R.layout.activity_crear_reservas);
 
@@ -364,13 +369,8 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
 
     private void configurarSeleccionAsientos() {
         // ✅ MEJORADO: Usar el método automático del SeatManager
-        // En lugar de definir manualmente los IDs, usamos el método configurarAsientos() sin parámetros
         seatManager.configurarAsientos();
 
-        // ✅ O puedes usar la versión que obtiene los IDs automáticamente:
-        // seatManager.configurarAsientos(SeatManager.getBotonesAsientosIds());
-
-        // ✅ INFORMACIÓN ÚTIL: También puedes obtener la capacidad total
         int capacidadTotal = seatManager.getNumeroTotalAsientos();
         Log.d(TAG, "✅ Asientos configurados automáticamente. Capacidad total: " + capacidadTotal);
     }
@@ -412,81 +412,36 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
         });
     }
 
+    /**
+     * ✅ MEJORADO: Usando ReservationDataProcessor para validaciones y envío
+     */
     private void validacionesReserva() {
-        if (rutaSeleccionada == null) {
-            Toast.makeText(this, "Error: No hay ruta seleccionada", Toast.LENGTH_SHORT).show();
-            analyticsHelper.logValidacionFallida("sin_ruta");
-            return;
+        // ✅ NUEVO: Usar el procesador para preparar la confirmación
+        Intent intent = reservationDataProcessor.prepareReservationConfirmation(
+                this, // Contexto
+                seatManager,
+                rutaSeleccionada,
+                horarioId,
+                horarioHora,
+                conductorNombre,
+                conductorTelefono,
+                conductorId,
+                placaVehiculo,
+                modeloVehiculo,
+                capacidadVehiculo,
+                usuarioNombre,
+                usuarioTelefono,
+                usuarioId,
+                obtenerFechaDelViaje()
+        );
+
+        if (intent != null) {
+            // ✅ NUEVO: Iniciar actividad con el Intent preparado
+            startActivity(intent);
+        } else {
+            // Mostrar mensaje de error genérico si el procesador devuelve null
+            Toast.makeText(this, "Error: Datos de reserva incompletos", Toast.LENGTH_SHORT).show();
         }
-
-        if (!seatManager.hasAsientoSeleccionado()) {
-            Toast.makeText(this, "Selecciona un asiento", Toast.LENGTH_SHORT).show();
-            analyticsHelper.logValidacionFallida("sin_asiento");
-            return;
-        }
-
-        analyticsHelper.logValidacionExitosa(seatManager.getAsientoSeleccionado(), rutaSeleccionada);
-        enviarConfirmarReserva();
-    }
-
-    private void enviarConfirmarReserva() {
-        Intent confirmarReserva = new Intent(this, ConfirmarReservaActivity.class);
-
-        Log.d(TAG, "📤 ENVIANDO DATOS A CONFIRMAR RESERVA:");
-        Log.d(TAG, "  - Asiento: " + seatManager.getAsientoSeleccionado());
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("asiento", seatManager.getAsientoSeleccionado());
-        params.put("accion", "envio_a_confirmar_reserva");
-        analyticsHelper.logEvent("envio_a_confirmar_reserva", params);
-
-        Map<String, Object> detallesParams = new HashMap<>();
-        detallesParams.put("asiento", seatManager.getAsientoSeleccionado());
-        detallesParams.put("ruta", rutaSeleccionada != null ? rutaSeleccionada : "N/A");
-        detallesParams.put("horario", horarioHora != null ? horarioHora : "N/A");
-        detallesParams.put("conductor_nombre", conductorNombre);
-        detallesParams.put("vehiculo_placa", placaVehiculo);
-        analyticsHelper.logEvent("detalles_reserva_crear", detallesParams);
-
-        // Información básica del viaje
-        confirmarReserva.putExtra("asientoSeleccionado", seatManager.getAsientoSeleccionado());
-        confirmarReserva.putExtra("rutaSelecionada", rutaSeleccionada);
-        confirmarReserva.putExtra("horarioId", horarioId);
-        confirmarReserva.putExtra("horarioHora", horarioHora);
-        confirmarReserva.putExtra("fechaViaje", obtenerFechaDelViaje());
-
-        // ✅ MEJORADO: Enviar información de capacidad desde el SeatManager
-        confirmarReserva.putExtra("capacidadTotal", seatManager.getCapacidadTotal());
-        confirmarReserva.putExtra("capacidadDisponible", seatManager.getCapacidadDisponible());
-        confirmarReserva.putExtra("asientosOcupados", seatManager.getAsientosOcupadosCount());
-
-        // Información del conductor
-        confirmarReserva.putExtra("conductorNombre", conductorNombre);
-        confirmarReserva.putExtra("conductorTelefono", conductorTelefono);
-        confirmarReserva.putExtra("conductorId", conductorId);
-
-        // Información del vehículo
-        confirmarReserva.putExtra("vehiculoPlaca", placaVehiculo);
-        confirmarReserva.putExtra("vehiculoModelo", modeloVehiculo);
-        confirmarReserva.putExtra("vehiculoCapacidad", capacidadVehiculo);
-
-        // Información del pasajero
-        confirmarReserva.putExtra("usuarioNombre", usuarioNombre);
-        confirmarReserva.putExtra("usuarioTelefono", usuarioTelefono);
-        confirmarReserva.putExtra("usuarioId", usuarioId);
-
-        // Información adicional
-        String[] partesRuta = rutaSeleccionada.split(" -> ");
-        if (partesRuta.length == 2) {
-            confirmarReserva.putExtra("origen", partesRuta[0].trim());
-            confirmarReserva.putExtra("destino", partesRuta[1].trim());
-        }
-
-        confirmarReserva.putExtra("precio", 12000.0);
-        confirmarReserva.putExtra("tiempoEstimado",
-                rutaSeleccionada.contains("Natagá -> La Plata") ? "60 min" : "55 min");
-
-        startActivity(confirmarReserva);
     }
 
     private void mostrarErrorSinHorario() {
@@ -772,7 +727,6 @@ public class CrearReservasActivity extends AppCompatActivity implements SeatMana
                             Log.w(TAG, "⚠️ Capacidad del vehículo (" + capacidadVehiculo +
                                     ") difiere de la configuración actual (" +
                                     seatManager.getCapacidadTotal() + ")");
-                            // Aquí podrías añadir lógica para manejar diferentes capacidades si es necesario
                         }
 
                         tvCapacidadInfo.setText("Capacidad: " + capacidadVehiculo + " asientos");
