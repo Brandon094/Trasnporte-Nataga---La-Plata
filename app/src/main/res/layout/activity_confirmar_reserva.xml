@@ -18,7 +18,7 @@
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="@string/confirmar"
+            app:title="@string/confirmarReserva"
             app:titleTextColor="@color/white"
             app:navigationIcon="@drawable/ic_arrow_back"
             app:navigationContentDescription="@string/volver"
@@ -73,7 +73,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Revisa y confirma tu reserva"
+                            android:text="@string/revisa_confirma_reserva"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="@color/primary_700" />
@@ -81,7 +81,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Verifica que toda la información sea correcta antes de continuar"
+                            android:text="@string/verifica_info_reserva"
                             android:textSize="14sp"
                             android:textColor="@color/text_secondary"
                             android:layout_marginTop="4dp" />
@@ -125,7 +125,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="1"
+                                android:text="@string/_1"
                                 android:textColor="@color/white"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -134,7 +134,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Detalles del Viaje"
+                            android:text="@string/detalles_viaje"
                             android:textSize="20sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary"
@@ -162,7 +162,7 @@
                                 android:id="@+id/tvOrigen"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Natagá"
+                                android:text="@string/nataga"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/primary_700"
@@ -172,7 +172,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Origen"
+                                android:text="@string/origen"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_tertiary"
                                 android:layout_marginTop="6dp" />
@@ -196,7 +196,7 @@
                                 android:id="@+id/tvDestino"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="La Plata"
+                                android:text="@string/laPlata"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/primary_700"
@@ -206,7 +206,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Destino"
+                                android:text="@string/destino"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_tertiary"
                                 android:layout_marginTop="6dp" />
@@ -236,7 +236,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Fecha"
+                                android:text="@string/fecha"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_tertiary" />
 
@@ -244,7 +244,7 @@
                                 android:id="@+id/tvFecha"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="18 Oct 2024"
+                                android:text="@string/cargando"
                                 android:textSize="16sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/text_primary"
@@ -262,17 +262,17 @@
                             android:layout_marginBottom="16dp">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Hora"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_tertiary" />
+                                android:layout_width="10dp"
+                                android:layout_height="8dp"
+                                android:text="@string/hora"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="12sp" />
 
                             <TextView
                                 android:id="@+id/tvHora"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="07:15 AM"
+                                android:text="@string/hora"
                                 android:textSize="16sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/text_primary"
@@ -292,7 +292,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Duración"
+                                android:text="@string/duracion"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_tertiary" />
 
@@ -300,7 +300,7 @@
                                 android:id="@+id/tvTiempoEstimado"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="60 min"
+                                android:text="@string/cargando"
                                 android:textSize="16sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/text_primary"
@@ -319,7 +319,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Asiento"
+                                android:text="@string/asiento"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_tertiary" />
 
@@ -327,7 +327,7 @@
                                 android:id="@+id/tvAsiento"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="A5"
+                                android:text="@string/cargando"
                                 android:textSize="16sp"
                                 android:textStyle="bold"
                                 android:background="@drawable/bg_chip_primary"
@@ -356,7 +356,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Total a pagar"
+                            android:text="@string/total_pagar"
                             android:textSize="16sp"
                             android:textColor="@color/text_secondary" />
 
@@ -370,7 +370,7 @@
                                 android:id="@+id/tvPrecio"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="$12,000"
+                                android:text="@string/cargando"
                                 android:textSize="28sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/primary_600" />
@@ -378,7 +378,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="COP"
+                                android:text="@string/moneda_cop"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_tertiary"
                                 android:layout_marginStart="4dp"
@@ -424,7 +424,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="2"
+                                android:text="@string/_2"
                                 android:textColor="@color/white"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -433,7 +433,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Información de Contacto"
+                            android:text="@string/info_contacto"
                             android:textSize="20sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary"
@@ -476,7 +476,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Tú"
+                                android:text="@string/tu"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_tertiary" />
 
@@ -484,7 +484,7 @@
                                 android:id="@+id/tvUsuario"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Brandon Daza"
+                                android:text="@string/cargando"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/text_primary"
@@ -494,26 +494,12 @@
                                 android:id="@+id/tvTelefonoP"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="322 282 4941"
+                                android:text="@string/cargando"
                                 android:textSize="14sp"
                                 android:textColor="@color/text_secondary"
                                 android:layout_marginTop="6dp" />
                         </LinearLayout>
 
-                        <com.google.android.material.button.MaterialButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Llamar"
-                            android:textSize="12sp"
-                            android:paddingHorizontal="16dp"
-                            android:paddingVertical="10dp"
-                            app:icon="@drawable/ic_call"
-                            app:iconSize="16dp"
-                            app:iconPadding="4dp"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            app:strokeColor="@color/primary_300"
-                            app:strokeWidth="1dp"
-                            android:textColor="@color/primary_600" />
                     </LinearLayout>
 
                     <!-- Tarjeta del Conductor - Mejorada visualmente -->
@@ -551,7 +537,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Conductor"
+                                android:text="@string/conductor"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_tertiary" />
 
@@ -559,7 +545,7 @@
                                 android:id="@+id/tvConductor"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Julian Gomez"
+                                android:text="@string/cargando"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/text_primary"
@@ -569,7 +555,7 @@
                                 android:id="@+id/tvPlaca"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Mazda BT-50 • GHI789"
+                                android:text="@string/cargando"
                                 android:textSize="14sp"
                                 android:textColor="@color/text_secondary"
                                 android:layout_marginTop="4dp" />
@@ -578,26 +564,12 @@
                                 android:id="@+id/tvTelefonoC"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="300 123 4567"
+                                android:text="@string/cargando"
                                 android:textSize="14sp"
                                 android:textColor="@color/text_secondary"
                                 android:layout_marginTop="2dp" />
                         </LinearLayout>
 
-                        <com.google.android.material.button.MaterialButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Llamar"
-                            android:textSize="12sp"
-                            android:paddingHorizontal="16dp"
-                            android:paddingVertical="10dp"
-                            app:icon="@drawable/ic_call"
-                            app:iconSize="16dp"
-                            app:iconPadding="4dp"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            app:strokeColor="@color/primary_300"
-                            app:strokeWidth="1dp"
-                            android:textColor="@color/primary_600" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -638,7 +610,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="3"
+                                android:text="@string/_3"
                                 android:textColor="@color/white"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -647,7 +619,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Método de Pago"
+                            android:text="@string/metodoPago"
                             android:textSize="20sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary"
@@ -655,7 +627,6 @@
                     </LinearLayout>
 
                     <!-- Opciones de pago - Mejoradas visualmente -->
-                    <!-- CORREGIDO: Cambiar id de checkIconEfectivo a cardEfectivo -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardEfectivo"
                         android:layout_width="match_parent"
@@ -701,7 +672,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Efectivo"
+                                    android:text="@string/pago_efectivo"
                                     android:textSize="16sp"
                                     android:textStyle="bold"
                                     android:textColor="@color/primary_700" />
@@ -709,13 +680,12 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Paga directamente al conductor"
+                                    android:text="@string/pago_efectivo_desc"
                                     android:textSize="12sp"
                                     android:textColor="@color/text_secondary"
                                     android:layout_marginTop="2dp" />
                             </LinearLayout>
 
-                            <!-- CORREGIDO: Agregar id al ImageView del check -->
                             <ImageView
                                 android:id="@+id/checkIconEfectivo"
                                 android:layout_width="24dp"
@@ -726,7 +696,6 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- CORREGIDO: Cambiar id de checkIconTransferencia a cardTransferencia -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardTransferencia"
                         android:layout_width="match_parent"
@@ -771,20 +740,19 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Transferencia"
+                                    android:text="@string/pago_transferencia"
                                     android:textSize="16sp"
                                     android:textColor="@color/text_primary" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Pago anticipado"
+                                    android:text="@string/pago_transferencia_desc"
                                     android:textSize="12sp"
                                     android:textColor="@color/text_secondary"
                                     android:layout_marginTop="2dp" />
                             </LinearLayout>
 
-                            <!-- CORREGIDO: Agregar id al ImageView del check -->
                             <ImageView
                                 android:id="@+id/checkIconTransferencia"
                                 android:layout_width="24dp"
@@ -818,7 +786,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Paga en efectivo al conductor al momento del viaje. Asegúrate de tener el cambio exacto."
+                            android:text="@string/info_pago_efectivo"
                             android:textSize="12sp"
                             android:textColor="@color/text_secondary"
                             android:lineSpacingExtra="4dp" />
@@ -835,10 +803,10 @@
 
                 <!-- Botón Confirmar mejorado -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnConfirmarReserva"
+                    android:id="@+id/btnConfirmar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Confirmar Reserva"
+                    android:text="@string/confirmarReserva"
                     android:textSize="16sp"
                     android:paddingVertical="18dp"
                     app:cornerRadius="16dp"
@@ -856,7 +824,7 @@
                     android:id="@+id/btnCancelar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Cancelar"
+                    android:text="@string/cancelar"
                     android:textSize="16sp"
                     android:paddingVertical="16dp"
                     app:cornerRadius="16dp"
@@ -880,7 +848,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="📋 Información importante"
+                    android:text="@string/info_importante"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"
@@ -889,7 +857,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="• Tu asiento estará reservado por 15 minutos\n• Llega 10 minutos antes de la salida\n• El conductor puede contactarte para confirmar\n• Cancela con al menos 1 hora de anticipación"
+                    android:text="@string/info_confirmacion_reserva"
                     android:textSize="12sp"
                     android:textColor="@color/text_secondary"
                     android:lineSpacingExtra="8dp" />
@@ -897,20 +865,5 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <!-- BOTÓN FLOTANTE DE AYUDA -->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabAyuda"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_gravity="bottom|end"
-        android:text="¿Necesitas ayuda?"
-        app:icon="@drawable/ic_help"
-        app:cornerRadius="20dp"
-        android:backgroundTint="@color/primary_500"
-        android:textColor="@color/white"
-        app:rippleColor="@color/ripple_primary"
-        app:elevation="4dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

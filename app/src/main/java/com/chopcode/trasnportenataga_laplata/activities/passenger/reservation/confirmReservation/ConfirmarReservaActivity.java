@@ -89,7 +89,7 @@ public class ConfirmarReservaActivity extends AppCompatActivity implements
         topAppBar = findViewById(R.id.topAppBar);
 
         // Botones
-        btnConfirmarReserva = findViewById(R.id.btnConfirmarReserva);
+        btnConfirmarReserva = findViewById(R.id.btnConfirmar);
         btnCancelar = findViewById(R.id.btnCancelar);
 
         // Inicializar referencias de vistas para el UIManager
@@ -114,14 +114,13 @@ public class ConfirmarReservaActivity extends AppCompatActivity implements
         // IMPORTANTE: IDs CORRECTOS después de la corrección
         MaterialCardView cardEfectivo = findViewById(R.id.cardEfectivo);
         MaterialCardView cardTransferencia = findViewById(R.id.cardTransferencia);
-        ExtendedFloatingActionButton fabAyuda = findViewById(R.id.fabAyuda);
 
         // Configurar UIManager con las nuevas vistas
         uiManager.setNewViewReferences(
                 tvOrigen, tvDestino, tvFecha, tvHora, tvTiempoEstimado,
                 tvPrecio, tvAsiento, tvUsuario, tvTelefonoP,
                 tvConductor, tvTelefonoC, tvPlaca,
-                cardEfectivo, cardTransferencia, fabAyuda
+                cardEfectivo, cardTransferencia
         );
 
         uiManager.setConfirmationListener(this);

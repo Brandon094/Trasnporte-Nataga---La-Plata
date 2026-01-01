@@ -47,8 +47,7 @@ public class ConfirmationUIManager {
             TextView tvTiempoEstimado, TextView tvPrecio, TextView tvAsiento,
             TextView tvUsuario, TextView tvTelefonoP, TextView tvConductor,
             TextView tvTelefonoC, TextView tvPlaca,
-            MaterialCardView cardEfectivo, MaterialCardView cardTransferencia,
-            ExtendedFloatingActionButton fabAyuda) {
+            MaterialCardView cardEfectivo, MaterialCardView cardTransferencia) {
 
         this.tvOrigen = tvOrigen;
         this.tvDestino = tvDestino;

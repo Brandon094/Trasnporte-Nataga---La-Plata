@@ -69,7 +69,7 @@
     <string name="precio">Precio: $%s</string>
     <string name="origen">Origen: %s</string>
     <string name="destino">Destino: %s</string>
-    <string name="metodoPago">Método de pago: %s</string>
+    <string name="metodoPago">Método de pago:</string>
     <string name="estadoReserva">Estado: %s</string>
     <string name="reservasPendientes">Reservas por confirmar</string>
     <string name="historial">Historial de reservas</string>
@@ -79,6 +79,25 @@
     <string name="hora">--:--</string>
     <string name="am_pm">-:-</string>
     <string name="seleccionado">Seleccionado</string>
+
+    <!-- ==================== -->
+    <!-- STRINGS PARA CONFIRMAR RESERVA -->
+    <!-- ==================== -->
+    <string name="revisa_confirma_reserva">Revisa y confirma tu reserva</string>
+    <string name="verifica_info_reserva">Verifica que toda la información sea correcta antes de continuar</string>
+    <string name="detalles_viaje">Detalles del Viaje</string>
+    <string name="fecha">Fecha</string>
+    <string name="duracion">Duración</string>
+    <string name="asiento">Asiento</string>
+    <string name="total_pagar">Total a pagar</string>
+    <string name="moneda_cop">COP</string>
+    <string name="info_contacto">Información de Contacto</string>
+    <string name="tu">Tú</string>
+    <string name="pago_efectivo_desc">Paga directamente al conductor</string>
+    <string name="pago_transferencia_desc">Pago anticipado</string>
+    <string name="info_pago_efectivo">Paga en efectivo al conductor al momento del viaje. Asegúrate de tener el cambio exacto.</string>
+    <string name="info_importante">📋 Información importante</string>
+    <string name="info_confirmacion_reserva">• Tu asiento estará reservado por 15 minutos\n• Llega 10 minutos antes de la salida\n• El conductor puede contactarte para confirmar\n• Cancela con al menos 1 hora de anticipación</string>
 
     <!-- SEATS -->
     <string name="asientosCabina">Asientos en cabina</string>
@@ -348,4 +367,7 @@
     <!-- API KEYS -->
     <!-- ==================== -->
     <string name="default_web_client_id" translatable="false">175264872585-abombvqq36bqqeet86onnhkf7uep6c60.apps.googleusercontent.com</string>
+    <string name="_1">1</string>
+    <string name="_2">2</string>
+    <string name="_3">3</string>
 </resources>
