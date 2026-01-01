@@ -23,6 +23,8 @@ import com.chopcode.trasnportenataga_laplata.managers.reservations.confirmation.
 import com.chopcode.trasnportenataga_laplata.managers.reservations.confirmation.ConfirmationDialogManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 public class ConfirmarReservaActivity extends AppCompatActivity implements
         ConfirmationUIManager.ConfirmationListener,
@@ -95,9 +97,11 @@ public class ConfirmarReservaActivity extends AppCompatActivity implements
     }
 
     private void initializeViewReferences() {
-        // Obtener referencias de vistas
-        TextView tvRuta = findViewById(R.id.tvRuta);
-        TextView tvFechaHora = findViewById(R.id.tvFechaHora);
+        // Obtener referencias de vistas DEL NUEVO LAYOUT
+        TextView tvOrigen = findViewById(R.id.tvOrigen);
+        TextView tvDestino = findViewById(R.id.tvDestino);
+        TextView tvFecha = findViewById(R.id.tvFecha);
+        TextView tvHora = findViewById(R.id.tvHora);
         TextView tvTiempoEstimado = findViewById(R.id.tvTiempoEstimado);
         TextView tvPrecio = findViewById(R.id.tvPrecio);
         TextView tvAsiento = findViewById(R.id.tvAsiento);
@@ -106,15 +110,18 @@ public class ConfirmarReservaActivity extends AppCompatActivity implements
         TextView tvConductor = findViewById(R.id.tvConductor);
         TextView tvTelefonoC = findViewById(R.id.tvTelefonoC);
         TextView tvPlaca = findViewById(R.id.tvPlaca);
-        RadioGroup radioGroupPago = findViewById(R.id.radioGroupPago);
-        RadioButton radioEfectivo = findViewById(R.id.radioEfectivo);
-        RadioButton radioTransferencia = findViewById(R.id.radioTransferencia);
 
-        // Configurar UIManager con las vistas
-        uiManager.setViewReferences(
-                tvRuta, tvFechaHora, tvTiempoEstimado, tvPrecio, tvAsiento,
-                tvUsuario, tvTelefonoP, tvConductor, tvTelefonoC, tvPlaca,
-                radioGroupPago, radioEfectivo, radioTransferencia
+        // IMPORTANTE: IDs CORRECTOS después de la corrección
+        MaterialCardView cardEfectivo = findViewById(R.id.cardEfectivo);
+        MaterialCardView cardTransferencia = findViewById(R.id.cardTransferencia);
+        ExtendedFloatingActionButton fabAyuda = findViewById(R.id.fabAyuda);
+
+        // Configurar UIManager con las nuevas vistas
+        uiManager.setNewViewReferences(
+                tvOrigen, tvDestino, tvFecha, tvHora, tvTiempoEstimado,
+                tvPrecio, tvAsiento, tvUsuario, tvTelefonoP,
+                tvConductor, tvTelefonoC, tvPlaca,
+                cardEfectivo, cardTransferencia, fabAyuda
         );
 
         uiManager.setConfirmationListener(this);
@@ -145,8 +152,8 @@ public class ConfirmarReservaActivity extends AppCompatActivity implements
             onCancelButtonClicked();
         });
 
-        // Configurar listeners del UI Manager
-        uiManager.setupListeners();
+        // Configurar listeners del NUEVO UI Manager
+        uiManager.setupNewListeners(); // <-- Cambiar a este método
     }
 
     private void loadDataIntoUI() {
@@ -191,11 +198,28 @@ public class ConfirmarReservaActivity extends AppCompatActivity implements
 
     private void updateUIWithUserData() {
         runOnUiThread(() -> {
-            uiManager.loadDataIntoUI(
+            // Primero actualizar el dataProcessor con los datos del usuario
+            dataProcessor.setUsuarioNombre(userManager.getUsuarioNombre());
+            dataProcessor.setUsuarioTelefono(userManager.getUsuarioTelefono());
+            dataProcessor.setUsuarioId(userManager.getUsuarioId());
+
+            // Luego cargar los datos en la UI
+            uiManager.loadDataIntoNewUI(
                     userManager.getUsuarioNombre(),
                     userManager.getUsuarioTelefono()
             );
+
+            // Log para debugging
+            Log.d(TAG, dataProcessor.getSummary());
         });
+    }
+
+    @Override
+    public void onHelpRequested() {
+        // Implementar funcionalidad de ayuda
+        // Por ejemplo, mostrar un diálogo o navegar a FAQ
+        Toast.makeText(this, "¿En qué podemos ayudarte?", Toast.LENGTH_SHORT).show();
+        confirmationAnalytics.logButtonClick("fab_ayuda");
     }
 
     // ✅ Implementación de ConfirmationUIManager.ConfirmationListener

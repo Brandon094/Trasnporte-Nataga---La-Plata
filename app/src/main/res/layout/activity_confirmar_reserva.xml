@@ -11,7 +11,8 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary">
+        android:background="@color/primary_500"
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
@@ -20,28 +21,34 @@
             app:title="@string/confirmar"
             app:titleTextColor="@color/white"
             app:navigationIcon="@drawable/ic_arrow_back"
-            app:navigationContentDescription="@string/volver" />
+            app:navigationContentDescription="@string/volver"
+            app:navigationIconTint="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:paddingTop="8dp">
 
-            <!-- BANNER DE CONFIRMACIÓN -->
+            <!-- BANNER DE CONFIRMACIÓN MEJORADO -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                android:layout_marginBottom="16dp">
+                app:cardElevation="1dp"
+                android:layout_marginBottom="20dp"
+                android:backgroundTint="@color/primary_50"
+                app:strokeColor="@color/primary_100"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -54,7 +61,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/ic_check"
-                        android:tint="?attr/colorPrimary"
+                        android:tint="@color/primary_600"
                         android:layout_marginEnd="16dp" />
 
                     <LinearLayout
@@ -66,450 +73,785 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Revisa tu reserva"
+                            android:text="Revisa y confirma tu reserva"
                             android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:textColor="@color/primary_700" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Confirma que toda la información sea correcta"
+                            android:text="Verifica que toda la información sea correcta antes de continuar"
                             android:textSize="14sp"
-                            android:textColor="@android:color/darker_gray"
+                            android:textColor="@color/text_secondary"
                             android:layout_marginTop="4dp" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- SECCIÓN: DETALLES DEL VIAJE -->
+            <!-- SECCIÓN: DETALLES DEL VIAJE MEJORADA -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardViaje"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="6dp"
-                android:layout_marginBottom="16dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                android:layout_marginBottom="20dp"
+                android:backgroundTint="@color/surface"
+                app:strokeColor="@color/outline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="24dp">
 
-                    <!-- Header de la sección -->
+                    <!-- Header con indicador de sección -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="24dp">
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_route"
-                            android:tint="?attr/colorPrimary"
-                            android:layout_marginEnd="12dp" />
+                        <LinearLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_circle_primary"
+                            android:gravity="center"
+                            android:backgroundTint="@color/primary_500">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="1"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Detalles del Viaje"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary"
+                            android:layout_marginStart="12dp" />
                     </LinearLayout>
 
-                    <!-- Información principal del viaje -->
+                    <!-- Línea de tiempo del viaje - Mejorada visualmente -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginBottom="28dp"
+                        android:paddingVertical="16dp"
+                        android:background="@drawable/bg_timeline">
 
-                        <!-- Ruta -->
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="12dp">
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
 
                             <TextView
-                                android:layout_width="0dp"
+                                android:id="@+id/tvOrigen"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Ruta:"
-                                android:textSize="14sp"
+                                android:text="Natagá"
+                                android:textSize="18sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/darker_gray" />
+                                android:textColor="@color/primary_700"
+                                android:maxLines="1"
+                                android:ellipsize="end" />
 
                             <TextView
-                                android:id="@+id/tvRuta"
-                                android:layout_width="0dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Natagá → La Plata"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
+                                android:text="Origen"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_tertiary"
+                                android:layout_marginTop="6dp" />
                         </LinearLayout>
 
-                        <!-- Fecha y Hora -->
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_arrow_right"
+                            android:tint="@color/primary_400"
+                            android:layout_marginHorizontal="12dp" />
+
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="12dp">
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
 
                             <TextView
-                                android:layout_width="0dp"
+                                android:id="@+id/tvDestino"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Fecha y Hora:"
-                                android:textSize="14sp"
+                                android:text="La Plata"
+                                android:textSize="18sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/darker_gray" />
+                                android:textColor="@color/primary_700"
+                                android:maxLines="1"
+                                android:ellipsize="end" />
 
                             <TextView
-                                android:id="@+id/tvFechaHora"
-                                android:layout_width="0dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Viernes, 18 de octubre del 2024 - 07:15 AM"
-                                android:textSize="14sp" />
+                                android:text="Destino"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_tertiary"
+                                android:layout_marginTop="6dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Grid de detalles - Mejorado visualmente -->
+                    <androidx.gridlayout.widget.GridLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:columnCount="2"
+                        android:rowCount="2"
+                        android:columnOrderPreserved="false"
+                        android:layout_marginBottom="24dp">
+
+                        <!-- Fecha -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_column="0"
+                            app:layout_row="0"
+                            app:layout_columnWeight="1"
+                            android:layout_marginEnd="12dp"
+                            android:layout_marginBottom="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Fecha"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_tertiary" />
+
+                            <TextView
+                                android:id="@+id/tvFecha"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="18 Oct 2024"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
+                        <!-- Hora -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_column="1"
+                            app:layout_row="0"
+                            app:layout_columnWeight="1"
+                            android:layout_marginBottom="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Hora"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_tertiary" />
+
+                            <TextView
+                                android:id="@+id/tvHora"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="07:15 AM"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
+                        <!-- Duración -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_column="0"
+                            app:layout_row="1"
+                            app:layout_columnWeight="1"
+                            android:layout_marginEnd="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Duración"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_tertiary" />
+
+                            <TextView
+                                android:id="@+id/tvTiempoEstimado"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="60 min"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary"
+                                android:layout_marginTop="4dp" />
                         </LinearLayout>
 
                         <!-- Asiento -->
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="12px">
+                            android:orientation="vertical"
+                            app:layout_column="1"
+                            app:layout_row="1"
+                            app:layout_columnWeight="1">
 
                             <TextView
-                                android:layout_width="0dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Asiento:"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:textColor="@android:color/darker_gray" />
+                                android:text="Asiento"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_tertiary" />
 
                             <TextView
                                 android:id="@+id/tvAsiento"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="A5"
-                                android:textSize="14sp"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
-                                android:background="@drawable/bg_chip_simple"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="4dp" />
+                                android:background="@drawable/bg_chip_primary"
+                                android:backgroundTint="@color/primary_100"
+                                android:textColor="@color/primary_700"
+                                android:paddingHorizontal="16dp"
+                                android:paddingVertical="8dp"
+                                android:layout_marginTop="4dp" />
                         </LinearLayout>
 
-                        <!-- Tiempo Estimado -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="16dp">
+                    </androidx.gridlayout.widget.GridLayout>
 
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Duración:"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
-                                android:textColor="@android:color/darker_gray" />
-
-                            <TextView
-                                android:id="@+id/tvTiempoEstimado"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="60 min"
-                                android:textSize="14sp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Precio destacado -->
+                    <!-- Precio destacado - Mejorado -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:background="@drawable/bg_price_highlight"
-                        android:padding="16dp">
+                        android:backgroundTint="@color/primary_50"
+                        android:padding="24dp"
+                        android:paddingVertical="20dp"
+                        app:cornerRadius="12dp">
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Total a pagar:"
+                            android:text="Total a pagar"
                             android:textSize="16sp"
-                            android:textStyle="bold" />
+                            android:textColor="@color/text_secondary" />
 
-                        <TextView
-                            android:id="@+id/tvPrecio"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="$12,000"
-                            android:textSize="20sp"
-                            android:textStyle="bold"
-                            android:textColor="?attr/colorPrimary" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:id="@+id/tvPrecio"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$12,000"
+                                android:textSize="28sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/primary_600" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="COP"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_tertiary"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- SECCIÓN: INFORMACIÓN DE CONTACTO -->
+            <!-- SECCIÓN: CONTACTOS MEJORADA -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardContactos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="6dp"
-                android:layout_marginBottom="16dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                android:layout_marginBottom="20dp"
+                android:backgroundTint="@color/surface"
+                app:strokeColor="@color/outline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="24dp">
 
-                    <!-- Header de la sección -->
+                    <!-- Header con indicador -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="24dp">
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_contact"
-                            android:tint="?attr/colorPrimary"
-                            android:layout_marginEnd="12dp" />
+                        <LinearLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_circle_primary"
+                            android:gravity="center"
+                            android:backgroundTint="@color/primary_500">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Información de Contacto"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary"
+                            android:layout_marginStart="12dp" />
                     </LinearLayout>
 
-                    <!-- Tarjeta del Pasajero -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="2dp"
-                        android:layout_marginBottom="12dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:padding="16dp">
-
-                            <ImageView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:src="@drawable/ic_passenger"
-                                android:tint="?attr/colorPrimary"
-                                android:layout_marginEnd="12dp" />
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Pasajero"
-                                    android:textSize="12sp"
-                                    android:textColor="@android:color/darker_gray" />
-
-                                <TextView
-                                    android:id="@+id/tvUsuario"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Brandon Daza"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold"
-                                    android:layout_marginTop="2dp" />
-
-                                <TextView
-                                    android:id="@+id/tvTelefonoP"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="322 282 4941"
-                                    android:textSize="14sp"
-                                    android:layout_marginTop="4dp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Tarjeta del Conductor -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="2dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:padding="16dp">
-
-                            <ImageView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:src="@drawable/ic_driver"
-                                android:tint="?attr/colorPrimary"
-                                android:layout_marginEnd="12dp" />
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Conductor"
-                                    android:textSize="12sp"
-                                    android:textColor="@android:color/darker_gray" />
-
-                                <TextView
-                                    android:id="@+id/tvConductor"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Julian Gomez"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold"
-                                    android:layout_marginTop="2dp" />
-
-                                <TextView
-                                    android:id="@+id/tvTelefonoC"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="300 123 4567"
-                                    android:textSize="14sp"
-                                    android:layout_marginTop="4dp" />
-
-                                <TextView
-                                    android:id="@+id/tvPlaca"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Vehículo: GHI789 - Mazda BT-50"
-                                    android:textSize="14sp"
-                                    android:layout_marginTop="4dp" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- SECCIÓN: MÉTODO DE PAGO -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="6dp"
-                android:layout_marginBottom="24dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <!-- Header de la sección -->
+                    <!-- Tarjeta del Pasajero - Mejorada visualmente -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
+                        android:padding="20dp"
+                        android:background="@drawable/bg_contact_card"
+                        android:backgroundTint="@color/surface_variant"
+                        android:layout_marginBottom="16dp"
+                        app:cornerRadius="12dp">
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_payment"
-                            android:tint="?attr/colorPrimary"
-                            android:layout_marginEnd="12dp" />
+                        <LinearLayout
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:background="@drawable/bg_circle_primary"
+                            android:backgroundTint="@color/primary_100"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:src="@drawable/ic_person"
+                                android:tint="@color/primary_600" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Tú"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_tertiary" />
+
+                            <TextView
+                                android:id="@+id/tvUsuario"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Brandon Daza"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary"
+                                android:layout_marginTop="2dp" />
+
+                            <TextView
+                                android:id="@+id/tvTelefonoP"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="322 282 4941"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginTop="6dp" />
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Llamar"
+                            android:textSize="12sp"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="10dp"
+                            app:icon="@drawable/ic_call"
+                            app:iconSize="16dp"
+                            app:iconPadding="4dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/primary_300"
+                            app:strokeWidth="1dp"
+                            android:textColor="@color/primary_600" />
+                    </LinearLayout>
+
+                    <!-- Tarjeta del Conductor - Mejorada visualmente -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="20dp"
+                        android:background="@drawable/bg_contact_card"
+                        android:backgroundTint="@color/surface_variant"
+                        app:cornerRadius="12dp">
+
+                        <LinearLayout
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:background="@drawable/bg_circle_primary"
+                            android:backgroundTint="@color/secondary_100"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
+                                android:src="@drawable/ic_driver"
+                                android:tint="@color/secondary_600" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Conductor"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_tertiary" />
+
+                            <TextView
+                                android:id="@+id/tvConductor"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Julian Gomez"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary"
+                                android:layout_marginTop="2dp" />
+
+                            <TextView
+                                android:id="@+id/tvPlaca"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Mazda BT-50 • GHI789"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginTop="4dp" />
+
+                            <TextView
+                                android:id="@+id/tvTelefonoC"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="300 123 4567"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Llamar"
+                            android:textSize="12sp"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="10dp"
+                            app:icon="@drawable/ic_call"
+                            app:iconSize="16dp"
+                            app:iconPadding="4dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/primary_300"
+                            app:strokeWidth="1dp"
+                            android:textColor="@color/primary_600" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- SECCIÓN: PAGO MEJORADA -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPago"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                android:layout_marginBottom="24dp"
+                android:backgroundTint="@color/surface"
+                app:strokeColor="@color/outline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <!-- Header con indicador -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="24dp">
+
+                        <LinearLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_circle_primary"
+                            android:gravity="center"
+                            android:backgroundTint="@color/primary_500">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="3"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Método de Pago"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary"
+                            android:layout_marginStart="12dp" />
                     </LinearLayout>
 
-                    <!-- Selección de método de pago simplificada -->
+                    <!-- Opciones de pago - Mejoradas visualmente -->
+                    <!-- CORREGIDO: Cambiar id de checkIconEfectivo a cardEfectivo -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardEfectivo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:layout_marginBottom="12dp"
+                        android:backgroundTint="@color/primary_50"
+                        app:strokeColor="@color/primary_300"
+                        app:strokeWidth="2dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="20dp">
+
+                            <LinearLayout
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_circle_primary"
+                                android:backgroundTint="@color/primary_100"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/ic_cash"
+                                    android:tint="@color/primary_600" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_marginStart="16dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Efectivo"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/primary_700" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Paga directamente al conductor"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/text_secondary"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <!-- CORREGIDO: Agregar id al ImageView del check -->
+                            <ImageView
+                                android:id="@+id/checkIconEfectivo"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_check"
+                                android:tint="@color/primary_600"
+                                android:visibility="visible" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- CORREGIDO: Cambiar id de checkIconTransferencia a cardTransferencia -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardTransferencia"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:backgroundTint="@color/surface"
+                        app:strokeColor="@color/outline"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="20dp">
+
+                            <LinearLayout
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_circle_primary"
+                                android:backgroundTint="@color/neutral_100"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/ic_transfer"
+                                    android:tint="@color/text_secondary" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_marginStart="16dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Transferencia"
+                                    android:textSize="16sp"
+                                    android:textColor="@color/text_primary" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Pago anticipado"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/text_secondary"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <!-- CORREGIDO: Agregar id al ImageView del check -->
+                            <ImageView
+                                android:id="@+id/checkIconTransferencia"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_check"
+                                android:tint="@color/primary_600"
+                                android:visibility="gone" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Información adicional de pago -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center">
+                        android:gravity="center_vertical"
+                        android:background="@drawable/bg_info_card"
+                        android:backgroundTint="@color/info_50"
+                        android:padding="16dp"
+                        android:layout_marginTop="16dp"
+                        app:cornerRadius="12dp">
 
-                        <RadioGroup
-                            android:id="@+id/radioGroupPago"
-                            android:layout_width="wrap_content"
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_info"
+                            android:tint="@color/info_600"
+                            android:layout_marginEnd="12dp" />
+
+                        <TextView
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <RadioButton
-                                android:id="@+id/radioEfectivo"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Efectivo"
-                                android:checked="true"
-                                android:layout_marginEnd="24dp" />
-
-                            <RadioButton
-                                android:id="@+id/radioTransferencia"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Transferencia" />
-                        </RadioGroup>
+                            android:layout_weight="1"
+                            android:text="Paga en efectivo al conductor al momento del viaje. Asegúrate de tener el cambio exacto."
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            android:lineSpacingExtra="4dp" />
                     </LinearLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Paga directamente al conductor al momento del viaje"
-                        android:textSize="12sp"
-                        android:textColor="@android:color/darker_gray"
-                        android:gravity="center"
-                        android:layout_marginTop="8dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- BOTONES DE ACCIÓN -->
+            <!-- BOTONES DE ACCIÓN MEJORADOS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="32dp">
 
-                <!-- Botón Confirmar -->
+                <!-- Botón Confirmar mejorado -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnConfirmarReserva"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Confirmar Reserva"
                     android:textSize="16sp"
-                    android:paddingVertical="16dp"
-                    app:cornerRadius="12dp"
-                    android:layout_marginBottom="8dp" />
+                    android:paddingVertical="18dp"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/ic_check"
+                    app:iconSize="20dp"
+                    app:iconPadding="8dp"
+                    android:layout_marginBottom="12dp"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:backgroundTint="@color/primary_500"
+                    android:textColor="@color/white"
+                    app:rippleColor="@color/ripple_primary" />
 
-                <!-- Botón Cancelar -->
+                <!-- Botón Cancelar mejorado -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCancelar"
                     android:layout_width="match_parent"
@@ -517,24 +859,58 @@
                     android:text="Cancelar"
                     android:textSize="16sp"
                     android:paddingVertical="16dp"
-                    app:cornerRadius="12dp"
+                    app:cornerRadius="16dp"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:strokeColor="@color/error"
+                    app:strokeColor="@color/outline"
                     app:strokeWidth="1dp"
-                    android:textColor="@color/error" />
-
+                    android:textColor="@color/text_primary"
+                    app:rippleColor="@color/ripple_color" />
             </LinearLayout>
 
-            <!-- INFORMACIÓN ADICIONAL -->
-            <TextView
+            <!-- INFORMACIÓN ADICIONAL MEJORADA -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="✅ Tu asiento estará reservado por 15 minutos. Recuerda llegar 10 minutos antes de la salida."
-                android:textSize="12sp"
-                android:textColor="@android:color/darker_gray"
-                android:gravity="center"
-                android:lineSpacingExtra="4dp" />
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:background="@drawable/bg_info_card"
+                android:backgroundTint="@color/surface_1"
+                app:cornerRadius="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📋 Información importante"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Tu asiento estará reservado por 15 minutos\n• Llega 10 minutos antes de la salida\n• El conductor puede contactarte para confirmar\n• Cancela con al menos 1 hora de anticipación"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"
+                    android:lineSpacingExtra="8dp" />
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <!-- BOTÓN FLOTANTE DE AYUDA -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabAyuda"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_gravity="bottom|end"
+        android:text="¿Necesitas ayuda?"
+        app:icon="@drawable/ic_help"
+        app:cornerRadius="20dp"
+        android:backgroundTint="@color/primary_500"
+        android:textColor="@color/white"
+        app:rippleColor="@color/ripple_primary"
+        app:elevation="4dp" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
