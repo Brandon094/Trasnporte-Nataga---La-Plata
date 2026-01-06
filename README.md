@@ -1,6 +1,6 @@
 # 🚍 RutaGo
 
-**Transporte-Nataga** es una aplicación que mejora la experiencia de pasajeros y conductores en la ruta Natagá - La Plata y viceversa. ✨
+**Ruta-Go** es una aplicación que mejora la experiencia de pasajeros y conductores en la ruta Natagá - La Plata y viceversa. ✨
 
 Esta versión reducida permite a los usuarios:
 - 📆 Visualizar los horarios disponibles en ambas direcciones (Natagá - La Plata y La Plata - Natagá).
