@@ -24,6 +24,9 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ReservaV
     private List<Reserva> reservas;
     private OnReservaClickListener listener;
 
+    // Valor especial para indicar que el asiento no está asignado
+    private static final int ASIENTO_NO_ASIGNADO = -1;
+
     public interface OnReservaClickListener {
         void onConfirmarClick(Reserva reserva);
         void onCancelarClick(Reserva reserva);
@@ -79,6 +82,9 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ReservaV
         private TextView tvNombre, tvTelefono, tvOrigenDestino, tvFechaHora, tvAsiento, tvEstado;
         private MaterialButton btnConfirmar, btnCancelar;
 
+        // Valor especial para indicar que el asiento no está asignado
+        private static final int ASIENTO_NO_ASIGNADO = -1;
+
         public ReservaViewHolder(@NonNull View itemView) {
             super(itemView);
             Log.d(TAG, "ReservaViewHolder constructor - Inicializando vistas");
@@ -119,12 +125,16 @@ public class ReservaAdapter extends RecyclerView.Adapter<ReservaAdapter.ReservaV
                 Log.w(TAG, "Ruta no especificada para reserva: " + reserva.getNombre());
             }
 
-            // 🔥 ASIENTO
-            if (reserva.getPuestoReservado() != null) {
-                tvAsiento.setText("💺 Asiento " + reserva.getPuestoReservado());
-            } else {
+            // 🔥 ASIENTO (CORREGIDO: usar valor especial en lugar de null)
+            int puestoReservado = reserva.getPuestoReservado();
+            if (puestoReservado > 0) { // Si es mayor a 0, está asignado
+                tvAsiento.setText("💺 Asiento " + puestoReservado);
+            } else if (puestoReservado == 0) {
                 tvAsiento.setText("💺 Asiento no asignado");
-                Log.w(TAG, "Asiento no asignado para reserva: " + reserva.getNombre());
+                Log.w(TAG, "Asiento con valor 0 para reserva: " + reserva.getNombre());
+            } else { // Valor negativo o -1
+                tvAsiento.setText("💺 Asiento no asignado");
+                Log.w(TAG, "Asiento no asignado (valor: " + puestoReservado + ") para reserva: " + reserva.getNombre());
             }
 
             // 🔥 FECHA Y HORA
