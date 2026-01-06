@@ -6,12 +6,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.chopcode.trasnportenataga_laplata.models.DisponibilidadAsientos;
+import com.chopcode.trasnportenataga_laplata.config.MyApp;
+import com.chopcode.trasnportenataga_laplata.managers.seats.dataprocessor.SeatsDataProcessor;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.*;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.*;
 
@@ -20,9 +19,8 @@ public class ReservaService {
     // ✅ NUEVO: Tag para logs
     private static final String TAG = "ReservaService";
 
-    private FirebaseFirestore db;
     private DatabaseReference databaseReference;
-    private FirebaseAuth auth;
+    private SeatsDataProcessor seatsDataManager;
 
     /**
      * INTERFACES CONSOLIDADAS - Todas las funcionalidades de reservas
@@ -70,14 +68,13 @@ public class ReservaService {
 
     public ReservaService() {
         Log.d(TAG, "🚀 Constructor - Inicializando servicio de reservas");
-        this.databaseReference = FirebaseDatabase.getInstance().getReference();
-        db = FirebaseFirestore.getInstance();
-        this.auth = FirebaseAuth.getInstance();
-        Log.d(TAG, "✅ Servicio de reservas inicializado correctamente");
+        this.databaseReference = MyApp.getDatabaseReference("");
+        this.seatsDataManager = new SeatsDataProcessor(); // ✅ INICIALIZAR EL MANAGER
+        Log.d(TAG, "✅ Servicio de reservas inicializado correctamente usando MyApp");
     }
 
     /**
-     * 🔥 MÉTODOS EXISTENTES (con logs agregados)
+     * 🔥 MÉTODOS EXISTENTES (refactorizados para usar MyApp)
      */
     public void actualizarDisponibilidadAsientos(Context context, String horarioId, int asientoSeleccionado,
                                                  String origen, String destino, String tiempoEstimado,
@@ -85,14 +82,16 @@ public class ReservaService {
                                                  String placa, Double precio,
                                                  String conductor, String telefonoC,
                                                  ReservaCallback callback) {
-        Log.d(TAG, "🔄 Iniciando actualización de disponibilidad de asientos:");
-        Log.d(TAG, "   - Horario ID: " + horarioId);
-        Log.d(TAG, "   - Asiento seleccionado: " + asientoSeleccionado);
-        Log.d(TAG, "   - Origen: " + origen + " → Destino: " + destino);
-        Log.d(TAG, "   - Conductor: " + conductor);
-        Log.d(TAG, "   - Precio: $" + precio);
 
-        FirebaseUser currentUser = auth.getCurrentUser();
+        Log.d(TAG, "🔄 Iniciando proceso de reserva para asiento: " + asientoSeleccionado);
+
+        // ✅ Registrar evento
+        Map<String, Object> eventParams = new HashMap<>();
+        eventParams.put("horario_id", horarioId);
+        eventParams.put("asiento", asientoSeleccionado);
+        MyApp.logEvent("reserva_iniciada", eventParams);
+
+        FirebaseUser currentUser = MyApp.getCurrentUser();
         if (currentUser == null) {
             Log.e(TAG, "❌ Usuario no autenticado");
             callback.onError("Usuario no autenticado.");
@@ -102,13 +101,44 @@ public class ReservaService {
         String uid = currentUser.getUid();
         Log.d(TAG, "👤 Usuario autenticado - UID: " + uid);
 
-        DatabaseReference userRef = databaseReference.child("usuarios").child(uid);
+        // ✅ PASO 1: Verificar disponibilidad del asiento ANTES de obtener datos del usuario
+        seatsDataManager.checkSeatAvailability(horarioId, asientoSeleccionado,
+                new SeatsDataProcessor.SeatAvailabilityCallback(){
+                    @Override
+                    public void onSeatAvailable(boolean available) {
+                        if (!available) {
+                            Log.e(TAG, "❌ Asiento " + asientoSeleccionado + " ya está ocupado");
+                            callback.onError("El asiento seleccionado ya está ocupado. Por favor selecciona otro.");
+                            return;
+                        }
+
+                        // ✅ PASO 2: Si el asiento está disponible, obtener datos del usuario
+                        obtenerDatosUsuarioYContinuar(context, uid, horarioId, asientoSeleccionado,
+                                origen, destino, tiempoEstimado, metodoPago, estadoReserva,
+                                placa, precio, conductor, telefonoC, callback);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Log.e(TAG, "❌ Error verificando disponibilidad: " + error);
+                        callback.onError("Error verificando disponibilidad: " + error);
+                    }
+                });
+    }
+
+    private void obtenerDatosUsuarioYContinuar(Context context, String uid, String horarioId, int asientoSeleccionado,
+                                               String origen, String destino, String tiempoEstimado,
+                                               String metodoPago, String estadoReserva,
+                                               String placa, Double precio, String conductor, String telefonoC,
+                                               ReservaCallback callback) {
+
+        DatabaseReference userRef = MyApp.getDatabaseReference("usuarios/" + uid);
 
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    Log.e(TAG, "❌ No se encontró información del usuario en la base de datos");
+                    Log.e(TAG, "❌ No se encontró información del usuario");
                     callback.onError("No se encontró información del usuario.");
                     return;
                 }
@@ -117,83 +147,75 @@ public class ReservaService {
                 String telefono = snapshot.child("telefono").getValue(String.class);
                 String email = snapshot.child("email").getValue(String.class);
 
-                Log.d(TAG, "📋 Datos del usuario obtenidos:");
-                Log.d(TAG, "   - Nombre: " + nombre);
-                Log.d(TAG, "   - Teléfono: " + telefono);
-                Log.d(TAG, "   - Email: " + email);
-
                 if (nombre == null || email == null) {
                     Log.e(TAG, "❌ Datos del usuario incompletos");
                     callback.onError("Datos del usuario incompletos.");
                     return;
                 }
 
-                DatabaseReference refDisponibilidad = databaseReference.child("disponibilidadAsientos").child(horarioId);
-                Log.d(TAG, "🔍 Consultando disponibilidad en: disponibilidadAsientos/" + horarioId);
+                // ✅ PASO 3: Reservar el asiento en Firebase
+                seatsDataManager.reserveSeat(horarioId, asientoSeleccionado,
+                        new SeatsDataProcessor.SeatReservationCallback() {
+                            @Override
+                            public void onSuccess() {
+                                // ✅ PASO 4: Crear la reserva
+                                registrarReserva(context, uid, nombre, telefono, email, horarioId, asientoSeleccionado,
+                                        origen, destino, tiempoEstimado, metodoPago, estadoReserva,
+                                        placa, precio, conductor, telefonoC, callback);
+                            }
 
-                refDisponibilidad.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (!snapshot.exists()) {
-                            Log.e(TAG, "❌ No se encontró disponibilidad para el horario: " + horarioId);
-                            callback.onError("No se encontró disponibilidad.");
-                            return;
-                        }
-
-                        DisponibilidadAsientos disponibilidad = snapshot.getValue(DisponibilidadAsientos.class);
-                        Log.d(TAG, "📊 Disponibilidad obtenida - Asientos disponibles: " +
-                                (disponibilidad != null ? disponibilidad.getAsientosDisponibles() : "null"));
-
-                        if (disponibilidad != null && disponibilidad.getAsientosDisponibles() > 0) {
-                            int nuevosAsientosDisponibles = disponibilidad.getAsientosDisponibles() - 1;
-                            Log.d(TAG, "🔄 Actualizando asientos disponibles: " +
-                                    disponibilidad.getAsientosDisponibles() + " → " + nuevosAsientosDisponibles);
-
-                            refDisponibilidad.child("asientosDisponibles").setValue(nuevosAsientosDisponibles);
-                            marcarAsientoComoOcupado(horarioId, asientoSeleccionado);
-
-                            registrarReserva(context, uid, nombre, telefono, email, horarioId, asientoSeleccionado,
-                                    origen, destino, tiempoEstimado, metodoPago, estadoReserva,
-                                    placa, precio, conductor, telefonoC, callback);
-                        } else {
-                            Log.w(TAG, "⚠️ No hay asientos disponibles para el horario: " + horarioId);
-                            callback.onError("No hay asientos disponibles.");
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e(TAG, "❌ Error al consultar disponibilidad: " + error.getMessage());
-                        Log.e(TAG, "   - Código: " + error.getCode());
-                        Log.e(TAG, "   - Detalles: " + error.getDetails());
-                        callback.onError("Error al consultar disponibilidad: " + error.getMessage());
-                    }
-                });
+                            @Override
+                            public void onError(String error) {
+                                Log.e(TAG, "❌ Error reservando asiento: " + error);
+                                callback.onError("Error reservando asiento: " + error);
+                            }
+                        });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "❌ Error al recuperar datos del usuario: " + error.getMessage());
-                callback.onError("Error al recuperar datos del usuario: " + error.getMessage());
+                Log.e(TAG, "❌ Error obteniendo datos del usuario: " + error.getMessage());
+                callback.onError("Error obteniendo datos del usuario: " + error.getMessage());
             }
         });
     }
 
-    private void marcarAsientoComoOcupado(String horarioId, int asiento) {
-        Log.d(TAG, "📍 Marcando asiento como ocupado - Horario: " + horarioId + ", Asiento: " + asiento);
+    /**
+     * 🔥 NUEVO: Método para liberar un asiento cuando se cancela una reserva
+     */
+    public void liberarAsientoReservado(String horarioId, int numeroAsiento, ReservationUpdateCallback callback) {
+        Log.d(TAG, "🔄 Liberando asiento para cancelación - Horario: " + horarioId + ", Asiento: " + numeroAsiento);
 
-        DatabaseReference refAsientosOcupados = databaseReference
-                .child("disponibilidadAsientos")
-                .child(horarioId)
-                .child("asientosOcupados");
+        seatsDataManager.freeSeat(horarioId, numeroAsiento,
+                new SeatsDataProcessor.SeatReservationCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "✅ Asiento liberado exitosamente");
+                callback.onSuccess();
+            }
 
-        refAsientosOcupados.child(String.valueOf(asiento)).setValue(true)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "✅ Asiento " + asiento + " marcado como ocupado exitosamente");
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "❌ Error marcando asiento como ocupado: " + e.getMessage());
-                });
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "❌ Error liberando asiento: " + error);
+                callback.onError(error);
+            }
+        });
+    }
+
+    /**
+     * 🔥 NUEVO: Método para reparar la estructura de asientos de un horario
+     */
+    public void repararEstructuraAsientos(String horarioId) {
+        Log.d(TAG, "🔧 Reparando estructura de asientos para: " + horarioId);
+        seatsDataManager.repairSeatStructure(horarioId);
+    }
+
+    /**
+     * 🔥 NUEVO: Método para inicializar todos los horarios
+     */
+    public void inicializarTodosHorarios() {
+        Log.d(TAG, "🚀 Inicializando todos los horarios en la base de datos");
+        seatsDataManager.initializeAllSchedules();
     }
 
     private void registrarReserva(Context context, String uid, String nombre, String telefono, String email,
@@ -219,18 +241,47 @@ public class ReservaService {
                 nombre, telefono, email
         );
 
-        databaseReference.child("reservas").child(idReserva).setValue(reserva)
+        // ✅ USANDO MyApp para obtener referencia
+        DatabaseReference reservaRef = MyApp.getDatabaseReference("reservas/" + idReserva);
+
+        reservaRef.setValue(reserva)
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "✅ Reserva registrada exitosamente en Firebase:");
                     Log.d(TAG, "   - ID: " + idReserva);
                     Log.d(TAG, "   - Estado: " + estadoReserva);
                     Log.d(TAG, "   - Fecha: " + new Date(fechaReserva));
 
+                    // ✅ Registrar evento exitoso en Analytics
+                    Map<String, Object> eventParams = new HashMap<>();
+                    eventParams.put("reserva_id", idReserva);
+                    eventParams.put("origen", origen);
+                    eventParams.put("destino", destino);
+                    eventParams.put("precio", precio);
+                    eventParams.put("metodo_pago", metodoPago);
+                    eventParams.put("asiento", asientoSeleccionado);
+                    MyApp.logEvent("reserva_exitosa", eventParams);
+
                     Toast.makeText(context, "Reserva confirmada", Toast.LENGTH_SHORT).show();
                     callback.onReservaExitosa();
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "❌ Error al guardar reserva en Firebase: " + e.getMessage());
+                    MyApp.logError(e);
+
+                    // ✅ IMPORTANTE: Si falla crear la reserva, LIBERAR EL ASIENTO
+                    liberarAsientoReservado(horarioId, asientoSeleccionado,
+                            new ReservationUpdateCallback() {
+                                @Override
+                                public void onSuccess() {
+                                    Log.w(TAG, "⚠️ Asiento liberado después de error en reserva");
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    Log.e(TAG, "❌ Error liberando asiento después de fallo: " + error);
+                                }
+                            });
+
                     callback.onError("Error al guardar reserva: " + e.getMessage());
                 });
     }
@@ -238,46 +289,27 @@ public class ReservaService {
     public void obtenerAsientosOcupados(String horarioId, AsientosCallback callback) {
         Log.d(TAG, "🔍 Obteniendo asientos ocupados para horario: " + horarioId);
 
-        DatabaseReference refAsientosOcupados = databaseReference
-                .child("disponibilidadAsientos")
-                .child(horarioId)
-                .child("asientosOcupados");
-
-        refAsientosOcupados.addListenerForSingleValueEvent(new ValueEventListener() {
+        // ✅ USAR SeatsDataManager en lugar de consultar directamente
+        seatsDataManager.loadSeatsDataForSchedule(horarioId,
+                new SeatsDataProcessor.SeatsDataCallback() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    Log.d(TAG, "ℹ️ No hay asientos ocupados para el horario: " + horarioId);
-                    callback.onAsientosObtenidos(new int[0]);
-                    return;
+            public void onSeatsDataLoaded(Set<Integer> occupiedSeats, int availableSeats) {
+                // Convertir Set<Integer> a int[]
+                int[] asientosOcupadosArray = new int[occupiedSeats.size()];
+                int index = 0;
+                for (Integer seat : occupiedSeats) {
+                    asientosOcupadosArray[index++] = seat;
                 }
 
-                List<Integer> asientosOcupadosList = new ArrayList<>();
-                Log.d(TAG, "📋 Procesando " + snapshot.getChildrenCount() + " asientos ocupados");
-
-                for (DataSnapshot asientoSnapshot : snapshot.getChildren()) {
-                    try {
-                        int numeroAsiento = Integer.parseInt(asientoSnapshot.getKey());
-                        asientosOcupadosList.add(numeroAsiento);
-                        Log.d(TAG, "   - Asiento ocupado: " + numeroAsiento);
-                    } catch (NumberFormatException e) {
-                        Log.e(TAG, "❌ Error al convertir asiento: " + asientoSnapshot.getKey());
-                    }
-                }
-
-                int[] asientosOcupados = new int[asientosOcupadosList.size()];
-                for (int i = 0; i < asientosOcupadosList.size(); i++) {
-                    asientosOcupados[i] = asientosOcupadosList.get(i);
-                }
-
-                Log.d(TAG, "✅ Asientos ocupados obtenidos: " + asientosOcupados.length + " asientos");
-                callback.onAsientosObtenidos(asientosOcupados);
+                Log.d(TAG, "✅ Asientos obtenidos - Ocupados: " + asientosOcupadosArray.length +
+                        ", Disponibles: " + availableSeats);
+                callback.onAsientosObtenidos(asientosOcupadosArray);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "❌ Error al obtener asientos ocupados: " + error.getMessage());
-                callback.onError("Error al obtener asientos ocupados: " + error.getMessage());
+            public void onError(String error) {
+                Log.e(TAG, "❌ Error obteniendo asientos: " + error);
+                callback.onError(error);
             }
         });
     }
@@ -291,11 +323,13 @@ public class ReservaService {
 
         if (conductorNombre == null) {
             Log.e(TAG, "❌ Nombre del conductor es nulo");
+            MyApp.logError(new Exception("Nombre del conductor es nulo en cargarReservasConductor"));
             callback.onError("Nombre del conductor es nulo");
             return;
         }
 
-        DatabaseReference reservasRef = databaseReference.child("reservas");
+        // ✅ USANDO MyApp para obtener referencia
+        DatabaseReference reservasRef = MyApp.getDatabaseReference("reservas");
         Log.d(TAG, "🔍 Consultando reservas en Firebase...");
 
         reservasRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -338,12 +372,21 @@ public class ReservaService {
                 }
 
                 Log.d(TAG, "📊 Reservas del conductor cargadas: " + reservasFiltradas + " de " + snapshot.getChildrenCount());
+
+                // ✅ Registrar evento de carga exitosa
+                Map<String, Object> eventParams = new HashMap<>();
+                eventParams.put("conductor_nombre", conductorNombre);
+                eventParams.put("reservas_encontradas", reservasFiltradas);
+                eventParams.put("horarios_asignados", horariosAsignados != null ? horariosAsignados.size() : 0);
+                MyApp.logEvent("reservas_conductor_cargadas", eventParams);
+
                 callback.onDriverReservationsLoaded(reservas);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e(TAG, "❌ Error al cargar reservas del conductor: " + error.getMessage());
+                MyApp.logError(error.toException());
                 callback.onError("Error al cargar reservas del conductor: " + error.getMessage());
             }
         });
@@ -357,18 +400,26 @@ public class ReservaService {
         Log.d(TAG, "   - Reserva ID: " + reservaId);
         Log.d(TAG, "   - Nuevo estado: " + nuevoEstado);
 
-        DatabaseReference reservaRef = databaseReference
-                .child("reservas")
-                .child(reservaId)
-                .child("estadoReserva");
+        // ✅ USANDO MyApp para obtener referencia
+        DatabaseReference reservaRef = MyApp.getDatabaseReference(
+                "reservas/" + reservaId + "/estadoReserva"
+        );
 
         reservaRef.setValue(nuevoEstado)
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "✅ Estado de reserva actualizado exitosamente");
+
+                    // ✅ Registrar evento en Analytics
+                    Map<String, Object> eventParams = new HashMap<>();
+                    eventParams.put("reserva_id", reservaId);
+                    eventParams.put("nuevo_estado", nuevoEstado);
+                    MyApp.logEvent("reserva_estado_actualizado", eventParams);
+
                     callback.onSuccess();
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "❌ Error actualizando estado de reserva: " + e.getMessage());
+                    MyApp.logError(e);
                     callback.onError(e.getMessage());
                 });
     }
@@ -379,7 +430,8 @@ public class ReservaService {
     public void cargarReservasPorEstado(String estado, ReservationsCallback callback) {
         Log.d(TAG, "🔍 Cargando reservas por estado: " + estado);
 
-        DatabaseReference reservasRef = databaseReference.child("reservas");
+        // ✅ USANDO MyApp para obtener referencia
+        DatabaseReference reservasRef = MyApp.getDatabaseReference("reservas");
 
         reservasRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -398,12 +450,20 @@ public class ReservaService {
                 }
 
                 Log.d(TAG, "📊 Reservas encontradas con estado '" + estado + "': " + reservasCoincidentes);
+
+                // ✅ Registrar evento de carga
+                Map<String, Object> eventParams = new HashMap<>();
+                eventParams.put("estado", estado);
+                eventParams.put("total_reservas", reservasCoincidentes);
+                MyApp.logEvent("reservas_cargadas_por_estado", eventParams);
+
                 callback.onReservationsLoaded(reservas);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e(TAG, "❌ Error al cargar reservas por estado: " + error.getMessage());
+                MyApp.logError(error.toException());
                 callback.onError("Error al cargar reservas: " + error.getMessage());
             }
         });
@@ -416,7 +476,8 @@ public class ReservaService {
         Log.d(TAG, "👤 Cargando reservas para conductor UID: " + conductorUID);
         Log.d(TAG, "   - Estado filtro: " + (estado != null ? estado : "TODAS"));
 
-        DatabaseReference reservasRef = databaseReference.child("reservas");
+        // ✅ USANDO MyApp para obtener referencia
+        DatabaseReference reservasRef = MyApp.getDatabaseReference("reservas");
 
         reservasRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -458,12 +519,21 @@ public class ReservaService {
                 Collections.sort(reservas, (r1, r2) -> Long.compare(r2.getFechaReserva(), r1.getFechaReserva()));
 
                 Log.d(TAG, "📊 Reservas del conductor cargadas: " + reservasDelConductor);
+
+                // ✅ Registrar evento
+                Map<String, Object> eventParams = new HashMap<>();
+                eventParams.put("conductor_uid", conductorUID);
+                eventParams.put("filtro_estado", estado != null ? estado : "TODAS");
+                eventParams.put("reservas_encontradas", reservasDelConductor);
+                MyApp.logEvent("reservas_conductor_uid_cargadas", eventParams);
+
                 callback.onReservationsLoaded(reservas);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e(TAG, "❌ Error al cargar reservas del conductor: " + error.getMessage());
+                MyApp.logError(error.toException());
                 callback.onError("Error al cargar reservas: " + error.getMessage());
             }
         });
@@ -475,7 +545,8 @@ public class ReservaService {
     public void obtenerHistorialUsuario(String usuarioId, HistorialCallback callback) {
         Log.d(TAG, "📋 Obteniendo historial de reservas para usuario: " + usuarioId);
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("reservas");
+        // ✅ USANDO MyApp para obtener referencia
+        DatabaseReference ref = MyApp.getDatabaseReference("reservas");
 
         ref.orderByChild("usuarioId").equalTo(usuarioId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -497,14 +568,60 @@ public class ReservaService {
                         }
 
                         Log.d(TAG, "📊 Historial procesado: " + reservasProcesadas + " reservas");
+
+                        // ✅ Registrar evento
+                        Map<String, Object> eventParams = new HashMap<>();
+                        eventParams.put("usuario_id", usuarioId);
+                        eventParams.put("reservas_encontradas", reservasProcesadas);
+                        MyApp.logEvent("historial_usuario_cargado", eventParams);
+
                         callback.onHistorialCargado(reservas);
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Log.e(TAG, "❌ Error al obtener historial: " + databaseError.getMessage());
+                        MyApp.logError(databaseError.toException());
                         callback.onError(databaseError.getMessage());
                     }
                 });
+    }
+
+    /**
+     * 🔥 NUEVO: Método simplificado para obtener la referencia usando MyApp
+     */
+    public DatabaseReference getDatabaseReference(String path) {
+        return MyApp.getDatabaseReference(path);
+    }
+
+    /**
+     * 🔥 NUEVO: Método para verificar disponibilidad rápida
+     */
+    public void verificarDisponibilidadRapida(String horarioId, DisponibilidadCallback callback) {
+        Log.d(TAG, "⚡ Verificando disponibilidad rápida para horario: " + horarioId);
+
+        DatabaseReference ref = MyApp.getDatabaseReference("disponibilidadAsientos/" + horarioId + "/asientosDisponibles");
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Integer asientosDisponibles = snapshot.getValue(Integer.class);
+                    boolean disponible = asientosDisponibles != null && asientosDisponibles > 0;
+                    Log.d(TAG, "⚡ Disponibilidad: " + (disponible ? "✅ Sí (" + asientosDisponibles + " asientos)" : "❌ No"));
+                    callback.onDisponible(disponible);
+                } else {
+                    Log.w(TAG, "⚠️ No se encontró información de disponibilidad");
+                    callback.onDisponible(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "❌ Error en verificación rápida: " + error.getMessage());
+                MyApp.logError(error.toException());
+                callback.onError("Error verificando disponibilidad: " + error.getMessage());
+            }
+        });
     }
 }
