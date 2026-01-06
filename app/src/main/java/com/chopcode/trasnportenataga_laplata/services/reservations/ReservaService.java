@@ -241,6 +241,13 @@ public class ReservaService {
                 nombre, telefono, email
         );
 
+        // Asegúrate de que asientoSeleccionado sea mayor a 0
+        if (asientoSeleccionado <= 0) {
+            Log.e(TAG, "❌ Número de asiento inválido: " + asientoSeleccionado);
+            callback.onError("Número de asiento inválido");
+            return;
+        }
+
         // ✅ USANDO MyApp para obtener referencia
         DatabaseReference reservaRef = MyApp.getDatabaseReference("reservas/" + idReserva);
 
