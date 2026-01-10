@@ -5,7 +5,7 @@ import android.util.Log;
 import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.notificactions.NotificationManager;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
-import com.chopcode.trasnportenataga_laplata.services.reservations.ReservaService;
+import com.chopcode.trasnportenataga_laplata.services.reservations.driver.DriverReservationService;
 import com.chopcode.trasnportenataga_laplata.services.user.UserService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -18,7 +18,7 @@ import java.util.List;
 public class ReservasManager {
     private static final String TAG = "ReservasManager";
 
-    private final ReservaService reservaService;
+    private final DriverReservationService driverReservationService;
     private final UserService userService;
     private NotificationManager notificationManager;
 
@@ -45,9 +45,16 @@ public class ReservasManager {
         void onError(String error);
     }
 
+    // 🔥 NUEVO: Callback para estadísticas
+    public interface StatsCallback {
+        void onStatsLoaded(DriverReservationService.SimpleDriverStats stats);
+        void onError(String error);
+    }
+
     public ReservasManager() {
-        this.reservaService = new ReservaService();
+        this.driverReservationService = new DriverReservationService();
         this.userService = new UserService();
+        Log.d(TAG, "✅ ReservasManager inicializado con DriverReservationService");
     }
 
     public void setNotificationManager(NotificationManager notificationManager) {
@@ -129,10 +136,12 @@ public class ReservasManager {
     public void loadReservations(String conductorNombre, ReservationsCallback callback) {
         Log.d(TAG, "Cargando reservas para: " + conductorNombre);
 
-        reservaService.cargarReservasConductor(conductorNombre, new ArrayList<>(),
-                new ReservaService.DriverReservationsCallback() {
+        driverReservationService.cargarReservasConductor(conductorNombre, new ArrayList<>(),
+                new DriverReservationService.DriverReservationsCallback() {
                     @Override
                     public void onDriverReservationsLoaded(List<Reserva> reservas) {
+                        Log.d(TAG, "✅ " + reservas.size() + " reservas cargadas desde DriverReservationService");
+
                         // Filtrar solo las reservas "Por confirmar"
                         List<Reserva> reservasPorConfirmar = new ArrayList<>();
                         for (Reserva reserva : reservas) {
@@ -140,7 +149,71 @@ public class ReservasManager {
                                 reservasPorConfirmar.add(reserva);
                             }
                         }
+
+                        Log.d(TAG, "📊 Reservas por confirmar: " + reservasPorConfirmar.size());
                         callback.onReservationsLoaded(reservasPorConfirmar);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Log.e(TAG, "❌ Error cargando reservas: " + error);
+                        callback.onError(error);
+                    }
+                });
+    }
+
+    // 🔥 NUEVO: Método para cargar todas las reservas del conductor
+    public void loadAllDriverReservations(String conductorUID, String estadoFiltro, ReservationsCallback callback) {
+        Log.d(TAG, "Cargando TODAS las reservas del conductor UID: " + conductorUID);
+
+        driverReservationService.cargarReservasConductorPorUID(conductorUID, estadoFiltro,
+                new DriverReservationService.DriverReservationsByUIDCallback() {
+                    @Override
+                    public void onReservationsLoaded(List<Reserva> reservas) {
+                        Log.d(TAG, "✅ " + reservas.size() + " reservas cargadas (todas)");
+                        callback.onReservationsLoaded(reservas);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Log.e(TAG, "❌ Error cargando todas las reservas: " + error);
+                        callback.onError(error);
+                    }
+                });
+    }
+
+    // 🔥 NUEVO: Método para obtener estadísticas del conductor
+    public void loadDriverStatistics(String conductorUID, StatsCallback callback) {
+        Log.d(TAG, "📊 Cargando estadísticas del conductor: " + conductorUID);
+
+        driverReservationService.obtenerEstadisticasSimples(conductorUID,
+                new DriverReservationService.SimpleStatsCallback() {
+                    @Override
+                    public void onStatsLoaded(DriverReservationService.SimpleDriverStats stats) {
+                        Log.d(TAG, "✅ Estadísticas cargadas: " + stats);
+                        callback.onStatsLoaded(stats);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Log.e(TAG, "❌ Error cargando estadísticas: " + error);
+                        callback.onError(error);
+                    }
+                });
+    }
+
+    public void updateReservationStatus(Reserva reserva, String nuevoEstado, UpdateCallback callback) {
+        Log.d(TAG, "Actualizando estado de reserva a: " + nuevoEstado);
+
+        driverReservationService.actualizarEstadoReserva(reserva.getIdReserva(), nuevoEstado,
+                new DriverReservationService.ReservationUpdateCallback() {
+                    @Override
+                    public void onSuccess() {
+                        // Enviar notificación al pasajero si es necesario
+                        if (notificationManager != null) {
+                            sendNotificationToPassenger(reserva, nuevoEstado);
+                        }
+                        callback.onSuccess();
                     }
 
                     @Override
@@ -150,16 +223,30 @@ public class ReservasManager {
                 });
     }
 
-    public void updateReservationStatus(Reserva reserva, String nuevoEstado, UpdateCallback callback) {
-        Log.d(TAG, "Actualizando estado de reserva a: " + nuevoEstado);
+    // 🔥 NUEVO: Método mejorado para cancelar reserva con liberación de asiento
+    public void cancelReservationWithSeatRelease(Reserva reserva, UpdateCallback callback) {
+        Log.d(TAG, "Cancelando reserva con liberación de asiento:");
+        Log.d(TAG, "   - Reserva ID: " + reserva.getIdReserva());
+        Log.d(TAG, "   - Horario: " + reserva.getHorarioId());
+        Log.d(TAG, "   - Asiento: " + reserva.getPuestoReservado());
 
-        reservaService.actualizarEstadoReserva(reserva.getIdReserva(), nuevoEstado,
-                new ReservaService.ReservationUpdateCallback() {
+        if (reserva.getHorarioId() == null || reserva.getPuestoReservado() <= 0) {
+            Log.w(TAG, "⚠️ No hay suficiente información para liberar el asiento");
+            // Cancelar solo la reserva
+            updateReservationStatus(reserva, "Cancelada", callback);
+            return;
+        }
+
+        driverReservationService.cancelarReservaConLiberacion(
+                reserva.getIdReserva(),
+                reserva.getHorarioId(),
+                reserva.getPuestoReservado(),
+                new DriverReservationService.ReservationUpdateCallback() {
                     @Override
                     public void onSuccess() {
-                        // Enviar notificación al pasajero si es necesario
+                        // Enviar notificación de cancelación
                         if (notificationManager != null) {
-                            sendNotificationToPassenger(reserva, nuevoEstado);
+                            sendNotificationToPassenger(reserva, "Cancelada");
                         }
                         callback.onSuccess();
                     }
@@ -186,12 +273,12 @@ public class ReservasManager {
                     new NotificationManager.NotificationCallback() {
                         @Override
                         public void onSuccess() {
-                            Log.d(TAG, "Notificación enviada al pasajero");
+                            Log.d(TAG, "✅ Notificación enviada al pasajero");
                         }
 
                         @Override
                         public void onError(String error) {
-                            Log.e(TAG, "Error enviando notificación: " + error);
+                            Log.e(TAG, "❌ Error enviando notificación: " + error);
                         }
                     }
             );
@@ -204,12 +291,12 @@ public class ReservasManager {
                     new NotificationManager.NotificationCallback() {
                         @Override
                         public void onSuccess() {
-                            Log.d(TAG, "Notificación de cancelación enviada");
+                            Log.d(TAG, "✅ Notificación de cancelación enviada");
                         }
 
                         @Override
                         public void onError(String error) {
-                            Log.e(TAG, "Error enviando notificación de cancelación: " + error);
+                            Log.e(TAG, "❌ Error enviando notificación de cancelación: " + error);
                         }
                     }
             );
@@ -219,7 +306,12 @@ public class ReservasManager {
     public void cleanup() {
         if (reservasRef != null && reservasListener != null) {
             reservasRef.removeEventListener(reservasListener);
-            Log.d(TAG, "Listener de Firebase removido");
+            Log.d(TAG, "✅ Listener de Firebase removido");
         }
+    }
+
+    // 🔥 NUEVO: Método para obtener el DriverReservationService
+    public DriverReservationService getDriverReservationService() {
+        return driverReservationService;
     }
 }
