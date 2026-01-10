@@ -1,4 +1,4 @@
-// InicioConductor.java (Versión actualizada con strings)
+// InicioConductor.java (Versión simplificada sin DriverHomeViewModel)
 package com.chopcode.trasnportenataga_laplata.activities.driver;
 
 import android.content.Intent;
@@ -22,12 +22,12 @@ import com.chopcode.trasnportenataga_laplata.config.MyApp;
 import com.chopcode.trasnportenataga_laplata.managers.auths.AuthManager;
 import com.chopcode.trasnportenataga_laplata.models.Reserva;
 import com.chopcode.trasnportenataga_laplata.models.Ruta;
-import com.chopcode.trasnportenataga_laplata.viewmodels.driver.DriverHomeViewModel;
 import com.chopcode.trasnportenataga_laplata.viewmodels.driver.EstadisticasViewModel;
-import com.chopcode.trasnportenataga_laplata.viewmodels.driver.ReservasViewModel;
 import com.chopcode.trasnportenataga_laplata.viewmodels.driver.RutasViewModel;
+import com.chopcode.trasnportenataga_laplata.viewmodels.driver.ReservasViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,8 +55,7 @@ public class InicioConductorActivity extends AppCompatActivity {
     private TextView tvNombreRutaReservas2, tvReservasRuta2, tvNombreRutaAsientos2, tvAsientosRuta2;
     private TextView tvContadorReservas, tvContadorRutas;
 
-    // ViewModels
-    private DriverHomeViewModel viewModel;
+    // ViewModels INDIVIDUALES (sin DriverHomeViewModel)
     private ReservasViewModel reservasViewModel;
     private EstadisticasViewModel estadisticasViewModel;
     private RutasViewModel rutasViewModel;
@@ -72,19 +71,18 @@ public class InicioConductorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inicio_conductor);
-        Log.d(TAG, "🚀 Iniciando actividad con nueva arquitectura");
+        Log.d(TAG, "🚀 Iniciando actividad con ViewModels individuales");
 
         authManager = AuthManager.getInstance();
         timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
-        // Inicializar ViewModels
-        viewModel = new ViewModelProvider(this).get(DriverHomeViewModel.class);
-        reservasViewModel = viewModel.getReservasViewModel();
-        estadisticasViewModel = viewModel.getEstadisticasViewModel();
-        rutasViewModel = viewModel.getRutasViewModel();
+        // ✅ INICIALIZAR VIEWMODELS INDIVIDUALMENTE
+        reservasViewModel = new ViewModelProvider(this).get(ReservasViewModel.class);
+        estadisticasViewModel = new ViewModelProvider(this).get(EstadisticasViewModel.class);
+        rutasViewModel = new ViewModelProvider(this).get(RutasViewModel.class);
 
         // Inicializar contexto en ViewModels que lo necesiten
-        viewModel.initialize(getApplicationContext());
+        reservasViewModel.initialize(this);
 
         initializeViews();
         setupRecyclerView();
@@ -131,14 +129,14 @@ public class InicioConductorActivity extends AppCompatActivity {
 
         // Configurar valores iniciales usando strings
         tvReservasConfirmadas.setText(getString(R.string.contador_reservas, 0));
-        tvAsientosDisponibles.setText("28"); // Valor por defecto
+        tvAsientosDisponibles.setText("26"); // Valor por defecto
         tvTotalIngresos.setText(getString(R.string.formato_moneda, "0"));
         tvContadorReservas.setText(getString(R.string.contador_reservas, 0));
         tvContadorRutas.setText(getString(R.string.contador_rutas, 0));
 
         // Configurar información por defecto usando strings
         if (tvInfoCapacidad != null) {
-            tvInfoCapacidad.setText(getString(R.string.ocupacion_porcentaje, 28, 0));
+            tvInfoCapacidad.setText(getString(R.string.ocupacion_porcentaje, 26, 0));
         }
         if (tvInfoIngresos != null) {
             tvInfoIngresos.setText(getString(R.string.acumulado_desde_inicio));
@@ -183,7 +181,7 @@ public class InicioConductorActivity extends AppCompatActivity {
             headerEstadisticas.setOnClickListener(view -> {
                 Log.d(TAG, "🔄 Actualizando estadísticas manualmente");
                 Toast.makeText(this, getString(R.string.actualizando_datos), Toast.LENGTH_SHORT).show();
-                viewModel.reloadAllData();
+                reloadAllData();
             });
         }
 
@@ -193,24 +191,40 @@ public class InicioConductorActivity extends AppCompatActivity {
     private void setupObservers() {
         Log.d(TAG, "👀 Configurando observadores...");
 
-        // Observar datos del conductor (ViewModel principal)
-        viewModel.getNombreConductorLiveData().observe(this, nombre -> {
-            if (nombre != null) {
-                tvConductor.setText(nombre);
-                Log.d(TAG, "✅ Nombre del conductor actualizado: " + nombre);
-            } else {
-                tvConductor.setText(getString(R.string.no_disponible));
-            }
-        });
+        // ✅ OBSERVAR DATOS DEL CONDUCTOR DESDE ReservasViewModel
+        // Observar cuando se carga el nombre del conductor
+        new Thread(() -> {
+            // Observar cambios en el conductor
+            while (true) {
+                try {
+                    Thread.sleep(500);
+                    String nombre = reservasViewModel.getConductorNombreActual();
+                    String uid = reservasViewModel.getConductorUIDActual();
 
-        viewModel.getPlacaVehiculoLiveData().observe(this, placa -> {
-            if (placa != null) {
-                tvPlacaVehiculo.setText(getString(R.string.placaVehiculo, placa));
-                Log.d(TAG, "✅ Placa del vehículo actualizada: " + placa);
-            } else {
-                tvPlacaVehiculo.setText(getString(R.string.placaVehiculo, getString(R.string.no_disponible)));
+                    if (nombre != null && !nombre.isEmpty()) {
+                        runOnUiThread(() -> {
+                            tvConductor.setText(nombre);
+                            Log.d(TAG, "✅ Nombre del conductor actualizado: " + nombre);
+
+                            // Establecer conductor en EstadisticasViewModel
+                            estadisticasViewModel.setConductorActual(nombre);
+
+                            // Calcular estadísticas iniciales
+                            estadisticasViewModel.calculateStatistics(nombre);
+                        });
+                    }
+
+                    if (uid != null && !uid.isEmpty()) {
+                        runOnUiThread(() -> {
+                            // Configurar listener en tiempo real
+                            reservasViewModel.setupRealTimeListener();
+                        });
+                    }
+                } catch (InterruptedException e) {
+                    break;
+                }
             }
-        });
+        }).start();
 
         // Observar reservas
         reservasViewModel.getReservasLiveData().observe(this, reservas -> {
@@ -225,6 +239,11 @@ public class InicioConductorActivity extends AppCompatActivity {
                 // Actualizar contador
                 tvContadorReservas.setText(getString(R.string.contador_reservas, reservas.size()));
                 Log.d(TAG, "✅ Contador de reservas: " + reservas.size());
+
+                // ✅ ACTUALIZAR ESTADÍSTICAS CUANDO HAY NUEVAS RESERVAS
+                if (!listaRutas.isEmpty()) {
+                    estadisticasViewModel.calculateRouteStatistics(listaRutas, listaReservas);
+                }
             } else {
                 tvContadorReservas.setText(getString(R.string.contador_reservas, 0));
             }
@@ -331,7 +350,7 @@ public class InicioConductorActivity extends AppCompatActivity {
                 tvContadorRutas.setText(getString(R.string.contador_rutas, rutas.size()));
                 Log.d(TAG, "✅ Contador de rutas: " + rutas.size());
 
-                // Actualizar estadísticas por ruta cuando se cargan nuevas rutas
+                // ✅ ACTUALIZAR ESTADÍSTICAS POR RUTA CUANDO SE CARGAN NUEVAS RUTAS
                 if (!rutas.isEmpty() && !listaReservas.isEmpty()) {
                     estadisticasViewModel.calculateRouteStatistics(rutas, listaReservas);
                 }
@@ -349,16 +368,16 @@ public class InicioConductorActivity extends AppCompatActivity {
             }
         });
 
-        // Observar estado de carga del ViewModel principal
-        viewModel.getLoadingLiveData().observe(this, isLoading -> {
+        // ✅ OBSERVAR ESTADO DE CARGA DESDE ReservasViewModel (PRINCIPAL)
+        reservasViewModel.getLoadingLiveData().observe(this, isLoading -> {
             if (isLoading != null) {
                 progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
                 Log.d(TAG, isLoading ? "⏳ Cargando datos..." : "✅ Carga completada");
             }
         });
 
-        // Observar errores del ViewModel principal
-        viewModel.getErrorLiveData().observe(this, error -> {
+        // ✅ OBSERVAR ERRORES DESDE ReservasViewModel
+        reservasViewModel.getErrorLiveData().observe(this, error -> {
             if (error != null && !error.isEmpty()) {
                 Log.e(TAG, "❌ Error observado: " + error);
                 Toast.makeText(InicioConductorActivity.this,
@@ -371,9 +390,11 @@ public class InicioConductorActivity extends AppCompatActivity {
             if (procesada != null && procesada) {
                 Log.d(TAG, "✅ Reserva procesada exitosamente");
                 Toast.makeText(this, getString(R.string.reserva_procesada_exito), Toast.LENGTH_SHORT).show();
-                // Actualizar estadísticas después de procesar una reserva
-                if (viewModel.getNombreConductorLiveData().getValue() != null) {
-                    estadisticasViewModel.calculateStatistics(viewModel.getNombreConductorLiveData().getValue());
+
+                // ✅ ACTUALIZAR ESTADÍSTICAS DESPUÉS DE PROCESAR UNA RESERVA
+                String nombreConductor = reservasViewModel.getConductorNombreActual();
+                if (nombreConductor != null) {
+                    estadisticasViewModel.calculateStatistics(nombreConductor);
                 }
             }
         });
@@ -418,7 +439,11 @@ public class InicioConductorActivity extends AppCompatActivity {
             return;
         }
 
-        String userId = MyApp.getCurrentUserId();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        if (userId == null || userId.isEmpty()) {
+            userId = MyApp.getCurrentUserId();
+        }
+
         if (userId == null || userId.isEmpty()) {
             Log.w(TAG, "⚠️ UserId es null - mostrando datos por defecto");
             showDefaultData();
@@ -426,7 +451,29 @@ public class InicioConductorActivity extends AppCompatActivity {
         }
 
         Log.d(TAG, "👤 UserId del conductor: " + userId);
-        viewModel.loadDriverData(userId);
+
+        // ✅ USAR ReservasViewModel PARA CARGAR DATOS DEL CONDUCTOR
+        reservasViewModel.loadDriverData(userId);
+    }
+
+    // ✅ NUEVO MÉTODO: Recargar todos los datos
+    private void reloadAllData() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        if (userId != null && !userId.isEmpty()) {
+            Log.d(TAG, "🔄 Recargando todos los datos para: " + userId);
+
+            // Recargar desde ReservasViewModel
+            reservasViewModel.refreshAllData();
+
+            // Recargar estadísticas si tenemos nombre del conductor
+            String nombreConductor = reservasViewModel.getConductorNombreActual();
+            if (nombreConductor != null) {
+                estadisticasViewModel.refreshStatistics();
+            }
+
+            // Actualizar tiempo
+            actualizarTiempoActualizacion();
+        }
     }
 
     private void showDefaultData() {
@@ -439,16 +486,16 @@ public class InicioConductorActivity extends AppCompatActivity {
 
         // Valores por defecto usando strings
         tvReservasConfirmadas.setText(getString(R.string.contador_reservas, 0));
-        tvAsientosDisponibles.setText("28"); // Valor por defecto
+        tvAsientosDisponibles.setText("26"); // Valor por defecto
         tvTotalIngresos.setText(getString(R.string.formato_moneda, "0"));
         tvContadorReservas.setText(getString(R.string.contador_reservas, 0));
         tvContadorRutas.setText(getString(R.string.contador_rutas, 0));
 
         // Datos por defecto para cada ruta individual
         if (tvReservasRuta != null) tvReservasRuta.setText(getString(R.string.contador_reservas, 0));
-        if (tvAsientosRuta != null) tvAsientosRuta.setText("14"); // Valor por defecto
+        if (tvAsientosRuta != null) tvAsientosRuta.setText("13"); // Valor por defecto
         if (tvReservasRuta2 != null) tvReservasRuta2.setText(getString(R.string.contador_reservas, 0));
-        if (tvAsientosRuta2 != null) tvAsientosRuta2.setText("14"); // Valor por defecto
+        if (tvAsientosRuta2 != null) tvAsientosRuta2.setText("13"); // Valor por defecto
 
         // Actualizar tiempo de actualización
         actualizarTiempoActualizacion();
@@ -598,9 +645,10 @@ public class InicioConductorActivity extends AppCompatActivity {
         Log.d(TAG, "📱 onResume - Actividad en primer plano");
 
         // Recargar datos si es necesario
-        if (viewModel.getNombreConductorLiveData().getValue() != null) {
+        String conductorUID = reservasViewModel.getConductorUIDActual();
+        if (conductorUID != null && !conductorUID.isEmpty()) {
             Log.d(TAG, "🔄 Recargando datos en onResume");
-            viewModel.reloadAllData();
+            reloadAllData();
         }
     }
 
@@ -609,7 +657,7 @@ public class InicioConductorActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(TAG, "📱 onDestroy - Actividad destruida");
 
-        // Limpiar ViewModel
-        viewModel.clearAllData();
+        // Los ViewModels se limpian automáticamente gracias a ViewModelProvider
+        // No necesitas hacer nada más
     }
 }
