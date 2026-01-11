@@ -1,4 +1,4 @@
-// InicioConductor.java (Versión simplificada sin DriverHomeViewModel)
+// InicioConductor.java (Versión corregida con llamada a RutasViewModel)
 package com.chopcode.trasnportenataga_laplata.activities.driver;
 
 import android.content.Intent;
@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,6 +29,11 @@ import com.chopcode.trasnportenataga_laplata.viewmodels.driver.ReservasViewModel
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -336,6 +342,24 @@ public class InicioConductorActivity extends AppCompatActivity {
             Log.d(TAG, "ℹ️ No se configuraron observadores para segunda ruta: " + e.getMessage());
         }
 
+        // ✅ OBSERVAR ESTADO DE CARGA DESDE RutasViewModel
+        rutasViewModel.getLoadingLiveData().observe(this, isLoading -> {
+            if (isLoading != null) {
+                if (isLoading && listaRutas.isEmpty()) {
+                    tvEmptyRutas.setText("Cargando rutas...");
+                }
+            }
+        });
+
+        // ✅ OBSERVAR ERRORES DESDE RutasViewModel
+        rutasViewModel.getErrorLiveData().observe(this, error -> {
+            if (error != null && !error.isEmpty()) {
+                Log.e(TAG, "❌ Error en RutasViewModel: " + error);
+                Toast.makeText(InicioConductorActivity.this,
+                        "Error cargando rutas: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // Observar rutas
         rutasViewModel.getRutasLiveData().observe(this, rutas -> {
             Log.d(TAG, "🔄 Rutas actualizadas: " + (rutas != null ? rutas.size() : 0));
@@ -343,7 +367,12 @@ public class InicioConductorActivity extends AppCompatActivity {
             if (rutas != null) {
                 listaRutas.clear();
                 listaRutas.addAll(rutas);
-                rutaAdapter.notifyDataSetChanged();
+
+                // ✅ ACTUALIZAR EL ADAPTADOR CORRECTAMENTE
+                if (rutaAdapter != null) {
+                    rutaAdapter.actualizarRutas(rutas);
+                }
+
                 updateRoutesUI();
 
                 // Actualizar contador
@@ -365,6 +394,14 @@ public class InicioConductorActivity extends AppCompatActivity {
         rutasViewModel.getContadorRutasLiveData().observe(this, contador -> {
             if (contador != null) {
                 tvContadorRutas.setText(getString(R.string.contador_rutas, contador));
+            }
+        });
+
+        // Observar la próxima ruta
+        rutasViewModel.getProximaRutaLiveData().observe(this, proximaRuta -> {
+            if (proximaRuta != null && !proximaRuta.isEmpty()) {
+                Log.d(TAG, "🎯 Próxima ruta: " + proximaRuta);
+                // Si tienes un TextView para mostrar la próxima ruta, puedes actualizarlo aquí
             }
         });
 
@@ -423,6 +460,7 @@ public class InicioConductorActivity extends AppCompatActivity {
         rvReservas.setAdapter(reservaAdapter);
         Log.d(TAG, "✅ RecyclerView de reservas configurado");
 
+        // ✅ INICIALIZAR RutaAdapter CON LA LISTA VACÍA
         rutaAdapter = new RutaAdapter(listaRutas);
         rvProximasRutas.setLayoutManager(new LinearLayoutManager(this,
                 LinearLayoutManager.HORIZONTAL, false));
@@ -430,6 +468,7 @@ public class InicioConductorActivity extends AppCompatActivity {
         Log.d(TAG, "✅ RecyclerView de rutas configurado");
     }
 
+    // ✅ MÉTODO MODIFICADO: Ahora también carga las rutas
     private void loadDriverData() {
         Log.d(TAG, "🔧 Cargando datos del conductor...");
 
@@ -452,11 +491,68 @@ public class InicioConductorActivity extends AppCompatActivity {
 
         Log.d(TAG, "👤 UserId del conductor: " + userId);
 
-        // ✅ USAR ReservasViewModel PARA CARGAR DATOS DEL CONDUCTOR
+        // ✅ USAR ReservasViewModel PARA CARGAR RESERVAS
         reservasViewModel.loadDriverData(userId);
+
+        // ✅ NUEVO: CARGAR RUTAS ASIGNADAS AL CONDUCTOR
+        loadAssignedRoutes(userId);
     }
 
-    // ✅ NUEVO MÉTODO: Recargar todos los datos
+    // ✅ NUEVO MÉTODO: Cargar rutas asignadas del conductor
+    private void loadAssignedRoutes(String userId) {
+        Log.d(TAG, "🗺️ Cargando rutas asignadas para: " + userId);
+
+        // Obtener referencia a la base de datos
+        DatabaseReference conductorRef = FirebaseDatabase.getInstance()
+                .getReference("conductores")
+                .child(userId);
+
+        conductorRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    List<String> horariosAsignados = new ArrayList<>();
+
+                    // Obtener la lista de horarios asignados
+                    if (snapshot.hasChild("horariosAsignados")) {
+                        Object horariosObj = snapshot.child("horariosAsignados").getValue();
+
+                        if (horariosObj instanceof List) {
+                            for (Object item : (List<?>) horariosObj) {
+                                if (item != null) {
+                                    horariosAsignados.add(item.toString());
+                                }
+                            }
+                        }
+                    }
+
+                    Log.d(TAG, "📅 Horarios asignados encontrados: " + horariosAsignados.size());
+
+                    if (!horariosAsignados.isEmpty()) {
+                        // ✅ LLAMAR AL VIEWMODEL DE RUTAS PARA QUE CARGUE LAS RUTAS
+                        rutasViewModel.loadRoutes(horariosAsignados);
+                    } else {
+                        Log.w(TAG, "⚠️ El conductor no tiene horarios asignados");
+                        // Mostrar lista vacía
+                        rutasViewModel.clearRoutes();
+                    }
+                } else {
+                    Log.w(TAG, "⚠️ Documento del conductor no encontrado");
+                    rutasViewModel.clearRoutes();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "❌ Error cargando horarios asignados: " + error.getMessage());
+                Toast.makeText(InicioConductorActivity.this,
+                        "Error cargando rutas asignadas", Toast.LENGTH_SHORT).show();
+                rutasViewModel.setError("Error cargando rutas asignadas: " + error.getMessage());
+            }
+        });
+    }
+
+    // ✅ MÉTODO MODIFICADO: Ahora también recarga las rutas
     private void reloadAllData() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         if (userId != null && !userId.isEmpty()) {
@@ -464,6 +560,9 @@ public class InicioConductorActivity extends AppCompatActivity {
 
             // Recargar desde ReservasViewModel
             reservasViewModel.refreshAllData();
+
+            // ✅ RECARGAR RUTAS TAMBIÉN
+            loadAssignedRoutes(userId);
 
             // Recargar estadísticas si tenemos nombre del conductor
             String nombreConductor = reservasViewModel.getConductorNombreActual();
@@ -591,9 +690,9 @@ public class InicioConductorActivity extends AppCompatActivity {
 
                 // Si se pasa reservasConfirmadas, actualizar ocupados
                 int ocupados = reservasConfirmadas != null ? reservasConfirmadas :
-                        (28 - disponibles); // Total fijo de 28 asientos
+                        (26 - disponibles); // Total fijo de 26 asientos
 
-                final int CAPACIDAD_TOTAL = 28;
+                final int CAPACIDAD_TOTAL = 26;
                 int porcentajeOcupacion = ocupados > 0 ? (ocupados * 100) / CAPACIDAD_TOTAL : 0;
 
                 String info = getString(R.string.ocupacion_porcentaje_detallada,
@@ -603,7 +702,7 @@ public class InicioConductorActivity extends AppCompatActivity {
                 Log.d(TAG, "📊 Información de capacidad: " + info);
             } catch (NumberFormatException e) {
                 Log.e(TAG, "❌ Error al calcular información de capacidad: " + e.getMessage());
-                tvInfoCapacidad.setText(getString(R.string.ocupacion_porcentaje, 28, 0));
+                tvInfoCapacidad.setText(getString(R.string.ocupacion_porcentaje, 26, 0));
             }
         }
     }
@@ -656,8 +755,5 @@ public class InicioConductorActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "📱 onDestroy - Actividad destruida");
-
-        // Los ViewModels se limpian automáticamente gracias a ViewModelProvider
-        // No necesitas hacer nada más
     }
 }
