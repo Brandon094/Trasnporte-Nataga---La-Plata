@@ -75,7 +75,7 @@ public class RutaAdapter extends RecyclerView.Adapter<RutaAdapter.RutaViewHolder
         return count;
     }
 
-    public void actualizarLista(List<Ruta> nuevasRutas) {
+    public void actualizarRutas(List<Ruta> nuevasRutas) {
         Log.i(TAG, SUB_TAG + " - actualizarLista llamado. " +
                 "Lista anterior: " + (listaRutas != null ? listaRutas.size() : "null") +
                 ", Nueva lista: " + (nuevasRutas != null ? nuevasRutas.size() : "null"));
