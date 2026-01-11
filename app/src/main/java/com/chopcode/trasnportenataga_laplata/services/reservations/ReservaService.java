@@ -305,4 +305,130 @@ public class ReservaService {
             }
         });
     }
+
+    //refactorizar en otra clase solo para manejar el historial de reservas del conductor
+    /**
+     * Carga TODAS las reservas de un conductor
+     */
+    public void cargarReservasConductorPorUID(String conductorUID, String estado, ReservationsCallback callback) {
+        Log.d(TAG, "👤 Cargando reservas para conductor UID: " + conductorUID);
+        Log.d(TAG, "   - Estado filtro: " + (estado != null ? estado : "TODAS"));
+
+        // ✅ USANDO MyApp para obtener referencia
+        DatabaseReference reservasRef = MyApp.getDatabaseReference("reservas");
+
+        reservasRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d(TAG, "✅ Datos de reservas recibidos - Total: " + snapshot.getChildrenCount());
+                List<Reserva> reservas = new ArrayList<>();
+                int reservasDelConductor = 0;
+
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Reserva reserva = dataSnapshot.getValue(Reserva.class);
+                    if (reserva != null && reserva.getConductorId() != null) {
+
+                        // Comparar por UID del conductor
+                        boolean esDelConductor = reserva.getConductorId().equals(conductorUID);
+
+                        // ✅ CORREGIDO: Lógica correcta para filtrar por estado
+                        boolean estadoCoincide;
+
+                        if ("TODAS".equalsIgnoreCase(estado) || estado == null || estado.isEmpty()) {
+                            // Cargar TODAS las reservas sin filtrar por estado
+                            estadoCoincide = true;
+                        } else {
+                            // Filtrar por estado específico
+                            estadoCoincide = reserva.getEstadoReserva() != null &&
+                                    reserva.getEstadoReserva().equalsIgnoreCase(estado);
+                        }
+
+                        if (esDelConductor && estadoCoincide) {
+                            reserva.setIdReserva(dataSnapshot.getKey());
+                            reservas.add(reserva);
+                            reservasDelConductor++;
+                            Log.d(TAG, "🎯 Reserva encontrada - ID: " + reserva.getIdReserva() +
+                                    ", Estado: " + reserva.getEstadoReserva());
+                        }
+                    }
+                }
+
+                // Ordenar por fecha (más recientes primero)
+                Collections.sort(reservas, (r1, r2) -> Long.compare(r2.getFechaReserva(), r1.getFechaReserva()));
+
+                Log.d(TAG, "📊 Reservas del conductor cargadas: " + reservasDelConductor);
+
+                // ✅ Registrar evento
+                Map<String, Object> eventParams = new HashMap<>();
+                eventParams.put("conductor_uid", conductorUID);
+                eventParams.put("filtro_estado", estado != null ? estado : "TODAS");
+                eventParams.put("reservas_encontradas", reservasDelConductor);
+                MyApp.logEvent("reservas_conductor_uid_cargadas", eventParams);
+
+                callback.onReservationsLoaded(reservas);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "❌ Error al cargar reservas del conductor: " + error.getMessage());
+                MyApp.logError(error.toException());
+                callback.onError("Error al cargar reservas: " + error.getMessage());
+            }
+        });
+    }
+    //refactorizar en otra clase solo para manejar el historial de reservas del pasajero
+    /**
+     * Método para cargar las reservas en la interfaz de historial de reservas del usuario pasajero
+     */
+    public void obtenerHistorialUsuario(String usuarioId, HistorialCallback callback) {
+        Log.d(TAG, "📋 Obteniendo historial de reservas para usuario: " + usuarioId);
+
+        // ✅ USANDO MyApp para obtener referencia
+        DatabaseReference ref = MyApp.getDatabaseReference("reservas");
+
+        ref.orderByChild("usuarioId").equalTo(usuarioId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(TAG, "✅ Historial recibido - Total reservas: " + dataSnapshot.getChildrenCount());
+                        List<Reserva> reservas = new ArrayList<>();
+                        int reservasProcesadas = 0;
+
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            Reserva reserva = snapshot.getValue(Reserva.class);
+                            if (reserva != null) {
+                                reservas.add(reserva);
+                                reservasProcesadas++;
+                                Log.d(TAG, "   - Reserva: " + reserva.getIdReserva() +
+                                        " | " + reserva.getOrigen() + " → " + reserva.getDestino() +
+                                        " | Estado: " + reserva.getEstadoReserva());
+                            }
+                        }
+
+                        Log.d(TAG, "📊 Historial procesado: " + reservasProcesadas + " reservas");
+
+                        // ✅ Registrar evento
+                        Map<String, Object> eventParams = new HashMap<>();
+                        eventParams.put("usuario_id", usuarioId);
+                        eventParams.put("reservas_encontradas", reservasProcesadas);
+                        MyApp.logEvent("historial_usuario_cargado", eventParams);
+
+                        callback.onHistorialCargado(reservas);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(TAG, "❌ Error al obtener historial: " + databaseError.getMessage());
+                        MyApp.logError(databaseError.toException());
+                        callback.onError(databaseError.getMessage());
+                    }
+                });
+    }
+
+    /**
+     * 🔥 NUEVO: Método simplificado para obtener la referencia usando MyApp
+     */
+    public DatabaseReference getDatabaseReference(String path) {
+        return MyApp.getDatabaseReference(path);
+    }
 }
