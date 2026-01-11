@@ -138,7 +138,7 @@
     <string name="estadisticas_especificas">Estadísticas específicas para cada itinerario programado</string>
     <string name="ruta_ida">Ruta de Ida</string>
     <string name="ruta_regreso">Ruta de Regreso</string>
-    <string name="proximo_horario">Próximo: %s</string>
+    <string name="proximo_horario">Próximo:</string>
 
     <!-- Textos específicos para rutas -->
     <string name="nataga_laplata">Nataga → La Plata</string>
