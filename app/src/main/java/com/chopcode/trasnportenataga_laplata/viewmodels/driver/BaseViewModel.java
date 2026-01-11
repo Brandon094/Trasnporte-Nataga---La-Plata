@@ -14,11 +14,11 @@ public abstract class BaseViewModel extends ViewModel {
     public LiveData<String> getErrorLiveData() { return errorLiveData; }
     public LiveData<Boolean> getLoadingLiveData() { return loadingLiveData; }
 
-    protected void setLoading(boolean loading) {
+    public void setLoading(boolean loading) {
         loadingLiveData.postValue(loading);
     }
 
-    protected void setError(String error) {
+    public void setError(String error) {
         Log.e(TAG, "Error: " + error);
         errorLiveData.postValue(error);
     }
