@@ -372,6 +372,7 @@
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:minHeight="200dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
                             app:cardBackgroundColor="@color/surface_1"
@@ -387,28 +388,13 @@
                                 android:orientation="vertical"
                                 android:padding="14dp">
 
-                                <!-- Encabezado de tarjeta -->
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center_vertical"
-                                    android:layout_marginBottom="10dp">
-
-                                    <ImageView
-                                        android:layout_width="20dp"
-                                        android:layout_height="20dp"
-                                        android:src="@drawable/ic_check"
-                                        android:tint="@color/success_600"
-                                        android:layout_marginEnd="8dp"/>
-
-                                    <TextView
-                                        style="@style/TextAppearance.MaterialComponents.Caption"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/confirmadas"
-                                        android:textColor="@color/text_secondary"/>
-                                </LinearLayout>
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:layout_gravity="center_horizontal"
+                                    android:src="@drawable/ic_checklist"
+                                    android:tint="@color/success_600"
+                                    android:layout_marginBottom="12dp"/>
 
                                 <!-- Valor principal -->
                                 <TextView
@@ -416,6 +402,7 @@
                                     style="@style/TextAppearance.MaterialComponents.Headline3"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
                                     android:text="@string/_0"
                                     android:textColor="@color/success_700"
                                     android:textStyle="bold"
@@ -424,8 +411,10 @@
                                 <!-- Descripción -->
                                 <TextView
                                     style="@style/TextAppearance.MaterialComponents.Body2"
+                                    android:textSize="12sp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
                                     android:text="@string/reservas_confirmadas_label"
                                     android:textAlignment="center"
                                     android:textColor="@color/text_secondary"
@@ -435,8 +424,10 @@
                                 <TextView
                                     android:id="@+id/tvInfoReservas"
                                     style="@style/TextAppearance.MaterialComponents.Caption"
+                                    android:textSize="11sp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
                                     android:text="@string/total_del_dia"
                                     android:textAlignment="center"
                                     android:textColor="@color/text_tertiary"
@@ -448,6 +439,7 @@
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:minHeight="200dp"
                             android:layout_weight="1"
                             android:layout_marginStart="8dp"
                             app:cardBackgroundColor="@color/surface_1"
@@ -463,28 +455,14 @@
                                 android:orientation="vertical"
                                 android:padding="14dp">
 
-                                <!-- Encabezado de tarjeta -->
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center_vertical"
-                                    android:layout_marginBottom="10dp">
-
-                                    <ImageView
-                                        android:layout_width="20dp"
-                                        android:layout_height="20dp"
-                                        android:src="@drawable/ic_seat"
-                                        android:tint="@color/primary_600"
-                                        android:layout_marginEnd="8dp"/>
-
-                                    <TextView
-                                        style="@style/TextAppearance.MaterialComponents.Caption"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/disponibilidad"
-                                        android:textColor="@color/text_secondary"/>
-                                </LinearLayout>
+                                <!-- Icono centrado y más grande -->
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:layout_gravity="center_horizontal"
+                                    android:src="@drawable/ic_seat"
+                                    android:tint="@color/primary_600"
+                                    android:layout_marginBottom="12dp"/>
 
                                 <!-- Valor principal -->
                                 <TextView
@@ -492,27 +470,30 @@
                                     style="@style/TextAppearance.MaterialComponents.Headline3"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
                                     android:text="@string/_26"
                                     android:textColor="@color/primary_700"
                                     android:textStyle="bold"
                                     android:layout_marginBottom="4dp"/>
 
-                                <!-- Descripción -->
+                                <!-- Descripción - CENTRADA -->
                                 <TextView
                                     style="@style/TextAppearance.MaterialComponents.Body2"
+                                    android:textSize="12sp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
                                     android:text="@string/asientos_disponibles_label"
                                     android:textAlignment="center"
                                     android:textColor="@color/text_secondary"
                                     android:layout_marginBottom="6dp"/>
 
-                                <!-- Información de capacidad -->
                                 <TextView
                                     android:id="@+id/tvInfoCapacidad"
                                     style="@style/TextAppearance.MaterialComponents.Caption"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
                                     android:text="@string/ocupacion_porcentaje"
                                     android:textAlignment="center"
                                     android:textColor="@color/text_tertiary"
@@ -586,12 +567,13 @@
                                 android:layout_height="1dp"
                                 android:layout_weight="1"/>
 
-                            <TextView
+                    <!--        <TextView
                                 style="@style/TextAppearance.MaterialComponents.Caption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/proximo_horario"
                                 android:textColor="@color/text_tertiary"/>
+                                -->
                         </LinearLayout>
 
                         <!-- Tarjetas de estadísticas de Ruta 1 -->
@@ -605,7 +587,7 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:id="@+id/cardRuta1Reservas"
                                 android:layout_width="0dp"
-                                android:layout_height="140dp"
+                                android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:layout_marginEnd="6dp"
                                 app:cardBackgroundColor="@color/info_50"
@@ -666,7 +648,7 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:id="@+id/cardRuta1Asientos"
                                 android:layout_width="0dp"
-                                android:layout_height="140dp"
+                                android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:layout_marginStart="6dp"
                                 app:cardBackgroundColor="@color/warning_50"
@@ -695,7 +677,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="12dp"
                                         android:layout_marginBottom="4dp"
-                                        android:text="14"
+                                        android:text="13"
                                         android:textColor="@color/warning_700"
                                         android:textStyle="bold"/>
 
@@ -765,12 +747,12 @@
                                 android:layout_height="1dp"
                                 android:layout_weight="1"/>
 
-                            <TextView
+                        <!--   <TextView
                                 style="@style/TextAppearance.MaterialComponents.Caption"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/proximo_horario"
-                                android:textColor="@color/text_tertiary"/>
+                                android:textColor="@color/text_tertiary"/> -->
                         </LinearLayout>
 
                         <!-- Tarjetas de estadísticas de Ruta 2 -->
@@ -784,7 +766,7 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:id="@+id/cardRuta2Reservas"
                                 android:layout_width="0dp"
-                                android:layout_height="140dp"
+                                android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:layout_marginEnd="6dp"
                                 app:cardBackgroundColor="@color/secondary_50"
@@ -845,7 +827,7 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:id="@+id/cardRuta2Asientos"
                                 android:layout_width="0dp"
-                                android:layout_height="140dp"
+                                android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:layout_marginStart="6dp"
                                 app:cardBackgroundColor="@color/warning_50"
@@ -874,7 +856,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="12dp"
                                         android:layout_marginBottom="4dp"
-                                        android:text="14"
+                                        android:text="13"
                                         android:textColor="@color/warning_700"
                                         android:textStyle="bold"/>
 

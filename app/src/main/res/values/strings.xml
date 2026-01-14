@@ -89,7 +89,7 @@
     <string name="detalles_viaje">Detalles del Viaje</string>
     <string name="fecha">Fecha</string>
     <string name="duracion">Duración</string>
-    <string name="asiento">Asiento</string>
+    <string name="asiento">Asiento seleccionado</string>
     <string name="total_pagar">Total a pagar</string>
     <string name="moneda_cop">COP</string>
     <string name="info_contacto">Información de Contacto</string>
@@ -130,9 +130,9 @@
     <string name="confirmadas">Confirmadas</string>
     <string name="disponibilidad">Disponibilidad</string>
     <string name="reservas_confirmadas_label">Reservas Confirmadas</string>
-    <string name="total_del_dia">Total del día • Actualizado ahora</string>
+    <string name="total_del_dia">Total del día \n• Actualizado ahora</string>
     <string name="asientos_disponibles_label">Asientos Disponibles</string>
-    <string name="ocupacion_porcentaje">%d asientos totales • Ocupación: %d%%</string>
+    <string name="ocupacion_porcentaje">%d asientos totales\n • Ocupación: %d%%</string>
 
     <!-- Desglose por ruta -->
     <string name="desglose_ruta">🛣️ Desglose por Ruta</string>
@@ -229,7 +229,8 @@
     <string name="no_disponible">N/A</string>
     <string name="reserva_procesada_exito">Reserva procesada exitosamente</string>
     <string name="debe_iniciar_sesion">Debe iniciar sesión primero</string>
-    <string name="ocupacion_porcentaje_detallada">%d asientos totales • Disponibles: %d • Ocupados: %d (%d%%)</string>
+    <string name="ocupacion_porcentaje_detallada">%d asientos totales \n• Disponibles: %d \n•
+        Ocupados: %d (%d%%)</string>
     <!-- ==================== -->
     <!-- VEHICLE & PROFILE -->
     <!-- ==================== -->
