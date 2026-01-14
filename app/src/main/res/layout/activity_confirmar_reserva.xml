@@ -162,7 +162,7 @@
                                 android:id="@+id/tvOrigen"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/nataga"
+                                android:text="@string/cargando"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/primary_700"
@@ -196,7 +196,7 @@
                                 android:id="@+id/tvDestino"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/laPlata"
+                                android:text="@string/cargando"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/primary_700"
@@ -262,9 +262,9 @@
                             android:layout_marginBottom="16dp">
 
                             <TextView
-                                android:layout_width="10dp"
-                                android:layout_height="8dp"
-                                android:text="@string/hora"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hora_salida"
                                 android:textColor="@color/text_tertiary"
                                 android:textSize="12sp" />
 
