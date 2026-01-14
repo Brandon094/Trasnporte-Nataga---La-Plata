@@ -24,7 +24,7 @@
     <string name="crearCuenta">Crear cuenta</string>
     <string name="nombreCompleto">Nombre completo</string>
     <string name="correo">Correo electrónico</string>
-    <string name="telefono">Teléfono (opcional)</string>
+    <string name="telefono">Teléfono</string>
     <string name="contraseña">Contraseña</string>
     <string name="confirmarContraseña">Confirmar contraseña</string>
     <string name="registrarse">Registrarse</string>
@@ -66,9 +66,9 @@
     <string name="infoReserva">Detalles de reserva</string>
     <string name="horaSalida">Hora de salida: %s</string>
     <string name="asientoReservado">Asiento: %s</string>
-    <string name="precio">Precio: $%s</string>
-    <string name="origen">Origen: %s</string>
-    <string name="destino">Destino: %s</string>
+    <string name="precio">Precio:</string>
+    <string name="origen">Origen:</string>
+    <string name="destino">Destino:</string>
     <string name="metodoPago">Método de pago:</string>
     <string name="estadoReserva">Estado: %s</string>
     <string name="reservasPendientes">Reservas por confirmar</string>
@@ -78,6 +78,7 @@
     <string name="editar_rapido">Editar</string>
     <string name="hora">--:--</string>
     <string name="am_pm">-:-</string>
+    <string name="hora_salida">Hora de salida</string>
     <string name="seleccionado">Seleccionado</string>
 
     <!-- ==================== -->
