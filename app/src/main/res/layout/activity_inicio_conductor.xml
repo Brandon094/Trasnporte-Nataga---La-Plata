@@ -171,7 +171,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/sin_reservas_activas"
-                    style="@style/TextAppearance.MaterialComponents.Body1"
+                    style="@style/TextAppearance.MaterialComponents.Body2"
                     android:gravity="center"
                     android:padding="32dp"
                     android:visibility="gone"/>
@@ -365,12 +365,13 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center"
-                        android:layout_marginBottom="12dp">
+                        android:layout_marginBottom="12dp"
+                        android:paddingHorizontal="4dp">
 
                         <!-- TARJETA DE RESERVAS CONFIRMADAS -->
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
-                            android:layout_height="160dp"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
                             app:cardBackgroundColor="@color/surface_1"
@@ -384,7 +385,7 @@
                                 android:layout_height="match_parent"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="16dp">
+                                android:padding="14dp">
 
                                 <!-- Encabezado de tarjeta -->
                                 <LinearLayout
@@ -392,7 +393,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="horizontal"
                                     android:gravity="center_vertical"
-                                    android:layout_marginBottom="12dp">
+                                    android:layout_marginBottom="10dp">
 
                                     <ImageView
                                         android:layout_width="20dp"
@@ -415,7 +416,7 @@
                                     style="@style/TextAppearance.MaterialComponents.Headline3"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="0"
+                                    android:text="@string/_0"
                                     android:textColor="@color/success_700"
                                     android:textStyle="bold"
                                     android:layout_marginBottom="4dp"/>
@@ -428,7 +429,7 @@
                                     android:text="@string/reservas_confirmadas_label"
                                     android:textAlignment="center"
                                     android:textColor="@color/text_secondary"
-                                    android:layout_marginBottom="8dp"/>
+                                    android:layout_marginBottom="6dp"/>
 
                                 <!-- Información adicional -->
                                 <TextView
@@ -446,7 +447,7 @@
                         <!-- TARJETA DE ASIENTOS DISPONIBLES -->
                         <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
-                            android:layout_height="160dp"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="8dp"
                             app:cardBackgroundColor="@color/surface_1"
@@ -460,7 +461,7 @@
                                 android:layout_height="match_parent"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="16dp">
+                                android:padding="14dp">
 
                                 <!-- Encabezado de tarjeta -->
                                 <LinearLayout
@@ -468,7 +469,7 @@
                                     android:layout_height="wrap_content"
                                     android:orientation="horizontal"
                                     android:gravity="center_vertical"
-                                    android:layout_marginBottom="12dp">
+                                    android:layout_marginBottom="10dp">
 
                                     <ImageView
                                         android:layout_width="20dp"
@@ -491,7 +492,7 @@
                                     style="@style/TextAppearance.MaterialComponents.Headline3"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="28"
+                                    android:text="@string/_26"
                                     android:textColor="@color/primary_700"
                                     android:textStyle="bold"
                                     android:layout_marginBottom="4dp"/>
@@ -504,7 +505,7 @@
                                     android:text="@string/asientos_disponibles_label"
                                     android:textAlignment="center"
                                     android:textColor="@color/text_secondary"
-                                    android:layout_marginBottom="8dp"/>
+                                    android:layout_marginBottom="6dp"/>
 
                                 <!-- Información de capacidad -->
                                 <TextView
